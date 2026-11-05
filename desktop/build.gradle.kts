@@ -26,6 +26,7 @@ dependencies {
 	implementation("org.jetbrains.compose.ui:ui:$composeVersion")
 	implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
 	implementation(libs.kotlinx.coroutines.swing)
+	implementation(libs.kotlinx.serialization.json)
 	implementation(libs.coil.compose)
 
 	testImplementation(kotlin("test"))
