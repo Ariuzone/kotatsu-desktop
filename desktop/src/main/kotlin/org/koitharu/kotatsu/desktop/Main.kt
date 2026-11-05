@@ -9,6 +9,7 @@
 package org.koitharu.kotatsu.desktop
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -64,6 +67,7 @@ private fun MainScreen() {
 	var selected by rememberSaveable { mutableStateOf(NavItem.EXPLORE) }
 	// Pile de navigation : écran source actuel + manga sélectionné (écran détails)
 	var selectedManga by remember { mutableStateOf<org.koitharu.kotatsu.parsers.model.Manga?>(null) }
+	var showSettings by remember { mutableStateOf(false) }
 	var readerRequest by remember {
 		mutableStateOf<Pair<org.koitharu.kotatsu.parsers.model.Manga, String>?>(null)
 	}
@@ -72,10 +76,11 @@ private fun MainScreen() {
 		NavigationRail(modifier = Modifier.align(Alignment.CenterStart)) {
 			for (item in NavItem.default) {
 				NavigationRailItem(
-					selected = selected == item && selectedManga == null,
+					selected = selected == item && selectedManga == null && !showSettings,
 					onClick = {
 						selected = item
 						selectedManga = null
+						showSettings = false
 					},
 					icon = {
 						Icon(
@@ -86,6 +91,15 @@ private fun MainScreen() {
 					label = { Text(item.title) },
 				)
 			}
+			// Paramètres : dans l'app d'origine ils sont dans le menu du drawer principal ;
+			// sur desktop ils sont accessibles en bas du rail (divergence documentée).
+			Spacer(modifier = Modifier.weight(1f))
+			NavigationRailItem(
+				selected = showSettings,
+				onClick = { showSettings = true },
+				icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
+				label = { Text("Settings") },
+			)
 		}
 		// Volet de contenu
 		Surface(
@@ -94,7 +108,12 @@ private fun MainScreen() {
 				.padding(start = 80.dp),
 			color = MaterialTheme.colorScheme.surface,
 		) {
-			val manga = selectedManga
+			if (showSettings) {
+				org.koitharu.kotatsu.desktop.ui.screens.settings.AppearanceSettingsScreen(
+					settings = DesktopSettings.getInstance(),
+				)
+			} else {
+				val manga = selectedManga
 			if (manga != null) {
 				org.koitharu.kotatsu.desktop.ui.screens.details.DetailsScreen(
 					manga = manga,
@@ -115,6 +134,7 @@ private fun MainScreen() {
 							},
 						)
 					else -> PlaceholderScreen(selected)
+				}
 				}
 			}
 		}
