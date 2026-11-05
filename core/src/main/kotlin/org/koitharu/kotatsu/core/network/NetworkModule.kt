@@ -27,7 +27,7 @@ class NetworkModule(
 	private val settings: AppSettings,
 	cacheDir: File?,
 	cookieStore: KeyValueStore,
-	cookieJar: MutableCookieJar? = null,
+	providedCookieJar: MutableCookieJar? = null,
 	private val cloudFlareBypassResolver: CloudFlareBypassResolver? = CloudFlareBypassStub,
 	private val repositoryFactoryProvider: (() -> org.koitharu.kotatsu.core.parser.MangaRepository.Factory)? = null,
 	defaultUserAgentProvider: () -> String = { UserAgents.FIREFOX_MOBILE },
@@ -35,7 +35,7 @@ class NetworkModule(
 
 	val proxyProvider: ProxyProvider = ProxyProvider(settings)
 
-	val cookieJar: MutableCookieJar = cookieJar ?: FileCookieJar(cookieStore)
+	val cookieJar: MutableCookieJar = providedCookieJar ?: FileCookieJar(cookieStore)
 
 	val cache: Cache? = cacheDir?.let { dir ->
 		dir.mkdirs()
@@ -53,7 +53,7 @@ class NetworkModule(
 		connectTimeout(20, TimeUnit.SECONDS)
 		readTimeout(60, TimeUnit.SECONDS)
 		writeTimeout(20, TimeUnit.SECONDS)
-		cookieJar(cookieJar as CookieJar)
+		cookieJar(cookieJar)
 		proxySelector(proxyProvider.selector)
 		proxyAuthenticator(proxyProvider.authenticator)
 		dns(DoHManager(cache, settings))
