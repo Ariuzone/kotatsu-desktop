@@ -1,0 +1,31 @@
+/*
+ * Fichier modifié — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
+ * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation JVM/desktop.
+ */
+package org.koitharu.kotatsu.core.network
+
+import okhttp3.CacheControl
+
+object CommonHeaders {
+
+	const val REFERER = "Referer"
+	const val USER_AGENT = "User-Agent"
+	const val ACCEPT = "Accept"
+	const val CONTENT_TYPE = "Content-Type"
+	const val CONTENT_DISPOSITION = "Content-Disposition"
+	const val COOKIE = "Cookie"
+	const val CONTENT_ENCODING = "Content-Encoding"
+	const val ACCEPT_ENCODING = "Accept-Encoding"
+	const val AUTHORIZATION = "Authorization"
+	const val CACHE_CONTROL = "Cache-Control"
+	const val PROXY_AUTHORIZATION = "Proxy-Authorization"
+	const val RETRY_AFTER = "Retry-After"
+	const val LAST_MODIFIED = "Last-Modified"
+	const val IF_MODIFIED_SINCE = "If-Modified-Since"
+	const val MANGA_SOURCE = "X-Manga-Source"
+
+	val CACHE_CONTROL_NO_STORE: CacheControl
+		get() = CacheControl.Builder().noStore().build()
+
+	const val DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz"
+}
