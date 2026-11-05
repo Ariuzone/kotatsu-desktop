@@ -36,6 +36,12 @@ compose.desktop {
 	application {
 		mainClass = "org.koitharu.kotatsu.desktop.MainKt"
 
+		buildTypes {
+			release.proguard {
+				configurationFiles.from(project.file("compose-desktop.pro"))
+			}
+		}
+
 		// Métadonnées dérivées de l'app d'origine (versionName 9.8.6)
 		group = "org.koitharu.kotatsu"
 		version = "9.8.6"
