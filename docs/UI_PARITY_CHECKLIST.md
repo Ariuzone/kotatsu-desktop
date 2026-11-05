@@ -5,15 +5,16 @@ comparée rangée dans `docs/ui-parity/`), référence utilisée.
 
 | Écran | Référence (capture/fichier d'origine) | Statut | Preuve |
 |---|---|---|---|
-| Shell principal (rail de navigation) | `activity_main.xml` + ComposeThemeBridge | à faire | — |
-| Explorateur / Discover | `fragment_discover.xml`, `fragment_explore.xml` | à faire | — |
-| Liste de mangas (grille/liste) | `fragment_list.xml`, `item_manga_grid.xml` | à faire | — |
-| Recherche multi-sources | `activity_search.xml`, `fragment_filter_header.xml` | à faire | — |
-| Détails du manga | `activity_details.xml`, `layout_details_table.xml` | à faire | — |
-| Lecteur (pager) | `fragment_reader_pager.xml` | à faire | — |
-| Lecteur (webtoon) | `fragment_reader_webtoon.xml` | à faire | — |
-| Favoris (catégories + liste) | `fragment_favourites_container.xml` | à faire | — |
-| Historique | `fragment_list_simple.xml` (HistoryListFragment) | à faire | — |
-| Téléchargements | `activity_downloads.xml` | à faire | — |
-| Paramètres | `activity_settings.xml` + pref_*.xml | à faire | — |
-| Thème clair / sombre / AMOLED | `colors_kotatsu.xml`, `values-night`, Amoled overlay | à faire | — |
+| Shell principal (rail de navigation) | `activity_main.xml` + tenInchScreenshots/1.png | **écart mineur** : structure identique (rail icônes+libellés à gauche, volet contenu) ; libellés exacts (« Explore », « History », « Favorites »…) ; à faire : barre de recherche en haut du volet | `ui-parity/desktop-explore.png` |
+| Explorateur (sources par langue) | `fragment_explore.xml`, `item_explore_source_grid.xml` | **écart mineur** : grille de cartes sources groupées par langue conforme ; icône placeholder au lieu de la favicon des sites | `ui-parity/desktop-explore.png` |
+| Liste de mangas (grille) | `fragment_list.xml`, `item_manga_grid.xml` | **implémenté** (MangaGrid : marge 2dp/padding 6dp, coins 12dp, titre 2 lignes) ; écart mineur : badges/anneaux de progression non encore portés | — |
+| Liste de mangas (liste) | `item_manga_list.xml` | **implémenté** (MangaList : couverture 40dp coins 4dp, titre+sous-titre) | — |
+| Recherche multi-sources | `activity_search.xml` | implémenté (hint exact, débounce 500 ms) ; écart mineur : suggestions de recherche non portées | — |
+| Détails du manga | `activity_details.xml` | implémenté (couverture + fond flouté, titre, auteur, tags, description repliable, chapitres, barre Read/Favorite/Download) ; écart mineur : chips favori/communauté/scrobbling non portés | — |
+| Lecteur (pager) | `fragment_reader_pager.xml` | implémenté (pager + zones de tap + clavier + overlay contrôles) ; écart mineur : menu de config lecteur non porté | — |
+| Lecteur (webtoon) | `fragment_reader_webtoon.xml` | implémenté (défilement vertical continu) | — |
+| Favoris (catégories + liste) | `fragment_favourites_container.xml` | en cours (lot sous-agent) | — |
+| Historique | `fragment_list_simple.xml` + tenInchScreenshots/1.png | en cours (lot sous-agent) ; référence analysée : chips de filtres + groupement par date + anneaux de progression à reproduire | — |
+| Téléchargements | `activity_downloads.xml` | en cours (lot sous-agent) | — |
+| Paramètres (apparence) | pref_appearance, AppearanceSettingsFragment | implémenté (thème Follow system/Light/Dark, AMOLED, 9 schémas d'accent avec noms exacts) ; écart mineur : disposition « liste de préférences » simplifiée | — |
+| Thème clair / sombre / AMOLED | `colors_kotatsu.xml`, `values-night/*`, overlay Amoled | **implémenté** : palettes générées à l'identique (10 schémas clair/sombre + AMOLED #000000) | Palettes.kt |
