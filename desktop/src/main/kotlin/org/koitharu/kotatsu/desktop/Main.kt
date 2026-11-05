@@ -62,13 +62,21 @@ private fun kotatsuIcon(): Painter = painterResource("kotatsu_256.png")
 @Composable
 private fun MainScreen() {
 	var selected by rememberSaveable { mutableStateOf(NavItem.EXPLORE) }
+	// Pile de navigation : écran source actuel + manga sélectionné (écran détails)
+	var selectedManga by remember { mutableStateOf<org.koitharu.kotatsu.parsers.model.Manga?>(null) }
+	var readerRequest by remember {
+		mutableStateOf<Pair<org.koitharu.kotatsu.parsers.model.Manga, String>?>(null)
+	}
 	Box(modifier = Modifier.fillMaxSize()) {
 		// Rail de navigation latéral (comme l'app d'origine en mode tablette/desktop)
 		NavigationRail(modifier = Modifier.align(Alignment.CenterStart)) {
 			for (item in NavItem.default) {
 				NavigationRailItem(
-					selected = selected == item,
-					onClick = { selected = item },
+					selected = selected == item && selectedManga == null,
+					onClick = {
+						selected = item
+						selectedManga = null
+					},
 					icon = {
 						Icon(
 							imageVector = if (selected == item) item.filledIcon else item.outlinedIcon,
@@ -79,20 +87,58 @@ private fun MainScreen() {
 				)
 			}
 		}
-		// Volet de contenu — remplacé par les écrans réels dans le lot L4b
+		// Volet de contenu
 		Surface(
 			modifier = Modifier
 				.fillMaxSize()
 				.padding(start = 80.dp),
 			color = MaterialTheme.colorScheme.surface,
 		) {
-			Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-				Text(
-					text = selected.title,
-					style = MaterialTheme.typography.headlineMedium,
-					color = MaterialTheme.colorScheme.onSurface,
+			val manga = selectedManga
+			if (manga != null) {
+				org.koitharu.kotatsu.desktop.ui.screens.details.DetailsScreen(
+					manga = manga,
+					chapters = emptyList(), // TODO: brancher les chapitres réels (fusion L3)
+					isFavourite = false,
+					onBackClick = { selectedManga = null },
+					onChapterClick = { readerRequest = manga to "Chapter" },
+					onFavouriteClick = {},
+					onDownloadClick = {},
+					onReadClick = { readerRequest = manga to "Chapter" },
 				)
+			} else {
+				when (selected) {
+					NavItem.EXPLORE ->
+						org.koitharu.kotatsu.desktop.ui.screens.explore.ExploreScreen(
+							onSourceClick = { source ->
+								// TODO: catalogue de la source (fusion L3) — placeholder détail
+							},
+						)
+					else -> PlaceholderScreen(selected)
+				}
 			}
 		}
+	}
+	// Fenêtre lecteur (comme ReaderActivity d'origine : une fenêtre dédiée)
+	val request = readerRequest
+	if (request != null) {
+		org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderContent(
+			title = request.first.title,
+			chapterTitle = request.second,
+			pageUrls = emptyList(), // TODO: pages réelles (fusion L3)
+			mode = org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderMode.PAGER,
+			onClose = { readerRequest = null },
+		)
+	}
+}
+
+@Composable
+private fun PlaceholderScreen(item: NavItem) {
+	Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+		Text(
+			text = item.title,
+			style = MaterialTheme.typography.headlineMedium,
+			color = MaterialTheme.colorScheme.onSurface,
+		)
 	}
 }
