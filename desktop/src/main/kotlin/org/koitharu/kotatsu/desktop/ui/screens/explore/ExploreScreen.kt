@@ -42,6 +42,7 @@ private val EXPLORE_CORNER = 12.dp
 @Composable
 public fun ExploreScreen(
 	onSourceClick: (MangaParserSource) -> Unit,
+	domainOf: (MangaParserSource) -> String? = { null },
 	modifier: Modifier = Modifier,
 ) {
 	// Sources regroupées par langue, triées comme l'app d'origine (ExploreFragment) ;
@@ -72,7 +73,11 @@ public fun ExploreScreen(
 				)
 			}
 			items(sources, key = { it.name }) { source ->
-				SourceCard(source = source, onClick = { onSourceClick(source) })
+				SourceCard(
+					source = source,
+					faviconUrl = domainOf(source)?.let { "https://$it/favicon.ico" },
+					onClick = { onSourceClick(source) },
+				)
 			}
 		}
 	}
@@ -87,7 +92,7 @@ private fun localeHeader(locale: String): String = if (locale == "multi") {
 }
 
 @Composable
-private fun SourceCard(source: MangaParserSource, onClick: () -> Unit) {
+private fun SourceCard(source: MangaParserSource, faviconUrl: String?, onClick: () -> Unit) {
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -102,11 +107,19 @@ private fun SourceCard(source: MangaParserSource, onClick: () -> Unit) {
 				.background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(EXPLORE_CORNER)),
 			contentAlignment = Alignment.Center,
 		) {
-			Icon(
-				imageVector = Icons.Filled.Image,
-				contentDescription = source.title,
-				tint = MaterialTheme.colorScheme.onSurfaceVariant,
-			)
+			if (faviconUrl != null) {
+				coil3.compose.AsyncImage(
+					model = faviconUrl,
+					contentDescription = source.title,
+					modifier = Modifier.fillMaxSize().padding(24.dp),
+				)
+			} else {
+				Icon(
+					imageVector = Icons.Filled.Image,
+					contentDescription = source.title,
+					tint = MaterialTheme.colorScheme.onSurfaceVariant,
+				)
+			}
 		}
 		Text(
 			text = source.title,

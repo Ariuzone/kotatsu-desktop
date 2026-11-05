@@ -110,6 +110,11 @@ public class AppContainer private constructor(appDir: File) {
 		}.awaitAll().flatten()
 	}
 
+	/** Domaine d'une source parser (pour les favicons), null si indisponible. */
+	public fun domainOf(source: MangaSource): String? = runCatching {
+		(source as? MangaParserSource)?.let { loaderContext.newParserInstance(it).domain }
+	}.getOrNull()
+
 	public companion object {
 
 		@Volatile

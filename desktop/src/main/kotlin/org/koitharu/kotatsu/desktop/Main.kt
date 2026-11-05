@@ -201,13 +201,14 @@ private fun MainScreen(container: AppContainer) {
 					)
 				}
 
-				else -> when (selected) {
-					NavItem.EXPLORE ->
-						org.koitharu.kotatsu.desktop.ui.screens.explore.ExploreScreen(
-							onSourceClick = { selectedSource = it },
-						)
-					else -> PlaceholderScreen(selected)
-				}
+					else -> when (selected) {
+						NavItem.EXPLORE ->
+							org.koitharu.kotatsu.desktop.ui.screens.explore.ExploreScreen(
+								onSourceClick = { selectedSource = it },
+								domainOf = { container.domainOf(it) },
+							)
+						else -> PlaceholderScreen(selected)
+					}
 			}
 		}
 	}
