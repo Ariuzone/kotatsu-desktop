@@ -10,4 +10,5 @@ indispensables (souris, clavier, fenêtre, tray).
 | 2 | Pas de pull-to-refresh dans les listes : actualisation par bouton/F5 | interaction souris ; l'app desktop reste fidèle sinon | prévu |
 | 3 | Résolution Cloudflare par WebView indisponible → sources protégées marquées « indisponible sur desktop » | pas de WebView JVM ; navigateur externe possible plus tard (P3+) | documenté |
 | 4 | Widgets d'écran d'accueil Android (shelf/recent) non portés | concept inexistant sur Windows | documenté |
+| 6 | Recherche accessible par **Ctrl+F** (au lieu du bouton des barres d'outils Android) ; paramètres en bas du rail (au lieu du menu du drawer) | adaptation desktop indispensable : pas de drawer ni de barre d'outils tactile | implémenté |
 | 5 | Les gestes du lecteur (swipe, double-tap) sont doublés par la souris (clic molette, molette) et le clavier (flèches) sans changer l'apparence | adaptation desktop indispensable (exigence §4 du cahier des charges) | prévu |

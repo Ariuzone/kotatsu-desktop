@@ -34,6 +34,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -60,9 +66,9 @@ fun main() = application {
 			mode = settings.themeMode.value,
 			amoled = settings.isAmoled.value,
 		) {
-			Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-				MainScreen(container)
-			}
+		Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+			MainScreen(container)
+		}
 		}
 	}
 }
@@ -76,9 +82,27 @@ private fun MainScreen(container: AppContainer) {
 	var selectedSource by remember { mutableStateOf<MangaParserSource?>(null) }
 	var selectedManga by remember { mutableStateOf<Manga?>(null) }
 	var showSettings by remember { mutableStateOf(false) }
+	var showSearch by remember { mutableStateOf(false) }
+	var searchResults by remember { mutableStateOf<List<Manga>>(emptyList()) }
 	var readerRequest by remember { mutableStateOf<MangaChapter?>(null) }
 
-	Box(modifier = Modifier.fillMaxSize()) {
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.onKeyEvent { event ->
+				// Ctrl+F : recherche multi-sources (équivalent du bouton recherche des
+				// barres d'outils de l'app d'origine)
+				if (event.type == androidx.compose.ui.input.key.KeyEventType.KeyUp &&
+					event.key == androidx.compose.ui.input.key.Key.F &&
+					event.isCtrlPressed
+				) {
+					showSearch = true
+					true
+				} else {
+					false
+				}
+			},
+	) {
 		// Rail de navigation latéral (comme l'app d'origine en mode tablette/desktop)
 		NavigationRail(modifier = Modifier.align(Alignment.CenterStart)) {
 			for (item in NavItem.default) {
@@ -121,6 +145,18 @@ private fun MainScreen(container: AppContainer) {
 					org.koitharu.kotatsu.desktop.ui.screens.settings.AppearanceSettingsScreen(
 						settings = DesktopSettings.getInstance(),
 					)
+
+				showSearch -> org.koitharu.kotatsu.desktop.ui.screens.search.SearchScreen(
+					results = searchResults,
+					onQuery = { query ->
+						container.searchAll(query).also { searchResults = it }
+					},
+					onMangaClick = {
+						showSearch = false
+						selectedManga = it
+					},
+					onBackClick = { showSearch = false },
+				)
 
 				selectedManga != null -> {
 					val seed = selectedManga!!

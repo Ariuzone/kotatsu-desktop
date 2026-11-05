@@ -11,6 +11,8 @@ package org.koitharu.kotatsu.desktop
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import org.koitharu.kotatsu.core.cache.MemoryContentCache
 import org.koitharu.kotatsu.core.network.NetworkModule
 import org.koitharu.kotatsu.core.parser.MangaLoaderContextImpl
@@ -87,6 +89,26 @@ public class AppContainer private constructor(appDir: File) {
 
 	public suspend fun getPageUrl(page: MangaPage): String =
 		repositoryFactory.create(page.source).getPageUrl(page)
+
+	/**
+	 * Recherche multi-sources, comme SearchActivity de l'app d'origine : requête envoyée
+	 * en parallèle aux sources activées (ici : les sources non « broken », triées par nom),
+	 * résultats concaténés.
+	 */
+	public suspend fun searchAll(query: String, maxSources: Int = 8): List<Manga> {
+		if (query.isBlank()) return emptyList()
+		val sources = MangaParserSource.entries
+			.filterNot { it.isBroken }
+			.sortedBy { it.title }
+			.take(maxSources)
+		val filter = org.koitharu.kotatsu.parsers.model.MangaListFilter(query = query)
+		return sources.map { source ->
+			scope.async {
+				runCatching { repositoryFactory.create(source).getList(0, SortOrder.RELEVANCE, filter) }
+					.getOrDefault(emptyList())
+			}
+		}.awaitAll().flatten()
+	}
 
 	public companion object {
 
