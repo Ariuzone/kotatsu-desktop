@@ -42,6 +42,16 @@ public class AppContainer private constructor(appDir: File) {
 
 	private val contentCache = MemoryContentCache()
 
+	/** Base Room (schéma v28 identique à l'app Android), dans %APPDATA%/Kotatsu. */
+	public val database: org.koitharu.kotatsu.core.db.MangaDatabase by lazy {
+		org.koitharu.kotatsu.core.db.createMangaDatabase(File(appDir, "kotatsu.db"))
+	}
+
+	/** Favoris + historique (DAO Room portés). */
+	public val library: org.koitharu.kotatsu.desktop.library.LibraryRepository by lazy {
+		org.koitharu.kotatsu.desktop.library.LibraryRepository(database)
+	}
+
 	public val repositoryFactory: MangaRepository.Factory
 
 	init {

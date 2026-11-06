@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,6 +50,8 @@ import org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderContent
 import org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderMode
 import org.koitharu.kotatsu.desktop.ui.settings.DesktopSettings
 import org.koitharu.kotatsu.desktop.ui.theme.KotatsuTheme
+import kotlinx.coroutines.launch
+import org.koitharu.kotatsu.core.db.entity.toManga
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
@@ -84,7 +87,8 @@ private fun MainScreen(container: AppContainer) {
 	var showSettings by remember { mutableStateOf(false) }
 	var showSearch by remember { mutableStateOf(false) }
 	var searchResults by remember { mutableStateOf<List<Manga>>(emptyList()) }
-	var readerRequest by remember { mutableStateOf<MangaChapter?>(null) }
+	var readerRequest by remember { mutableStateOf<Pair<Manga, MangaChapter>?>(null) }
+	val scope = rememberCoroutineScope()
 
 	Box(
 		modifier = Modifier
@@ -177,10 +181,12 @@ private fun MainScreen(container: AppContainer) {
 						chapters = chapters.map { it.name },
 						isFavourite = false,
 						onBackClick = { selectedManga = null },
-						onChapterClick = { index -> chapters.getOrNull(index)?.let { readerRequest = it } },
+						onChapterClick = { index ->
+							chapters.getOrNull(index)?.let { readerRequest = (details ?: seed) to it }
+						},
 						onFavouriteClick = {},
 						onDownloadClick = {},
-						onReadClick = { chapters.firstOrNull()?.let { readerRequest = it } },
+						onReadClick = { chapters.firstOrNull()?.let { readerRequest = (details ?: seed) to it } },
 					)
 					if (error != null) {
 						LaunchedEffect(error) {
@@ -207,22 +213,96 @@ private fun MainScreen(container: AppContainer) {
 								onSourceClick = { selectedSource = it },
 								domainOf = { container.domainOf(it) },
 							)
+
+						NavItem.HISTORY -> {
+							// Historique réel depuis la DB Room (HistoryDao)
+							var historyItems by remember {
+								mutableStateOf<List<org.koitharu.kotatsu.desktop.ui.screens.history.HistoryItem>>(emptyList())
+							}
+							LaunchedEffect(Unit) {
+								val library = container.library
+								historyItems = library.getHistory().mapNotNull { row ->
+									val (manga, history) = library.run { row.toDisplay() }
+									org.koitharu.kotatsu.desktop.ui.screens.history.HistoryItem(
+										manga = manga,
+										chapter = null, // chapitre résolu au clic via getDetails
+										percent = history.percent,
+										updatedAt = java.time.Instant.ofEpochMilli(history.updatedAt),
+									)
+								}
+							}
+							org.koitharu.kotatsu.desktop.ui.screens.history.HistoryScreen(
+								historyItems = historyItems,
+								onMangaClick = { selectedManga = it },
+								onContinueClick = { item ->
+									// « Continue reading » : retrouve le chapitre courant via la source
+									scope.launch {
+										val details = runCatching { container.getDetails(item.manga) }.getOrNull()
+										val chapter = details?.chapters?.firstOrNull()
+										if (chapter != null) readerRequest = item.manga to chapter
+									}
+								},
+							)
+						}
+
+						NavItem.FAVORITES -> {
+							// Favoris réels depuis la DB Room (FavouritesDao + catégories)
+							var categories by remember {
+								mutableStateOf<List<org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouriteCategory>>(emptyList())
+							}
+							LaunchedEffect(Unit) {
+								val library = container.library
+								val all = library.getFavourites()
+								val cats = library.getFavouriteCategories()
+								categories = buildList {
+									add(
+										org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouriteCategory(
+											id = -1L,
+											title = null, // « All favorites » comme FavouritesTabConfigurationStrategy
+											count = all.size,
+										),
+									)
+									for (c in cats) {
+										add(
+											org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouriteCategory(
+												id = c.categoryId.toLong(),
+												title = c.title,
+												count = all.count { f -> f.favourite.categoryId == c.categoryId.toLong() },
+											),
+										)
+									}
+								}
+							}
+							org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouritesScreen(
+								categories = categories,
+								fetchManga = { category ->
+									container.library.getFavourites()
+										.filter { category.id == -1L || it.favourite.categoryId.toLong() == category.id }
+										.map { it.manga.toManga(emptySet(), chapters = null) }
+								},
+								onMangaClick = { selectedManga = it },
+							)
+						}
+
 						else -> PlaceholderScreen(selected)
 					}
 			}
 		}
 	}
-	// Fenêtre lecteur (comme ReaderActivity d'origine : une fenêtre dédiée)
-	val chapter = readerRequest
-	if (chapter != null) {
-		var pageUrls by remember(chapter) { mutableStateOf<List<String>>(emptyList()) }
-		LaunchedEffect(chapter) {
+	// Fenêtre lecteur (comme ReaderActivity d'origine : une fenêtre dédiée) ;
+	// l'ouverture enregistre la progression dans l'historique (HistoryDao, comme l'app d'origine)
+	val request = readerRequest
+	if (request != null) {
+		val (readerManga, chapter) = request
+		var pageUrls by remember(request) { mutableStateOf<List<String>>(emptyList()) }
+		LaunchedEffect(request) {
+			container.library.saveProgress(readerManga, chapter, page = 0)
 			val pages = container.getPages(chapter)
 			pageUrls = pages.map { container.getPageUrl(it) }
 		}
 		ReaderContent(
-			title = chapter.name,
-			chapterTitle = chapter.name,
+			title = readerManga.title,
+			chapterTitle = chapter.title ?: chapter.name,
 			pageUrls = pageUrls,
 			mode = ReaderMode.PAGER,
 			onClose = { readerRequest = null },
