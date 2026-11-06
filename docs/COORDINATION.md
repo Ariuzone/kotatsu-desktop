@@ -11,7 +11,7 @@
 | L4c écrans History/Favorites/Downloads | sous-agent C | **fini, fusionné** + câblé à la DB réelle | agent/ui-screens | fusion 04819e8 | — | écran Downloads à brancher au lot P2 |
 | P2 téléchargements + CBZ local | sous-agent D puis principal (quota épuisé, travail repris) | **fini, fusionné** — 12/12 tests core verts, câblé (rail + enqueue depuis Détails + dépôt local dans la fabrique) | agent/downloads | fusion dc0faf7 | — | — |
 | P3 tracker + verrouillage | sous-agent E | **fini, fusionné** — 14/14 tests verts, câblé (Tray + ProtectScreen) | agent/tracker | fusion | — | — |
-| L5 packaging/CI | principal | **fini** (app-image + Kotatsu-9.8.6.exe ; install locale bloquée par UAC → CI) | main | 1a2e796 | — | rebuild final après fusions |
+| L5 packaging/CI | principal | **fini** — installateur final Kotatsu-9.8.6.exe (94 Mo, JDK embarqué, WiX 3 portable) ; fix ProGuard keep Room/sqlite vérifié par lancement de l'app packagée (DB v28 créée) ; install locale bloquée par UAC → CI | main | — | — | — |
 | Signets (UI) | principal | **fini, branché** | main | — | — | — |
 | L6 docs | principal | en cours | main | — | — | rapport final |
 
