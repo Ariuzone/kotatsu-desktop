@@ -110,11 +110,34 @@ class MangaLoaderContextImpl(
 	 * uploads.mangadex.org -> MANGADEX). Index domaine -> source construit paresseusement
 	 * à partir des domaines prédéfinis des parsers. Sous-domaines acceptés
 	 * (uploads.mangadex.org correspond à mangadex.org).
+	 * Les CDN d'images hébergés hors du domaine de la source passent par [CDN_HOST_ALIASES].
 	 */
 	fun sourceForDomain(host: String): MangaParserSource? {
 		val normalized = host.lowercase(Locale.ROOT).removePrefix("www.")
 		return domainIndex[normalized]
 			?: domainIndex.entries.firstOrNull { normalized.endsWith(".${it.key}") }?.value
+			?: cdnAliases[normalized]
+			?: cdnAliases.entries.firstOrNull { normalized.endsWith(".${it.key}") }?.value
+	}
+
+	/**
+	 * CDN d'images hébergés sur un domaine tiers, non déductible du domaine de la source.
+	 * Sans entrée ici, ces covers partent avec l'User-Agent par défaut et sans Referer,
+	 * et certains CDN répondent 403 (Naver exige le Referer webtoons.com ; CloudFlare
+	 * bloque fmcdn.mangahere.com et cdn1.comicknew.pictures sans l'identité du parser).
+	 */
+	private val cdnAliases: Map<String, MangaParserSource> by lazy {
+		val aliases = mapOf(
+			// Covers Comick, derrière CloudFlare (UA parser + Referer comick.live requis)
+			"comicknew.pictures" to "COMICK_FUN",
+			// fmcdn.mangahere.com : héberge les covers sous .com alors que la source vit en .cc
+			"mangahere.com" to "MANGAHERE",
+			// CDN Naver des covers Webtoons (403 sans Referer https://webtoons.com/)
+			"pstatic.net" to "WEBTOONS_EN",
+		)
+		aliases.mapValues { (_, name) -> MangaParserSource.entries.firstOrNull { it.name == name } }
+			.filterValues { it != null }
+			.mapValues { it.value!! }
 	}
 
 	private val domainIndex: Map<String, MangaParserSource> by lazy {
