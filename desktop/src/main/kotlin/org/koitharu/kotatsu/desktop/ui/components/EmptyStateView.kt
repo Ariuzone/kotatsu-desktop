@@ -1,15 +1,17 @@
 /*
  * Fichier modifié — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
- * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation Compose Desktop.
+ * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-06 — les illustrations
+ * vectorielles d'origine (ic_empty_history, ic_empty_favourites, ic_empty_feed, ic_empty_common)
+ * sont désormais portées en ImageVector (voir TotoroVectors.kt) ; la variante par icône Material
+ * est conservée pour compatibilité.
  *
  * État vide — reproduit item_empty_state.xml : colonne centrée, illustration 192dp,
  * texte primaire TitleLarge, texte secondaire BodyMedium, bouton tonal optionnel
- * (button_retry), padding horizontal 32dp. Les illustrations vectorielles d'origine
- * (ic_empty_history, ic_empty_favourites, ic_empty_common) sont remplacées par des
- * icônes Material équivalentes (divergence documentée — pas de drawables portés).
+ * (button_retry), padding horizontal 32dp.
  */
 package org.koitharu.kotatsu.desktop.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -115,6 +117,83 @@ public fun EmptyStateScreen(
 			actionText = actionText,
 			onActionClick = onActionClick,
 			iconTint = iconTint,
+		)
+	}
+}
+
+/**
+ * État vide avec l'illustration Totoro portée des drawables d'origine (voir TotoroVectors.kt).
+ * Rendue à 192dp comme item_empty_state.xml (l'illustration d'origine fait 200dp).
+ */
+@Composable
+public fun EmptyStateView(
+	illustration: TotoroIllustration,
+	textPrimary: String,
+	modifier: Modifier = Modifier,
+	textSecondary: String? = null,
+	actionText: String? = null,
+	onActionClick: (() -> Unit)? = null,
+) {
+	Box(
+		modifier = modifier
+			.fillMaxWidth()
+			.padding(horizontal = EMPTY_HORIZONTAL_PADDING),
+		contentAlignment = Alignment.Center,
+	) {
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+		) {
+			Image(
+				imageVector = illustration.vector(),
+				contentDescription = null,
+				modifier = Modifier.size(EMPTY_ICON_SIZE),
+			)
+			Text(
+				text = textPrimary,
+				style = MaterialTheme.typography.titleLarge,
+				color = MaterialTheme.colorScheme.onSurface,
+				textAlign = TextAlign.Center,
+				modifier = Modifier.padding(top = EMPTY_SPACING),
+			)
+			if (!textSecondary.isNullOrEmpty()) {
+				Text(
+					text = textSecondary,
+					style = MaterialTheme.typography.bodyMedium,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					textAlign = TextAlign.Center,
+					modifier = Modifier.padding(top = EMPTY_SPACING),
+				)
+			}
+			if (!actionText.isNullOrEmpty() && onActionClick != null) {
+				FilledTonalButton(
+					onClick = onActionClick,
+					colors = ButtonDefaults.filledTonalButtonColors(),
+					modifier = Modifier.padding(top = EMPTY_SPACING),
+				) {
+					Text(text = actionText)
+				}
+			}
+		}
+	}
+}
+
+/** État vide plein écran (illustration Totoro), centré verticalement comme item_empty_state.xml. */
+@Composable
+public fun EmptyStateScreen(
+	illustration: TotoroIllustration,
+	textPrimary: String,
+	modifier: Modifier = Modifier,
+	textSecondary: String? = null,
+	actionText: String? = null,
+	onActionClick: (() -> Unit)? = null,
+) {
+	Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+		EmptyStateView(
+			illustration = illustration,
+			textPrimary = textPrimary,
+			textSecondary = textSecondary,
+			actionText = actionText,
+			onActionClick = onActionClick,
 		)
 	}
 }
