@@ -24,7 +24,6 @@ dependencies {
 		// le repackage lenient d'Android — les parsers comptent sur la coercition d'Android.
 		exclude(group = "org.json", module = "json")
 	}
-	implementation("com.vaadin.external.google:android-json:0.0.20131108.vaadin1")
 
 	// Réseau
 	implementation(libs.okhttp)
