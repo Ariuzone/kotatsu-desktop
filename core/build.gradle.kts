@@ -19,7 +19,12 @@ dependencies {
 	implementation(libs.kotlinx.collections.immutable)
 
 	// Parsers de sources manga (JVM pur, consommé tel quel comme l'app Android)
-	api(libs.parsers)
+	api(libs.parsers) {
+		// Comme l'app Android d'origine : exclure l'org.json Maven (strict) et utiliser
+		// le repackage lenient d'Android — les parsers comptent sur la coercition d'Android.
+		exclude(group = "org.json", module = "json")
+	}
+	implementation("com.vaadin.external.google:android-json:0.0.20131108.vaadin1")
 
 	// Réseau
 	implementation(libs.okhttp)

@@ -124,6 +124,9 @@ public class AppContainer private constructor(appDir: File) {
 			instance ?: AppContainer(defaultAppDir()).also { instance = it }
 		}
 
+		/** Pour les tests : conteneur isolé dans un dossier temporaire. */
+		public fun createForTest(dir: File): AppContainer = AppContainer(dir)
+
 		private fun defaultAppDir(): File {
 			val appData = System.getenv("APPDATA") ?: System.getProperty("user.home")
 			return File(appData, "Kotatsu")
