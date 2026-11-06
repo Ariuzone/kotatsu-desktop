@@ -50,6 +50,11 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import org.koitharu.kotatsu.core.APP_VERSION_NAME
 import org.koitharu.kotatsu.desktop.ui.nav.NavItem
+import org.koitharu.kotatsu.desktop.ui.strings.FR_HISTORY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FAVOURITES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_EXPLORE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FEED
 import org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderContent
 import org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderMode
 import org.koitharu.kotatsu.desktop.tracker.TrackerTray
@@ -107,8 +112,20 @@ private fun MainScreen(container: AppContainer) {
 	var showSettings by remember { mutableStateOf(false) }
 	var showSearch by remember { mutableStateOf(false) }
 	var showDownloads by remember { mutableStateOf(false) }
+	var showSourcesCatalog by remember { mutableStateOf(false) }
 	var incognito by remember {
 		mutableStateOf(container.appSettings.isIncognitoModeEnabled)
+	}
+	var suggestions by remember { mutableStateOf<List<Manga>>(emptyList()) }
+	val sourcesList = remember {
+		MangaParserSource.entries.filterNot { it.isBroken }.sortedBy { it.title }
+	}
+	LaunchedEffect(Unit) {
+		// Suggestions de l'onglet Source : populaires MangaDex, comme le preset d'origine
+		runCatching {
+			val md = MangaParserSource.entries.first { it.name == "MANGADEX" }
+			container.getList(md, 0, org.koitharu.kotatsu.parsers.model.SortOrder.POPULARITY).take(10)
+		}.getOrDefault(emptyList()).let { suggestions = it }
 	}
 	var searchResults by remember { mutableStateOf<List<Manga>>(emptyList()) }
 	var readerRequest by remember { mutableStateOf<Pair<Manga, MangaChapter>?>(null) }
@@ -131,18 +148,21 @@ private fun MainScreen(container: AppContainer) {
 				}
 			},
 	) {
-		// Rail de navigation latéral (comme l'app d'origine en mode tablette/desktop)
+		// Rail de navigation latéral — mise en page « tablette/desktop » de l'app d'origine ;
+		// onglets = navigation basse du téléphone (Historique, Favoris, Explorer, Source, Flux)
 		NavigationRail(modifier = Modifier.align(Alignment.CenterStart)) {
-		// Libellés français exacts de l'app d'origine (values-fr : history, favourites,
-		// explore, by_source, feed)
-			for (item in NavItem.default) {
+			for (item in listOf(NavItem.HISTORY, NavItem.FAVORITES, NavItem.EXPLORE, NavItem.SOURCES, NavItem.FEED)) {
 				NavigationRailItem(
-					selected = selected == item && selectedManga == null && selectedSource == null && !showSettings,
+					selected = selected == item && selectedManga == null && selectedSource == null &&
+						!showSettings && !showDownloads && !showSourcesCatalog && !showSearch,
 					onClick = {
 						selected = item
 						selectedSource = null
 						selectedManga = null
 						showSettings = false
+						showDownloads = false
+						showSourcesCatalog = false
+						showSearch = false
 					},
 					icon = {
 						Icon(
@@ -150,21 +170,22 @@ private fun MainScreen(container: AppContainer) {
 							contentDescription = item.title,
 						)
 					},
-					label = { Text(item.title) },
+					label = {
+						Text(
+							when (item) {
+								NavItem.HISTORY -> FR_HISTORY
+								NavItem.FAVORITES -> FR_FAVOURITES
+								NavItem.EXPLORE -> FR_EXPLORE
+								NavItem.SOURCES -> FR_SOURCE
+								else -> FR_FEED
+							},
+						)
+					},
 				)
 			}
-			// Paramètres : dans l'app d'origine ils sont dans le menu du drawer principal ;
+			// Paramètres : dans l'app d'origine ils sont dans le menu ⋮ et le drawer ;
 			// sur desktop ils sont accessibles en bas du rail (divergence documentée).
 			Spacer(modifier = Modifier.weight(1f))
-			if (incognito) {
-				IconButton(onClick = { incognito = false; container.appSettings.isIncognitoModeEnabled = false }) {
-					Icon(
-						imageVector = Icons.Filled.PrivacyTip,
-						contentDescription = "Mode incognito",
-						tint = MaterialTheme.colorScheme.primary,
-					)
-				}
-			}
 			NavigationRailItem(
 				selected = showDownloads,
 				onClick = { showDownloads = true },
@@ -186,6 +207,19 @@ private fun MainScreen(container: AppContainer) {
 			color = MaterialTheme.colorScheme.surface,
 		) {
 			when {
+				showSourcesCatalog ->
+					org.koitharu.kotatsu.desktop.ui.screens.sources.SourcesCatalogScreen(
+						domainOf = { container.domainOf(it) },
+						onSourceClick = {
+							showSourcesCatalog = false
+							selectedSource = it
+						},
+						onSourceToggle = { /* activation/désactivation : P3 */ },
+						isAdded = { true },
+						onBackClick = { showSourcesCatalog = false },
+						onSearchClick = { showSearch = true },
+					)
+
 				showDownloads -> {
 					// Téléchargements réels (DownloadManager.observeState)
 					val states by container.downloadManager.observeState().collectAsState()
@@ -240,6 +274,13 @@ private fun MainScreen(container: AppContainer) {
 						selectedManga = it
 					},
 					onBackClick = { showSearch = false },
+					suggestions = suggestions,
+					sources = sourcesList.take(8),
+					domainOf = { container.domainOf(it) },
+					onSourceClick = {
+						showSearch = false
+						selectedSource = it
+					},
 				)
 
 				selectedManga != null -> {
@@ -291,121 +332,70 @@ private fun MainScreen(container: AppContainer) {
 
 					else -> when (selected) {
 						NavItem.EXPLORE ->
-							org.koitharu.kotatsu.desktop.ui.screens.explore.ExploreScreen(
-								onSourceClick = { selectedSource = it },
+							org.koitharu.kotatsu.desktop.ui.screens.discover.DiscoverScreen(
+								fetchSection = { section, _ ->
+									// Sections Discover depuis MangaDex (preset principal de l'app
+									// d'origine) : popularité / récent / suite
+									val source = MangaParserSource.entries.first { it.name == "MANGADEX" }
+									val order = when (section) {
+										org.koitharu.kotatsu.desktop.ui.screens.discover.DiscoverSection.FOR_YOU ->
+											org.koitharu.kotatsu.parsers.model.SortOrder.POPULARITY
+										org.koitharu.kotatsu.desktop.ui.screens.discover.DiscoverSection.NEW_FINDS ->
+											org.koitharu.kotatsu.parsers.model.SortOrder.UPDATED
+										else ->
+											org.koitharu.kotatsu.parsers.model.SortOrder.POPULARITY
+									}
+									container.getList(source, 0, order).take(20)
+								},
+								onMangaClick = { selectedManga = it },
+								onShowAllClick = { /* ouvre le catalogue MD complet : à venir */ },
+								onSearchClick = { showSearch = true },
+								onUpdateClick = { container.trackerScheduler.startNow() },
+								onRestoreDismissedClick = {},
+								onIncognitoToggle = { incognito = it },
+								onSettingsClick = { showSettings = true },
+							)
+
+						NavItem.SOURCES ->
+							org.koitharu.kotatsu.desktop.ui.screens.sources.SourcePresetsScreen(
+								suggestions = suggestions,
+								sources = sourcesList,
 								domainOf = { container.domainOf(it) },
-							)
-
-						NavItem.HISTORY -> {
-							// Historique réel depuis la DB Room (HistoryDao)
-							var historyItems by remember {
-								mutableStateOf<List<org.koitharu.kotatsu.desktop.ui.screens.history.HistoryItem>>(emptyList())
-							}
-							LaunchedEffect(Unit) {
-								val library = container.library
-								historyItems = library.getHistory().mapNotNull { row ->
-									val (manga, history) = library.run { row.toDisplay() }
-									org.koitharu.kotatsu.desktop.ui.screens.history.HistoryItem(
-										manga = manga,
-										chapter = null, // chapitre résolu au clic via getDetails
-										percent = history.percent,
-										updatedAt = java.time.Instant.ofEpochMilli(history.updatedAt),
-									)
-								}
-							}
-							org.koitharu.kotatsu.desktop.ui.screens.history.HistoryScreen(
-								historyItems = historyItems,
-								onMangaClick = { selectedManga = it },
-								onContinueClick = { item ->
-									// « Continue reading » : retrouve le chapitre courant via la source
-									scope.launch {
-										val details = runCatching { container.getDetails(item.manga) }.getOrNull()
-										val chapter = details?.chapters?.firstOrNull()
-										if (chapter != null) readerRequest = item.manga to chapter
-									}
-								},
-							)
-						}
-
-						NavItem.FAVORITES -> {
-							// Favoris réels depuis la DB Room (FavouritesDao + catégories)
-							var categories by remember {
-								mutableStateOf<List<org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouriteCategory>>(emptyList())
-							}
-							LaunchedEffect(Unit) {
-								val library = container.library
-								val all = library.getFavourites()
-								val cats = library.getFavouriteCategories()
-								categories = buildList {
-									add(
-										org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouriteCategory(
-											id = -1L,
-											title = null, // « All favorites » comme FavouritesTabConfigurationStrategy
-											count = all.size,
-										),
-									)
-									for (c in cats) {
-										add(
-											org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouriteCategory(
-												id = c.categoryId.toLong(),
-												title = c.title,
-												count = all.count { f -> f.favourite.categoryId == c.categoryId.toLong() },
-											),
-										)
-									}
-								}
-							}
-							org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouritesScreen(
-								categories = categories,
-								fetchManga = { category ->
-									container.library.getFavourites()
-										.filter { category.id == -1L || it.favourite.categoryId.toLong() == category.id }
-										.map { it.manga.toManga(emptySet(), chapters = null) }
-								},
-								onMangaClick = { selectedManga = it },
-							)
-						}
-
-						NavItem.BOOKMARKS -> {
-							// Signets réels depuis la DB Room (BookmarksDao.observe())
-							var bookmarksMap by remember {
-								mutableStateOf<Map<org.koitharu.kotatsu.core.db.entity.MangaWithTags, List<org.koitharu.kotatsu.desktop.ui.screens.bookmarks.BookmarkUi>>>(emptyMap())
-							}
-							LaunchedEffect(Unit) {
-								container.database.getBookmarksDao().observe().collect { map ->
-									bookmarksMap = map.mapValues { (_, marks) ->
-										marks.map { b ->
-											org.koitharu.kotatsu.desktop.ui.screens.bookmarks.BookmarkUi(
-												pageId = b.pageId,
-												chapterId = b.chapterId,
-												page = b.page,
-												imageUrl = b.imageUrl,
-												percent = b.percent,
-											)
+								hasNewChapters = { false },
+								onSuggestionClick = { selectedManga = it },
+								onSourceClick = { selectedSource = it },
+								onCatalogClick = { showSourcesCatalog = true },
+								onMoreSuggestionsClick = {},
+								onQuickAction = { action ->
+									when (action) {
+										org.koitharu.kotatsu.desktop.ui.screens.sources.SourceQuickAction.LOCAL_STORAGE -> selected = NavItem.LOCAL
+										org.koitharu.kotatsu.desktop.ui.screens.sources.SourceQuickAction.BOOKMARKS -> selected = NavItem.BOOKMARKS
+										org.koitharu.kotatsu.desktop.ui.screens.sources.SourceQuickAction.DOWNLOADS -> showDownloads = true
+										org.koitharu.kotatsu.desktop.ui.screens.sources.SourceQuickAction.RANDOM -> scope.launch {
+											val source = MangaParserSource.entries.filterNot { it.isBroken }.random()
+											val list = runCatching { container.getList(source, 0) }.getOrDefault(emptyList())
+											list.randomOrNull()?.let { selectedManga = it }
 										}
-									}
-								}
-							}
-							org.koitharu.kotatsu.desktop.ui.screens.bookmarks.BookmarksScreen(
-								bookmarksByManga = bookmarksMap,
-								onBookmarkClick = { mangaWithTags, bookmark ->
-									// ouvre le lecteur sur la page du signet
-									scope.launch {
-										val mangaEntity = mangaWithTags.manga
-										val manga = mangaEntity.toManga(
-											mangaWithTags.tags.map { it.toMangaTag() }.toSet(),
-											chapters = null,
-										)
-										val details = runCatching { container.getDetails(manga) }.getOrNull()
-										val chapter = details?.chapters?.firstOrNull { it.id == bookmark.chapterId }
-										if (chapter != null) readerRequest = details to chapter
+										else -> showSourcesCatalog = true
 									}
 								},
-								onBookmarkDelete = { bookmark ->
-									scope.launch { container.database.getBookmarksDao().delete(bookmark.pageId) }
-								},
+								onSearchClick = { showSearch = true },
+								onIncognitoToggle = { incognito = it },
+								onSettingsClick = { showSettings = true },
+								onManageSourcesClick = { showSourcesCatalog = true },
 							)
-						}
+
+						NavItem.FEED ->
+							org.koitharu.kotatsu.desktop.ui.screens.feed.FeedScreen(
+								entries = emptyList(),
+								onEntryClick = { selectedManga = it.manga },
+								onUpdateClick = { container.trackerScheduler.startNow() },
+								onClearFeedClick = {},
+								onShowUpdatedToggle = {},
+								onSearchClick = { showSearch = true },
+								onSettingsClick = { showSettings = true },
+								onIncognitoToggle = { incognito = it },
+							)
 
 						else -> PlaceholderScreen(selected)
 					}
