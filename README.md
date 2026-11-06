@@ -21,14 +21,17 @@ Desktop (Material 3).
 - Catalogue par source, recherche multi-sources avec filtres
 - Détails d'un manga (couverture, auteur, tags, description, chapitres)
 - Lecteur : mode paginé + mode webtoon, zones de tap, navigation clavier (adaptation desktop)
-- Favoris, historique persistants (base Room v28 identique à l'app Android)
+- Favoris, historique et signets persistants (base Room v28 identique à l'app Android)
+- Téléchargements hors-ligne + lecture de CBZ locaux
+- Notifications de nouveaux chapitres (icône tray + bulles Windows, vérification périodique)
+- Verrouillage par mot de passe (même hachage que l'app Android)
 - Thème clair / sombre / AMOLED, 9 schémas de couleurs d'origine (Miku, Sakura, Totoro…)
 - Installateur Windows `.exe` (JDK embarqué, raccourcis, désinstallation propre)
 
 ### Non portées (voir [Limitations](#limitations))
-- Suivi AniList / MyAnimeList / Shikimori / Kitsu, Discord RPC (P3)
-- Synchronisation, notifications de nouveaux chapitres (P3)
-- Verrouillage biométrique (P3 — mot de passe visé)
+- Suivi AniList / MyAnimeList / Shikimori / Kitsu (scrobbling), Discord RPC
+- Synchronisation multi-appareils, sauvegardes/restauration
+- Verrouillage biométrique (le mot de passe est porté)
 - Résolution Cloudflare intégrée (sources protégées)
 
 ## Installation
