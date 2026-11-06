@@ -28,3 +28,6 @@
 -keepclassmembers class * {
     @androidx.room.* <methods>;
 }
+
+# okio : ProGuard casse les fonctions inline (VerifyError buffer$hash) en build release
+-dontobfuscate
