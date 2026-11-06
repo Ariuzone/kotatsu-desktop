@@ -18,6 +18,8 @@ Desktop (Material 3).
 
 ### Portées (P1/P2)
 - Liste et exploration des 1200+ sources manga (bibliothèque [kotatsu-parsers-redo](https://github.com/Kotatsu-Redo/kotatsu-parsers-redo) réutilisée telle quelle via JitPack)
+- **Interface en français** (chaînes exactes de l'app Android, illustrations d'états vides d'origine)
+- Écran Explorer avec sections « Pour vous / Nouveautés pour vous / Plus pour vous » (MangaDex et presets), onglet Source (boutons rapides, suggestions, grille de sources), catalogue des sources
 - Catalogue par source, recherche multi-sources avec filtres
 - Détails d'un manga (couverture, auteur, tags, description, chapitres)
 - Lecteur : mode paginé + mode webtoon, zones de tap, navigation clavier (adaptation desktop)
