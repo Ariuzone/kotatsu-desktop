@@ -107,7 +107,14 @@ private fun kotatsuIcon(): Painter = painterResource("kotatsu_256.png")
 
 @Composable
 private fun MainScreen(container: AppContainer) {
-	var selected by rememberSaveable { mutableStateOf(NavItem.EXPLORE) }
+	// Onglet de démarrage surchargeable pour les vérifications automatisées :
+	// -Dkotatsu.startTab=HISTORY|FAVORITES|EXPLORE|SOURCES|FEED
+	var selected by rememberSaveable {
+		mutableStateOf(
+			runCatching { NavItem.valueOf(System.getProperty("kotatsu.startTab", "EXPLORE")) }
+				.getOrDefault(NavItem.EXPLORE),
+		)
+	}
 	var selectedSource by remember { mutableStateOf<MangaParserSource?>(null) }
 	var selectedManga by remember { mutableStateOf<Manga?>(null) }
 	var showSettings by remember { mutableStateOf(false) }
