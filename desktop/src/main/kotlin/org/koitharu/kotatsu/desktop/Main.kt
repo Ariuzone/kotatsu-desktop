@@ -52,6 +52,7 @@ import org.koitharu.kotatsu.desktop.ui.settings.DesktopSettings
 import org.koitharu.kotatsu.desktop.ui.theme.KotatsuTheme
 import kotlinx.coroutines.launch
 import org.koitharu.kotatsu.core.db.entity.toManga
+import org.koitharu.kotatsu.core.db.entity.toMangaTag
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
@@ -281,6 +282,47 @@ private fun MainScreen(container: AppContainer) {
 										.map { it.manga.toManga(emptySet(), chapters = null) }
 								},
 								onMangaClick = { selectedManga = it },
+							)
+						}
+
+						NavItem.BOOKMARKS -> {
+							// Signets réels depuis la DB Room (BookmarksDao.observe())
+							var bookmarksMap by remember {
+								mutableStateOf<Map<org.koitharu.kotatsu.core.db.entity.MangaWithTags, List<org.koitharu.kotatsu.desktop.ui.screens.bookmarks.BookmarkUi>>>(emptyMap())
+							}
+							LaunchedEffect(Unit) {
+								container.database.getBookmarksDao().observe().collect { map ->
+									bookmarksMap = map.mapValues { (_, marks) ->
+										marks.map { b ->
+											org.koitharu.kotatsu.desktop.ui.screens.bookmarks.BookmarkUi(
+												pageId = b.pageId,
+												chapterId = b.chapterId,
+												page = b.page,
+												imageUrl = b.imageUrl,
+												percent = b.percent,
+											)
+										}
+									}
+								}
+							}
+							org.koitharu.kotatsu.desktop.ui.screens.bookmarks.BookmarksScreen(
+								bookmarksByManga = bookmarksMap,
+								onBookmarkClick = { mangaWithTags, bookmark ->
+									// ouvre le lecteur sur la page du signet
+									scope.launch {
+										val mangaEntity = mangaWithTags.manga
+										val manga = mangaEntity.toManga(
+											mangaWithTags.tags.map { it.toMangaTag() }.toSet(),
+											chapters = null,
+										)
+										val details = runCatching { container.getDetails(manga) }.getOrNull()
+										val chapter = details?.chapters?.firstOrNull { it.id == bookmark.chapterId }
+										if (chapter != null) readerRequest = details to chapter
+									}
+								},
+								onBookmarkDelete = { bookmark ->
+									scope.launch { container.database.getBookmarksDao().delete(bookmark.pageId) }
+								},
 							)
 						}
 
