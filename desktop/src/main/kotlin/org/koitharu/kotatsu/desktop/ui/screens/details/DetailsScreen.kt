@@ -12,6 +12,7 @@ package org.koitharu.kotatsu.desktop.ui.screens.details
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,11 +72,12 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_MORE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_NSFW
 import org.koitharu.kotatsu.desktop.ui.strings.FR_READ
 
-private val DETAILS_COVER_WIDTH = 100.dp
-private val DETAILS_COVER_HEIGHT = 152.dp
+private const val DETAILS_COVER_WIDTH_PERCENT = 0.3f // layout_constraintWidth_percent=0.3
 private val DETAILS_COVER_CORNER = 12.dp
 private val DETAILS_HEADER_HORIZONTAL_PADDING = 16.dp
 private val DETAILS_HEADER_VERTICAL_PADDING = 12.dp
+private val DETAILS_BADGE_MARGIN = 8.dp // card_indicator_offset
+private const val DETAILS_TAGS_LIMIT = 6
 
 /** Badge 18+ si la source est Hentai (comme DetailsScreen d'origine, isNsfw). */
 private fun isNsfw(manga: Manga): Boolean =
@@ -102,6 +104,10 @@ public fun DetailsScreen(
 			}
 			item {
 				DescriptionSection(description = manga?.description.orEmpty())
+			}
+			item {
+				// chips_tags : sous la description comme activity_details.xml
+				TagsSection(tags = manga?.tags.orEmpty())
 			}
 			item {
 				Text(
@@ -185,36 +191,44 @@ private fun DetailsHeader(manga: Manga, onBackClick: () -> Unit) {
 						vertical = DETAILS_HEADER_VERTICAL_PADDING,
 					),
 			) {
-				AsyncImage(
-					model = ImageRequest.Builder(coil3.PlatformContext.INSTANCE)
-						.data(manga.coverUrl)
-						.crossfade(true)
-						.build(),
-					contentDescription = manga.title,
-					contentScale = ContentScale.Crop,
+				// Couverture : 30 % de la largeur, ratio 13:18 (activity_details.xml)
+				Box(
 					modifier = Modifier
-						.width(DETAILS_COVER_WIDTH)
-						.height(DETAILS_COVER_HEIGHT)
+						.fillMaxWidth(DETAILS_COVER_WIDTH_PERCENT)
+						.aspectRatio(13f / 18f)
 						.clip(RoundedCornerShape(DETAILS_COVER_CORNER))
-						.background(MaterialTheme.colorScheme.surfaceContainer),
-				)
-				Column(
-					modifier = Modifier
-						.weight(1f)
-						.padding(start = 16.dp),
+						.background(MaterialTheme.colorScheme.secondaryContainer),
+					contentAlignment = Alignment.Center,
 				) {
-					// Badge 18+ (textView_nsfw_18 d'origine, string nsfw)
+					AsyncImage(
+						model = ImageRequest.Builder(coil3.PlatformContext.INSTANCE)
+							.data(manga.coverUrl)
+							.crossfade(true)
+							.build(),
+						contentDescription = manga.title,
+						contentScale = ContentScale.Crop,
+						modifier = Modifier.fillMaxSize(),
+					)
+					// Badge 18+ (textView_nsfw_18) : superposé en bas à droite de la couverture
 					if (isNsfw(manga)) {
 						Text(
 							text = FR_NSFW,
 							style = MaterialTheme.typography.labelSmall,
-							color = MaterialTheme.colorScheme.error,
+							color = MaterialTheme.colorScheme.onErrorContainer,
 							modifier = Modifier
+								.align(Alignment.BottomEnd)
+								.padding(DETAILS_BADGE_MARGIN)
 								.clip(RoundedCornerShape(4.dp))
 								.background(MaterialTheme.colorScheme.errorContainer)
-								.padding(horizontal = 6.dp, vertical = 2.dp),
+								.padding(horizontal = 4.dp, vertical = 2.dp),
 						)
 					}
+				}
+				Column(
+					modifier = Modifier
+						.weight(1f)
+						.padding(start = 16.dp, end = 16.dp),
+				) {
 					Text(
 						text = manga.title,
 						style = MaterialTheme.typography.titleLarge,
@@ -227,27 +241,36 @@ private fun DetailsHeader(manga: Manga, onBackClick: () -> Unit) {
 						text = manga.author.orEmpty(),
 						style = MaterialTheme.typography.bodyMedium,
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
+						maxLines = 3,
+						overflow = TextOverflow.Ellipsis,
+					)
+				}
+			}
+		}
+	}
+}
+
+/** Chips des tags (chips_tags d'origine, sous la description). */
+@Composable
+private fun TagsSection(tags: Set<org.koitharu.kotatsu.parsers.model.MangaTag>) {
+	if (tags.isEmpty()) return
+	Row(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(horizontal = DETAILS_HEADER_HORIZONTAL_PADDING),
+		horizontalArrangement = Arrangement.spacedBy(8.dp),
+	) {
+		for (tag in tags.take(DETAILS_TAGS_LIMIT)) {
+			AssistChip(
+				onClick = {},
+				label = {
+					Text(
+						text = tag.title,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis,
 					)
-					Spacer(modifier = Modifier.height(8.dp))
-					// chips des tags (chips_tags d'origine), limités à 2 rangées visuelles
-					Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-						for (tag in manga.tags.take(3)) {
-							AssistChip(
-								onClick = {},
-								label = {
-									Text(
-										text = tag.title,
-										maxLines = 1,
-										overflow = TextOverflow.Ellipsis,
-									)
-								},
-							)
-						}
-					}
-				}
-			}
+				},
+			)
 		}
 	}
 }

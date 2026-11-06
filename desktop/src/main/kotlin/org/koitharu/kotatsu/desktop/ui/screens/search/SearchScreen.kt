@@ -28,10 +28,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.NorthWest
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -70,7 +70,7 @@ import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 
-private val SUGGESTION_WIDTH = 104.dp
+private val SUGGESTION_WIDTH = 120.dp // largeur des couvertures de suggestions (capture)
 private val SUGGESTION_CORNER = 12.dp
 
 /**
@@ -280,7 +280,7 @@ private fun HistoryRow(history: List<String>, onHistoryClick: (String) -> Unit) 
 					.background(MaterialTheme.colorScheme.outlineVariant),
 			)
 			Icon(
-				imageVector = Icons.AutoMirrored.Filled.Redo,
+				imageVector = Icons.Filled.NorthWest,
 				contentDescription = "Rechercher à nouveau",
 				tint = MaterialTheme.colorScheme.onSurfaceVariant,
 			)
