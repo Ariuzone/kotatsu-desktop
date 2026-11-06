@@ -1,10 +1,13 @@
 /*
  * Fichier modifié — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
- * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation JVM/desktop.
+ * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-06 — contexte global.
  * Adaptation : pas d'Android Context — le User-Agent est un UA desktop constant ; les stores de
  * SourceSettings viennent d'un SourceSettingsStoreProvider injecté ; base64 en java.util ;
  * evaluateJs/WebView : stubs (null / listes vides) ; redrawImageResponse/createBitmap : non
  * supportés sur JVM (UnsupportedOperationException).
+ * Nouveau (desktop) : l'instance s'enregistre dans [globalInstance] et expose [parserFor] —
+ * permet à CommonHeadersInterceptor (core/network) de retrouver les en-têtes par source
+ * (User-Agent du parser, Referer) même quand la fabrique de dépôts n'est pas câblée, faute de DI.
  */
 package org.koitharu.kotatsu.core.parser
 
@@ -27,12 +30,18 @@ import org.koitharu.kotatsu.parsers.util.map
 import org.koitharu.kotatsu.parsers.webview.InterceptedRequest
 import java.util.Base64
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 class MangaLoaderContextImpl(
 	override val httpClient: OkHttpClient,
 	override val cookieJar: MutableCookieJar,
 	private val sourceSettingsStoreProvider: SourceSettingsStoreProvider,
 ) : MangaLoaderContext() {
+
+	init {
+		// Fallback desktop : sans DI, le réseau doit pouvoir retrouver le contexte courant.
+		globalInstance = this
+	}
 
 	override suspend fun evaluateJs(baseUrl: String, script: String, timeout: Long): String? = null
 
@@ -87,4 +96,18 @@ class MangaLoaderContextImpl(
 		urlPattern: Regex,
 		timeout: Long,
 	): List<String> = emptyList()
+
+	/** Parser brut pour une source (mis en cache) — fallback réseau sans fabrique de dépôts. */
+	fun parserFor(source: MangaParserSource): MangaParser =
+		cachedParsers.getOrPut(source.name) { newParserInstance(source) }
+
+	private val cachedParsers = ConcurrentHashMap<String, MangaParser>()
+
+	companion object {
+
+		/** Dernière instance créée — équivalent desktop du singleton Hilt Android. */
+		@Volatile
+		var globalInstance: MangaLoaderContextImpl? = null
+			private set
+	}
 }
