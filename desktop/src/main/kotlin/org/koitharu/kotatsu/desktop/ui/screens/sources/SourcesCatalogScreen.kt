@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -62,6 +63,8 @@ import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 
 private val FAVICON_SIZE = 48.dp
+private val FAVICON_CORNER = 12.dp // coins arrondis du favicon (capture)
+private val CATALOG_ROW_HEIGHT = 88.dp // hauteur d'une ligne du catalogue (capture)
 
 /**
  * Catalogue des sources. @param isAdded indique si la source est déjà ajoutée à l'utilisateur ;
@@ -151,6 +154,14 @@ public fun SourcesCatalogScreen(
 						selected = newestOnly,
 						onClick = { newestOnly = !newestOnly },
 						label = { Text(FR_NEWEST) },
+						leadingIcon = {
+							// icône horloge comme la capture (chip « Nouveaux »)
+							Icon(
+								imageVector = Icons.Outlined.History,
+								contentDescription = null,
+								modifier = Modifier.size(18.dp),
+							)
+						},
 						colors = FilterChipDefaults.filterChipColors(
 							containerColor = MaterialTheme.colorScheme.surfaceContainer,
 						),
@@ -239,14 +250,15 @@ private fun SourceCatalogRow(
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
+			.height(CATALOG_ROW_HEIGHT)
 			.clickable(onClick = onClick)
-			.padding(horizontal = 16.dp, vertical = 12.dp),
+			.padding(horizontal = 16.dp),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Box(
 			modifier = Modifier
 				.size(FAVICON_SIZE)
-				.clip(RoundedCornerShape(8.dp))
+				.clip(RoundedCornerShape(FAVICON_CORNER))
 				.background(MaterialTheme.colorScheme.surfaceContainerHighest),
 			contentAlignment = Alignment.Center,
 		) {
