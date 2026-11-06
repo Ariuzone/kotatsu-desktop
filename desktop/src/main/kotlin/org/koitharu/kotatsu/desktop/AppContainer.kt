@@ -54,9 +54,36 @@ public class AppContainer private constructor(appDir: File) {
 
 	public val repositoryFactory: MangaRepository.Factory
 
+	/** Verrouillage par mot de passe ( ProtectManager, hash MD5 comme l'app d'origine). */
+	public val protectManager: org.koitharu.kotatsu.desktop.ui.screens.protect.ProtectManager by lazy {
+		org.koitharu.kotatsu.desktop.ui.screens.protect.ProtectManager(settingsStore)
+	}
+
+	/** Suivi des nouveaux chapitres : notifier + tâche périodique. */
+	public val trackerNotifier: org.koitharu.kotatsu.desktop.tracker.TrackerNotifier by lazy {
+		org.koitharu.kotatsu.desktop.tracker.TrackerNotifier()
+	}
+
+	public val trackerScheduler: org.koitharu.kotatsu.desktop.tracker.TrackerScheduler by lazy {
+		org.koitharu.kotatsu.desktop.tracker.TrackerScheduler(
+			settings = appSettings,
+			store = settingsStore,
+			repository = org.koitharu.kotatsu.tracker.domain.TrackingRepository(database),
+			checkNewChapters = org.koitharu.kotatsu.tracker.domain.CheckNewChaptersUseCase(
+				repository = org.koitharu.kotatsu.tracker.domain.TrackingRepository(database),
+				detailsLoader = org.koitharu.kotatsu.tracker.domain.MangaDetailsLoader.of(repositoryFactory),
+			),
+			notifier = trackerNotifier,
+			scope = scope,
+		)
+	}
+
+	private lateinit var settingsStore: org.koitharu.kotatsu.core.prefs.KeyValueStore
+
 	init {
 		appDir.mkdirs()
 		val settingsStore = FileKeyValueStore(appDir.resolve("settings.json").toPath())
+		this.settingsStore = settingsStore
 		val sourcesDir: Path = appDir.resolve("sources").toPath()
 		appSettings = AppSettings(settingsStore)
 		network = NetworkModule(

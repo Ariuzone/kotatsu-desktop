@@ -48,6 +48,7 @@ import org.koitharu.kotatsu.core.APP_VERSION_NAME
 import org.koitharu.kotatsu.desktop.ui.nav.NavItem
 import org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderContent
 import org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderMode
+import org.koitharu.kotatsu.desktop.tracker.TrackerTray
 import org.koitharu.kotatsu.desktop.ui.settings.DesktopSettings
 import org.koitharu.kotatsu.desktop.ui.theme.KotatsuTheme
 import kotlinx.coroutines.launch
@@ -60,6 +61,11 @@ import org.koitharu.kotatsu.parsers.model.MangaParserSource
 fun main() = application {
 	val container = remember { AppContainer.getInstance() }
 	val settings = remember { DesktopSettings.getInstance() }
+
+	// Notifications nouveaux chapitres (icône tray + bulles Windows), cf. TrackWorker d'origine
+	TrackerTray(notifier = container.trackerNotifier)
+	LaunchedEffect(Unit) { container.trackerScheduler.start() }
+
 	Window(
 		onCloseRequest = ::exitApplication,
 		title = "Kotatsu $APP_VERSION_NAME",
@@ -70,8 +76,17 @@ fun main() = application {
 			mode = settings.themeMode.value,
 			amoled = settings.isAmoled.value,
 		) {
-		Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-			MainScreen(container)
+		if (container.protectManager.isProtectionEnabled && !container.protectManager.isUnlocked) {
+			org.koitharu.kotatsu.desktop.ui.screens.protect.ProtectScreen(
+				manager = container.protectManager,
+				onUnlocked = { /* recomposition : isUnlocked devient vrai */ },
+				onCancel = ::exitApplication,
+				modifier = Modifier.fillMaxSize(),
+			)
+		} else {
+			Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+				MainScreen(container)
+			}
 		}
 		}
 	}
