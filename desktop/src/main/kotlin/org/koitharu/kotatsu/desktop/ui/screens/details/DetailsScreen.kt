@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -131,8 +132,10 @@ public fun DetailsScreen(
 					)
 				}
 			}
-			items(chapters, key = { it }) { chapterTitle ->
-				ChapterRow(title = chapterTitle, onClick = { onChapterClick(chapters.indexOf(chapterTitle)) })
+			// clé par index : les titres de chapitres peuvent être dupliqués
+			// (même nom dans deux branches/volumes) → clé unique obligatoire
+			itemsIndexed(chapters) { index, chapterTitle ->
+				ChapterRow(title = chapterTitle, onClick = { onChapterClick(index) })
 				HorizontalDivider(
 					color = MaterialTheme.colorScheme.outlineVariant,
 					thickness = 0.5.dp,

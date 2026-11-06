@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -148,7 +149,8 @@ public fun ReaderContent(
 					},
 			) {
 				LazyColumn(modifier = Modifier.fillMaxSize()) {
-					items(pageUrls, key = { it }) { pageUrl ->
+					// clé par index : une même image peut apparaître sur deux pages
+					itemsIndexed(pageUrls) { _, pageUrl ->
 						ReaderPageImage(pageUrl = pageUrl, fillHeight = false)
 					}
 				}

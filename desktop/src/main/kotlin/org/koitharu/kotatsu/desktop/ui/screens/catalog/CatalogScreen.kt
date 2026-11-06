@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.layout.Arrangement
 import org.koitharu.kotatsu.desktop.ui.components.MangaGridCard
@@ -109,7 +110,7 @@ public fun CatalogScreen(
 				horizontalArrangement = Arrangement.spacedBy(6.dp),
 				verticalArrangement = Arrangement.spacedBy(6.dp),
 			) {
-				items(items, key = { it.url }) { manga ->
+				itemsIndexed(items) { _, manga ->
 					MangaGridCard(manga = manga, onClick = { onMangaClick(manga) })
 				}
 				item(span = { GridItemSpan(maxLineSpan) }) {

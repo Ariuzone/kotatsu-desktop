@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
@@ -175,7 +176,7 @@ public fun FavouritesScreen(
 					horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(GRID_SPACING),
 					verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(GRID_SPACING),
 				) {
-					items(mangas, key = { it.url }) { manga ->
+					itemsIndexed(mangas) { _, manga ->
 						MangaGridCard(manga = manga, onClick = { onMangaClick(manga) })
 					}
 				}

@@ -171,7 +171,7 @@ public fun SearchScreen(
 							contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
 							horizontalArrangement = Arrangement.spacedBy(12.dp),
 						) {
-							itemsIndexed(suggestions, key = { _, manga -> manga.url }) { _, manga ->
+							itemsIndexed(suggestions) { _, manga ->
 								SearchSuggestionCover(
 									manga = manga,
 									onClick = { onMangaClick(manga) },

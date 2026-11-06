@@ -114,7 +114,7 @@ public fun MangaGrid(
 		horizontalArrangement = Arrangement.spacedBy(GRID_SPACING - GRID_CARD_MARGIN),
 		verticalArrangement = Arrangement.spacedBy(GRID_SPACING - GRID_CARD_MARGIN),
 	) {
-		itemsIndexed(mangaList, key = { _, manga -> manga.url }) { _, manga ->
+		itemsIndexed(mangaList) { index, manga ->
 			MangaGridCard(
 				manga = manga,
 				onClick = { onMangaClick(manga) },

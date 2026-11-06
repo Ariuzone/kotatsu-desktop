@@ -110,7 +110,7 @@ public fun MangaList(
 	modifier: Modifier = Modifier,
 ) {
 	LazyColumn(modifier = modifier.fillMaxSize()) {
-		itemsIndexed(mangaList, key = { _, manga -> manga.url }) { _, manga ->
+		itemsIndexed(mangaList) { index, manga ->
 			MangaListCard(
 				manga = manga,
 				onClick = { onMangaClick(manga) },
