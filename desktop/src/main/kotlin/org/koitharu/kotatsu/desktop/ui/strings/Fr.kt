@@ -107,6 +107,12 @@ public const val FR_NEXT_PAGE: String = "Page suivante"
 public const val FR_SAVE_PAGE: String = "Sauvegarder la page"
 public const val FR_READER_SETTINGS: String = "Paramètres du lecteur"
 
+// --- Stockage local (string/text_local_holder_primary, text_local_holder_secondary, _import) ---
+public const val FR_TEXT_LOCAL_HOLDER_PRIMARY: String = "Sauvegardez d'abord quelque chose"
+public const val FR_TEXT_LOCAL_HOLDER_SECONDARY: String =
+	"Enregistrez quelque chose à partir d'un catalogue en ligne ou importez-le à partir d'un fichier."
+public const val FR_IMPORT: String = "Importer"
+
 /** Barre d'infos du lecteur (string/reader_info_pattern) : « Ch. %1$d/%2$d Pg. %3$d/%4$d ». */
 public fun frReaderInfo(chapter: Int, chaptersCount: Int, page: Int, pagesCount: Int): String =
 	"Ch. $chapter/$chaptersCount Pg. $page/$pagesCount"
