@@ -63,6 +63,10 @@ class NetworkModule(
 		dns(DoHManager(cache, settings))
 		if (settings.isSSLBypassEnabled) {
 			disableCertificateVerification()
+		} else {
+			// Fidèle à l'app Android : quand le bypass SSL est désactivé, on étend le trust
+			// (magasin système en plus du cacerts JVM — voir SSLUtils.installExtraCertificates).
+			installExtraCertificates()
 		}
 		if (cache != null) {
 			cache(cache)

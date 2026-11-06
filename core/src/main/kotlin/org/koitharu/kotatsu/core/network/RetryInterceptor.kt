@@ -64,6 +64,9 @@ class RetryInterceptor(
 		is NoRouteToHostException,
 		is java.net.SocketException,
 		is java.net.ProtocolException,
+		// Reset HTTP/2 (PROTOCOL_ERROR) : certains serveurs (ex. mangapark.io) réinitialisent
+		// la première requête d'une connexion ; le réessai passe sur une nouvelle stream.
+		is okhttp3.internal.http2.StreamResetException,
 		-> true
 
 		else -> cause?.let { (it as? IOException)?.isTransient() } ?: false

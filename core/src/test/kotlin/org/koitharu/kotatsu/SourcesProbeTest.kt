@@ -18,6 +18,7 @@ import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.core.prefs.FileKeyValueStore
 import org.koitharu.kotatsu.core.prefs.SourceSettingsStoreProvider
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
+import org.koitharu.kotatsu.parsers.model.SortOrder
 import java.io.File
 import java.nio.file.Files
 
@@ -59,14 +60,19 @@ class SourcesProbeTest {
 		val errors = mutableMapOf<String, String>()
 		for (name in selected) {
 			val source = MangaParserSource.entries.first { it.name == name }
-			try {
-				val list = factory.create(source).getList(0, null, null)
-				println("PROBE $name: OK (${list.size} mangas)")
-				ok++
-			} catch (e: Exception) {
-				val detail = e.message?.take(120) ?: "<no message>"
-				println("PROBE $name: FAIL ${e.javaClass.simpleName}: $detail")
-				errors[name] = e.javaClass.simpleName
+			// Ordre par défaut + ordre explicite POPULARITY (l'écran Discover de l'app desktop
+			// utilise des tris explicites : un ordre peut échouer là où le défaut passe).
+			for (order in listOf(null, SortOrder.POPULARITY)) {
+				val label = if (order == null) name else "$name/POPULARITY"
+				try {
+					val list = factory.create(source).getList(0, order, null)
+					println("PROBE $label: OK (${list.size} mangas)")
+					if (order == null) ok++
+				} catch (e: Exception) {
+					val detail = e.message?.take(120) ?: "<no message>"
+					println("PROBE $label: FAIL ${e.javaClass.simpleName}: $detail")
+					if (order == null) errors[name] = e.javaClass.simpleName
+				}
 			}
 		}
 		val summary = errors.entries.groupingBy { it.value }.eachCount()
