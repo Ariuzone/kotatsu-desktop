@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.collectAsState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
@@ -105,6 +107,9 @@ private fun MainScreen(container: AppContainer) {
 	var showSettings by remember { mutableStateOf(false) }
 	var showSearch by remember { mutableStateOf(false) }
 	var showDownloads by remember { mutableStateOf(false) }
+	var incognito by remember {
+		mutableStateOf(container.appSettings.isIncognitoModeEnabled)
+	}
 	var searchResults by remember { mutableStateOf<List<Manga>>(emptyList()) }
 	var readerRequest by remember { mutableStateOf<Pair<Manga, MangaChapter>?>(null) }
 	val scope = rememberCoroutineScope()
@@ -128,6 +133,8 @@ private fun MainScreen(container: AppContainer) {
 	) {
 		// Rail de navigation latéral (comme l'app d'origine en mode tablette/desktop)
 		NavigationRail(modifier = Modifier.align(Alignment.CenterStart)) {
+		// Libellés français exacts de l'app d'origine (values-fr : history, favourites,
+		// explore, by_source, feed)
 			for (item in NavItem.default) {
 				NavigationRailItem(
 					selected = selected == item && selectedManga == null && selectedSource == null && !showSettings,
@@ -149,6 +156,15 @@ private fun MainScreen(container: AppContainer) {
 			// Paramètres : dans l'app d'origine ils sont dans le menu du drawer principal ;
 			// sur desktop ils sont accessibles en bas du rail (divergence documentée).
 			Spacer(modifier = Modifier.weight(1f))
+			if (incognito) {
+				IconButton(onClick = { incognito = false; container.appSettings.isIncognitoModeEnabled = false }) {
+					Icon(
+						imageVector = Icons.Filled.PrivacyTip,
+						contentDescription = "Mode incognito",
+						tint = MaterialTheme.colorScheme.primary,
+					)
+				}
+			}
 			NavigationRailItem(
 				selected = showDownloads,
 				onClick = { showDownloads = true },
@@ -403,7 +419,10 @@ private fun MainScreen(container: AppContainer) {
 		val (readerManga, chapter) = request
 		var pageUrls by remember(request) { mutableStateOf<List<String>>(emptyList()) }
 		LaunchedEffect(request) {
-			container.library.saveProgress(readerManga, chapter, page = 0)
+			// Mode incognito (comme l'app d'origine) : aucune progression enregistrée
+			if (!incognito) {
+				container.library.saveProgress(readerManga, chapter, page = 0)
+			}
 			val pages = container.getPages(chapter)
 			pageUrls = pages.map { container.getPageUrl(it) }
 		}
