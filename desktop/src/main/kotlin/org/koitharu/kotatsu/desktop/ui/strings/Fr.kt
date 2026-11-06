@@ -75,3 +75,38 @@ public const val FR_CONTENT_TYPE_HENTAI: String = "Hentais"
 
 // --- Recherche (string/clear_search_history, search_history_cleared) ---
 public const val FR_CLEAR_SEARCH_HISTORY: String = "Effacer l'historique de recherche"
+
+// --- Flux (string/update, show_updated, clear_feed ; plurals new_chapters de values-fr/plurals.xml) ---
+public const val FR_SHOW_UPDATED: String = "Afficher mis à jour"
+public const val FR_CLEAR_FEED: String = "Effacer le flux"
+
+/** Pluriel « nouveau(x) chapitre(s) » (plurals.xml : new_chapters, values-fr). */
+public fun frNewChapters(count: Int): String = when (count) {
+	1 -> "1 nouveau chapitre"
+	else -> "$count nouveaux chapitres"
+}
+
+// --- Détails du manga (string/read, chapters, chapters_empty, description, expand, collapse,
+//     download, add_to_favourites, nsfw) ---
+public const val FR_READ: String = "Lire"
+public const val FR_CHAPTERS: String = "Chapitres"
+public const val FR_CHAPTERS_EMPTY: String = "Pas de chapitres dans ce manga"
+public const val FR_DESCRIPTION: String = "Description"
+public const val FR_EXPAND: String = "Développer"
+public const val FR_COLLAPSE: String = "Réduire"
+public const val FR_DOWNLOAD: String = "Télécharger"
+public const val FR_ADD_TO_FAVOURITES: String = "Ajouter aux favoris"
+public const val FR_NSFW: String = "18+"
+
+// --- Lecteur (string/prev_chapter, next_chapter, prev_page, next_page, save_page,
+//     reader_settings, reader_info_pattern) ---
+public const val FR_PREV_CHAPTER: String = "Chapitre précèdent"
+public const val FR_NEXT_CHAPTER: String = "Chapitre suivant"
+public const val FR_PREV_PAGE: String = "Page précédente"
+public const val FR_NEXT_PAGE: String = "Page suivante"
+public const val FR_SAVE_PAGE: String = "Sauvegarder la page"
+public const val FR_READER_SETTINGS: String = "Paramètres du lecteur"
+
+/** Barre d'infos du lecteur (string/reader_info_pattern) : « Ch. %1$d/%2$d Pg. %3$d/%4$d ». */
+public fun frReaderInfo(chapter: Int, chaptersCount: Int, page: Int, pagesCount: Int): String =
+	"Ch. $chapter/$chaptersCount Pg. $page/$pagesCount"
