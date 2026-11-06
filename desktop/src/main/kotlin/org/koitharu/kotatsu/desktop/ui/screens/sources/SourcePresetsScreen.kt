@@ -58,6 +58,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
 import coil3.request.crossfade
 import org.koitharu.kotatsu.desktop.ui.components.TopSearchBar
 import org.koitharu.kotatsu.desktop.ui.components.TopSearchMenuAction
@@ -413,14 +416,24 @@ private fun SourceIcon(
 			contentAlignment = Alignment.Center,
 		) {
 			if (faviconUrl != null) {
-				AsyncImage(
+				// Fallback visible si le favicon échoue (la tuile reste cliquable)
+				SubcomposeAsyncImage(
 					model = faviconUrl,
 					contentDescription = source.title,
 					contentScale = ContentScale.Fit,
 					modifier = Modifier
 						.fillMaxSize()
 						.padding(12.dp),
-				)
+				) {
+					when (painter.state) {
+						is AsyncImagePainter.State.Error -> Icon(
+							imageVector = Icons.AutoMirrored.Filled.MenuBook,
+							contentDescription = source.title,
+							tint = MaterialTheme.colorScheme.onSurfaceVariant,
+						)
+						else -> SubcomposeAsyncImageContent()
+					}
+				}
 			} else {
 				Icon(
 					imageVector = Icons.AutoMirrored.Filled.MenuBook,
