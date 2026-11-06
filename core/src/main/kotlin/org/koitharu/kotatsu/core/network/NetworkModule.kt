@@ -1,12 +1,16 @@
 /*
  * Fichier modifié — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
- * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation JVM/desktop.
+ * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-06 — intercepteurs desktop.
  * Adaptation : version sans Hilt de NetworkModule — classe explicite exposant `baseHttpClient`
  * (qualifier @BaseHttpClient) et `mangaHttpClient` (qualifier @MangaHttpClient) en simples vals.
  * Le cache HTTP est créé ici si [cacheDir] est fourni ; le CookieJar persistant est créé
  * automatiquement à partir du [cookieStore] (JSON desktop) si non fourni.
  * Les fournisseurs pour CommonHeadersInterceptor (fabrique de dépôts, User-Agent par défaut)
  * sont injectables — câblés par l'hôte desktop une fois le parser prêt.
+ * Desktop ajoute deux intercepteurs absents d'Android : ErrorClassificationInterceptor
+ * (UnknownHostException -> DeadDomainException, pour que l'UI distingue un domaine mort d'un
+ * échec temporaire) et RetryInterceptor (réessai court avec backoff pour les erreurs
+ * transitoires 502/503/504/522/524 et les IOException transitoires).
  */
 package org.koitharu.kotatsu.core.network
 
@@ -59,12 +63,18 @@ class NetworkModule(
 		dns(DoHManager(cache, settings))
 		if (settings.isSSLBypassEnabled) {
 			disableCertificateVerification()
+		} else {
+			// Fidèle à l'app Android : quand le bypass SSL est désactivé, on étend le trust
+			// (magasin système en plus du cacerts JVM — voir SSLUtils.installExtraCertificates).
+			installExtraCertificates()
 		}
 		if (cache != null) {
 			cache(cache)
 		}
+		addInterceptor(ErrorClassificationInterceptor())
 		addInterceptor(CloudFlareInterceptor(cloudFlareBypassResolver))
 		addInterceptor(RateLimitInterceptor())
+		addInterceptor(RetryInterceptor())
 	}.build()
 
 	/** Qualifier desktop pour l'ancien `@MangaHttpClient`. */

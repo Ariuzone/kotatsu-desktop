@@ -16,6 +16,7 @@ import org.koitharu.kotatsu.core.exceptions.CaughtException
 import org.koitharu.kotatsu.core.exceptions.CloudFlareBlockedException
 import org.koitharu.kotatsu.core.exceptions.CloudFlareException
 import org.koitharu.kotatsu.core.exceptions.CloudFlareProtectedException
+import org.koitharu.kotatsu.core.exceptions.DeadDomainException
 import org.koitharu.kotatsu.core.exceptions.EmptyMangaException
 import org.koitharu.kotatsu.core.exceptions.IncompatiblePluginException
 import org.koitharu.kotatsu.core.exceptions.NoDataReceivedException
@@ -86,7 +87,8 @@ fun Throwable.getCauseUrl(): String? = when (this) {
 }
 
 fun Throwable.isNetworkError(): Boolean {
-	return this is UnknownHostException
+	return this is DeadDomainException
+		|| this is UnknownHostException
 		|| this is SocketTimeoutException
 		|| this is StreamResetException
 		|| this is SocketException
@@ -95,6 +97,12 @@ fun Throwable.isNetworkError(): Boolean {
 
 @Suppress("FunctionName")
 fun NoSpaceLeftException() = IOException(MSG_NO_SPACE_LEFT)
+
+/**
+ * Vrai si l'erreur provient d'un domaine de source définitivement injoignable (DNS introuvable
+ * après fallback DoH). L'UI peut alors proposer de désactiver la source au lieu de « réessayer ».
+ */
+fun Throwable.isDeadDomainError(): Boolean = this is DeadDomainException || this is UnknownHostException
 
 fun FileNotFoundException.getFile(): File? {
 	val groups = FNFE_MESSAGE_REGEX.matchEntire(message ?: return null)?.groupValues ?: return null

@@ -1,0 +1,6 @@
+# Certificats racine supplémentaires chargés par SSLUtils.installExtraCertificates (desktop).
+# Équivalent desktop des assets .pem de l'app Android. Un nom de fichier .pem par ligne,
+# relatif à ce répertoire. Sources officielles :
+# - isrg-root-ye.pem : https://letsencrypt.org/certs/gen-y/root-ye.pem (Let's Encrypt, ISRG Root YE,
+#   SHA-256 E1:4F:FC:AD:5B:00:25:73:10:06:CA:A4:3A:12:1A:22:D8:E9:70:0F:4F:B9:CF:85:2F:02:A7:08:AA:5D:56:66)
+isrg-root-ye.pem
