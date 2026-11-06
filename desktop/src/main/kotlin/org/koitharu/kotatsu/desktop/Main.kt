@@ -61,6 +61,7 @@ import org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderMode
 import org.koitharu.kotatsu.desktop.tracker.TrackerTray
 import org.koitharu.kotatsu.desktop.ui.settings.DesktopSettings
 import org.koitharu.kotatsu.desktop.ui.theme.KotatsuTheme
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import org.koitharu.kotatsu.core.db.entity.toManga
 import org.koitharu.kotatsu.core.db.entity.toMangaTag
@@ -503,6 +504,27 @@ private fun MainScreen(container: AppContainer) {
 								onSettingsClick = { showSettings = true },
 								onManageSourcesClick = { showSourcesCatalog = true },
 							)
+
+						NavItem.LOCAL -> {
+							// CBZ/dossiers locaux (LocalMangaRepository, lot P2)
+							var localItems by remember { mutableStateOf<List<Manga>>(emptyList()) }
+							LaunchedEffect(Unit) {
+								runCatching {
+									container.downloadManager // initialise le dépôt local
+									val local = container.localRepository() ?: return@runCatching
+									// chaque émission du flux = un manga local découvert
+									local.getRawListAsFlow().toList().map { it.manga }
+								}
+							}
+							org.koitharu.kotatsu.desktop.ui.screens.local.LocalScreen(
+								items = localItems,
+								onMangaClick = { selectedManga = it },
+								onImportClick = {},
+								onSearchClick = { showSearch = true },
+								onSettingsClick = { showSettings = true },
+								onIncognitoToggle = { incognito = it },
+							)
+						}
 
 						NavItem.FEED ->
 							org.koitharu.kotatsu.desktop.ui.screens.feed.FeedScreen(

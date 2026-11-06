@@ -120,6 +120,10 @@ public class AppContainer private constructor(appDir: File) {
 	/** Dépôt local (CBZ/dossiers), branché dans la fabrique de dépôts. */
 	private lateinit var localMangaRepository: org.koitharu.kotatsu.local.data.LocalMangaRepository
 
+	/** Dépôt local (CBZ/dossiers), null tant que le gestionnaire de téléchargements n'est pas initialisé. */
+	public fun localRepository(): org.koitharu.kotatsu.local.data.LocalMangaRepository? =
+		if (::localMangaRepository.isInitialized) localMangaRepository else null
+
 	init {
 		appDir.mkdirs()
 		val settingsStore = FileKeyValueStore(appDir.resolve("settings.json").toPath())
