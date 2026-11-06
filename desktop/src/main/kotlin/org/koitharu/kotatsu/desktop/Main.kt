@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.collectAsState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
@@ -102,6 +104,7 @@ private fun MainScreen(container: AppContainer) {
 	var selectedManga by remember { mutableStateOf<Manga?>(null) }
 	var showSettings by remember { mutableStateOf(false) }
 	var showSearch by remember { mutableStateOf(false) }
+	var showDownloads by remember { mutableStateOf(false) }
 	var searchResults by remember { mutableStateOf<List<Manga>>(emptyList()) }
 	var readerRequest by remember { mutableStateOf<Pair<Manga, MangaChapter>?>(null) }
 	val scope = rememberCoroutineScope()
@@ -147,6 +150,12 @@ private fun MainScreen(container: AppContainer) {
 			// sur desktop ils sont accessibles en bas du rail (divergence documentée).
 			Spacer(modifier = Modifier.weight(1f))
 			NavigationRailItem(
+				selected = showDownloads,
+				onClick = { showDownloads = true },
+				icon = { Icon(Icons.Filled.Download, contentDescription = "Downloads") },
+				label = { Text("Downloads") },
+			)
+			NavigationRailItem(
 				selected = showSettings,
 				onClick = { showSettings = true },
 				icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
@@ -161,6 +170,45 @@ private fun MainScreen(container: AppContainer) {
 			color = MaterialTheme.colorScheme.surface,
 		) {
 			when {
+				showDownloads -> {
+					// Téléchargements réels (DownloadManager.observeState)
+					val states by container.downloadManager.observeState().collectAsState()
+					org.koitharu.kotatsu.desktop.ui.screens.downloads.DownloadsScreen(
+						items = states.map { s ->
+							org.koitharu.kotatsu.desktop.ui.screens.downloads.DownloadItem(
+								id = java.util.UUID.nameUUIDFromBytes(byteArrayOf((s.manga.id and 0xff).toByte())),
+								manga = s.manga,
+								state = when {
+									s.isStopped && s.error != null ->
+										org.koitharu.kotatsu.desktop.ui.screens.downloads.DownloadUiState.FAILED
+									s.isStopped && s.error == null ->
+										org.koitharu.kotatsu.desktop.ui.screens.downloads.DownloadUiState.SUCCEEDED
+									s.isStopped ->
+										org.koitharu.kotatsu.desktop.ui.screens.downloads.DownloadUiState.CANCELLED
+									else ->
+										org.koitharu.kotatsu.desktop.ui.screens.downloads.DownloadUiState.RUNNING
+								},
+								isPaused = s.isPaused,
+								isIndeterminate = s.isIndeterminate,
+								progress = s.progress,
+								max = s.max,
+								error = s.errorMessage ?: s.error?.message,
+								eta = if (s.eta > 0) java.time.Instant.ofEpochMilli(s.timestamp + s.eta) else null,
+								isStuck = s.isStuck,
+								chaptersDownloaded = s.downloadedChapters,
+							)
+						},
+						onItemClick = { item ->
+							item.manga?.let { selectedManga = it }
+							showDownloads = false
+						},
+						onPauseClick = { item -> item.manga?.let { container.downloadManager.pause(it.id) } },
+						onResumeClick = { item -> item.manga?.let { container.downloadManager.resume(it.id) } },
+						onCancelClick = { item -> item.manga?.let { container.downloadManager.cancel(it.id) } },
+						onBackClick = { showDownloads = false },
+					)
+				}
+
 				showSettings ->
 					org.koitharu.kotatsu.desktop.ui.screens.settings.AppearanceSettingsScreen(
 						settings = DesktopSettings.getInstance(),
@@ -201,7 +249,9 @@ private fun MainScreen(container: AppContainer) {
 							chapters.getOrNull(index)?.let { readerRequest = (details ?: seed) to it }
 						},
 						onFavouriteClick = {},
-						onDownloadClick = {},
+						onDownloadClick = {
+							container.downloadManager.enqueue(manga = details ?: seed)
+						},
 						onReadClick = { chapters.firstOrNull()?.let { readerRequest = (details ?: seed) to it } },
 					)
 					if (error != null) {

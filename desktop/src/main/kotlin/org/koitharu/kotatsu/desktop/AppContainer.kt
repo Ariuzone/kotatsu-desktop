@@ -13,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableSharedFlow
+import org.koitharu.kotatsu.local.domain.MangaLock
 import org.koitharu.kotatsu.core.cache.MemoryContentCache
 import org.koitharu.kotatsu.core.network.NetworkModule
 import org.koitharu.kotatsu.core.parser.MangaLoaderContextImpl
@@ -80,6 +82,44 @@ public class AppContainer private constructor(appDir: File) {
 
 	private lateinit var settingsStore: org.koitharu.kotatsu.core.prefs.KeyValueStore
 
+	/** Téléchargements hors-ligne + lecture locale (CBZ/dossiers), cf. lot P2. */
+	public val downloadManager: org.koitharu.kotatsu.download.domain.DownloadManager by lazy {
+		val localStorageChanges = MutableSharedFlow<org.koitharu.kotatsu.local.domain.model.LocalManga?>(
+			extraBufferCapacity = 16,
+		)
+		val lock = MangaLock()
+		val storageManager = org.koitharu.kotatsu.local.data.LocalStorageManager(
+			defaultDir = File(appDir, "local"),
+		)
+		lateinit var localRepository: org.koitharu.kotatsu.local.data.LocalMangaRepository
+		val localMangaIndex = org.koitharu.kotatsu.local.data.index.LocalMangaIndex(
+			db = database,
+			localMangaRepositoryProvider = { localRepository },
+			prefsFile = File(appDir, "local-prefs.json"),
+		)
+		localRepository = org.koitharu.kotatsu.local.data.LocalMangaRepository(
+			storageManager = storageManager,
+			localMangaIndex = localMangaIndex,
+			localStorageChanges = localStorageChanges,
+			settings = appSettings,
+			lock = lock,
+		)
+		localMangaRepository = localRepository
+		org.koitharu.kotatsu.download.domain.DownloadManager(
+			scope = scope,
+			okHttp = network.mangaHttpClient,
+			localMangaRepository = localRepository,
+			mangaRepositoryFactory = repositoryFactory,
+			localMangaIndex = localMangaIndex,
+			settings = appSettings,
+			lock = lock,
+			localStorageChanges = localStorageChanges,
+		)
+	}
+
+	/** Dépôt local (CBZ/dossiers), branché dans la fabrique de dépôts. */
+	private lateinit var localMangaRepository: org.koitharu.kotatsu.local.data.LocalMangaRepository
+
 	init {
 		appDir.mkdirs()
 		val settingsStore = FileKeyValueStore(appDir.resolve("settings.json").toPath())
@@ -103,6 +143,7 @@ public class AppContainer private constructor(appDir: File) {
 			loaderContext = loaderContext,
 			contentCache = contentCache,
 			mirrorSwitcher = mirrorSwitcher,
+			localMangaRepository = null, // branché après création du dépôt local (lazy, cf. downloadManager)
 		)
 	}
 
