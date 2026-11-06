@@ -124,6 +124,18 @@ public class AppContainer private constructor(appDir: File) {
 		appDir.mkdirs()
 		val settingsStore = FileKeyValueStore(appDir.resolve("settings.json").toPath())
 		this.settingsStore = settingsStore
+		// ImageLoader Coil global : passe par le client réseau de l'app (headers communs)
+		// + referer par source, fidèle au MangaSourceHeaderInterceptor d'origine.
+		val imageLoader = coil3.ImageLoader.Builder(coil3.PlatformContext.INSTANCE)
+			.components {
+				add(
+					coil3.network.okhttp.OkHttpNetworkFetcherFactory(
+						callFactory = { imageClient() },
+					),
+				)
+			}
+			.build()
+		coil3.SingletonImageLoader.setSafe { imageLoader }
 		val sourcesDir: Path = appDir.resolve("sources").toPath()
 		appSettings = AppSettings(settingsStore)
 		network = NetworkModule(
@@ -187,6 +199,35 @@ public class AppContainer private constructor(appDir: File) {
 			}
 		}.awaitAll().flatten()
 	}
+
+	// Cache domaine -> referer (MangaSourceHeaderInterceptor d'origine : images chargées
+	// avec Referer = base du site source, sinon certaines renvoient 403).
+	@Volatile
+	private var referers: Map<String, String>? = null
+
+	private fun refererFor(host: String): String? {
+		val map = referers ?: MangaParserSource.entries
+			.mapNotNull { s ->
+				domainOf(s)?.let { d -> d.lowercase() to "https://$d/" }
+			}
+			.toMap()
+			.also { referers = it }
+		return map.entries.firstOrNull { host.endsWith(it.key.removePrefix("www.")) }?.value
+	}
+
+	/** Client HTTP dédié aux images : headers communs + referer par source. */
+	private fun imageClient(): okhttp3.OkHttpClient = network.mangaHttpClient.newBuilder()
+		.addInterceptor { chain ->
+			val request = chain.request()
+			val referer = refererFor(request.url.host)
+			val enriched = if (referer != null && request.header("Referer") == null) {
+				request.newBuilder().header("Referer", referer).build()
+			} else {
+				request
+			}
+			chain.proceed(enriched)
+		}
+		.build()
 
 	/** Domaine d'une source parser (pour les favicons), null si indisponible. */
 	public fun domainOf(source: MangaSource): String? = runCatching {
