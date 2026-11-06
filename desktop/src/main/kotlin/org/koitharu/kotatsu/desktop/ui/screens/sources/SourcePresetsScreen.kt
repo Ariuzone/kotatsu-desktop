@@ -13,6 +13,7 @@
 package org.koitharu.kotatsu.desktop.ui.screens.sources
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,6 +56,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.crossfade
 import org.koitharu.kotatsu.desktop.ui.components.TopSearchBar
@@ -71,6 +73,7 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_RANDOM
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SETTINGS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCE_PRESETS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TEXT_EMPTY_HOLDER_PRIMARY
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 
@@ -292,7 +295,19 @@ private fun SuggestionsPager(
 	suggestions: List<Manga>,
 	onSuggestionClick: (Manga) -> Unit,
 ) {
-	if (suggestions.isEmpty()) return
+	if (suggestions.isEmpty()) {
+		// État vide FR : aucune suggestion disponible (fetch en cours ou préférences vides)
+		Text(
+			text = FR_TEXT_EMPTY_HOLDER_PRIMARY,
+			style = MaterialTheme.typography.bodyMedium,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(vertical = 24.dp),
+			textAlign = TextAlign.Center,
+		)
+		return
+	}
 	val pagerState = rememberPagerState { suggestions.size }
 	Column(horizontalAlignment = Alignment.CenterHorizontally) {
 		HorizontalPager(
@@ -331,7 +346,7 @@ private fun SuggestionsPager(
 				) {
 					Text(
 						text = manga.title,
-						style = MaterialTheme.typography.titleMedium,
+						style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
 						color = MaterialTheme.colorScheme.onSurface,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis,
@@ -346,15 +361,16 @@ private fun SuggestionsPager(
 				}
 			}
 		}
-		// Points de pagination
+		// Points de pagination (point actif plus grand, comme la capture)
 		Row(
 			modifier = Modifier.padding(top = 8.dp),
 			horizontalArrangement = Arrangement.spacedBy(6.dp),
+			verticalAlignment = Alignment.CenterVertically,
 		) {
 			repeat(suggestions.size) { index ->
 				Box(
 					modifier = Modifier
-						.size(8.dp)
+						.size(if (index == pagerState.currentPage) 8.dp else 4.dp)
 						.clip(CircleShape)
 						.background(
 							if (index == pagerState.currentPage) {
@@ -388,6 +404,11 @@ private fun SourceIcon(
 			modifier = Modifier
 				.size(SOURCE_FAVICON_SIZE)
 				.clip(RoundedCornerShape(16.dp))
+				.border(
+					width = 1.dp,
+					color = MaterialTheme.colorScheme.outlineVariant,
+					shape = RoundedCornerShape(16.dp),
+				)
 				.background(MaterialTheme.colorScheme.surfaceContainerHighest),
 			contentAlignment = Alignment.Center,
 		) {
