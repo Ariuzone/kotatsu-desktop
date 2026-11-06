@@ -10,6 +10,7 @@ package org.koitharu.kotatsu.desktop.tracker
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 
@@ -32,6 +33,9 @@ class TrackerNotifier {
 	private val _events = MutableSharedFlow<NewChaptersEvent>(extraBufferCapacity = 16)
 
 	val events: SharedFlow<NewChaptersEvent> = _events
+
+	/** Nombre d'abonnés au bus (StateFlow, pour l'observabilité/tests). */
+	val subscriberCount: StateFlow<Int> get() = _events.subscriptionCount
 
 	/** Publie un événement « nouveaux chapitres » (suspend si le buffer est plein). */
 	suspend fun notify(event: NewChaptersEvent) {
