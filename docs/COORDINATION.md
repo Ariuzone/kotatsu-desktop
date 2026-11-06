@@ -4,14 +4,15 @@
 
 | Lot | Agent | Statut | Branche | Dernier commit | Blocages | Prochaine action |
 |---|---|---|---|---|---|---|
-| Squelette build | principal | **fini** | main | « Squelette Gradle compilable » | — | — |
-| L1 contrats | principal | intégré au squelette | main | — | — | — |
-| L2 core-données (Room JVM) | sous-agent B | en cours | agent/core-data (worktree kotatsu-desktop-core-data) | — | — | — |
-| L3 core-réseau/parser/prefs | sous-agent A | en cours (5 commits : prefs, network, parser, github) | agent/core-net (worktree kotatsu-desktop-core-net) | 019d359 | — | fin de lot : test réseau |
+| L2 core-données (Room JVM) | sous-agent B | **fini, fusionné** — 97 fichiers, 17 entités, 16 DAO, 28 migrations, schéma v28 exporté, 3/3 tests | agent/core-data | fusion | — | — |
+| L3 core-réseau/parser/prefs | sous-agent A | **fini, fusionné** — test réseau réel PASSED (DYNASTYSCANS) | agent/core-net | d1f2e47 | — | — |
 | L4a ui-shell + thème | principal | **fini** | main | 266cf2b | — | — |
-| L4b ui-écrans | principal | en cours | main | 24bec18+ | — | Explore/Détails/Lecteur/Recherche/Paramètres écrits ; données réelles à brancher après fusion L2/L3 |
-| L5 packaging/CI | principal | **fini** (app-image vérifié + .exe généré ; install local bloqué par UAC → CI) | main | 1a2e796 | UAC pour install silencieuse locale | — |
-| L6 docs | principal | en cours | main | — | — | README initial écrit |
+| L4b ui-écrans (Explore/Catalogue/Détails/Lecteur/Recherche/Paramètres) | principal | **fini** — E2E réseau réel PASSED (catalogue>détails>chapitres>pages>URL après fix org.json lenient) | main | 04819e8 | — | — |
+| L4c écrans History/Favorites/Downloads | sous-agent C | **fini, fusionné** + câblé à la DB réelle | agent/ui-screens | fusion 04819e8 | — | écran Downloads à brancher au lot P2 |
+| P2 téléchargements + CBZ local | sous-agent D | en cours | agent/downloads (worktree) | — | — | rapport puis fusion |
+| P3 tracker + verrouillage | sous-agent E | en cours | agent/tracker (worktree) | — | — | rapport puis fusion |
+| L5 packaging/CI | principal | **fini** (app-image + Kotatsu-9.8.6.exe ; install locale bloquée par UAC → CI) | main | 1a2e796 | — | rebuild final après fusions |
+| L6 docs | principal | en cours | main | — | — | rapport final |
 
 ## Requêtes (destinataire : agent)
 
