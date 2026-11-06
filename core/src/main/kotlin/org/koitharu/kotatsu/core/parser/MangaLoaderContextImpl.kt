@@ -101,6 +101,31 @@ class MangaLoaderContextImpl(
 	fun parserFor(source: MangaParserSource): MangaParser =
 		cachedParsers.getOrPut(source.name) { newParserInstance(source) }
 
+	/**
+	 * Source dont le domaine correspond au host donné (images sans tag, ex. Coil :
+	 * uploads.mangadex.org -> MANGADEX). Index domaine -> source construit paresseusement
+	 * à partir des domaines prédéfinis des parsers. Sous-domaines acceptés
+	 * (uploads.mangadex.org correspond à mangadex.org).
+	 */
+	fun sourceForDomain(host: String): MangaParserSource? {
+		val normalized = host.lowercase(Locale.ROOT).removePrefix("www.")
+		return domainIndex[normalized]
+			?: domainIndex.entries.firstOrNull { normalized.endsWith(".${it.key}") }?.value
+	}
+
+	private val domainIndex: Map<String, MangaParserSource> by lazy {
+		val index = HashMap<String, MangaParserSource>()
+		for (source in MangaParserSource.entries) {
+			runCatching {
+				for (domain in parserFor(source).configKeyDomain.presetValues) {
+					val key = domain.lowercase(Locale.ROOT).removePrefix("www.")
+					index.putIfAbsent(key, source)
+				}
+			}
+		}
+		index
+	}
+
 	private val cachedParsers = ConcurrentHashMap<String, MangaParser>()
 
 	companion object {

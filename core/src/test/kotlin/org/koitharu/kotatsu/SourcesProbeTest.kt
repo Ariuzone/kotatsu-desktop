@@ -1,13 +1,22 @@
 /*
  * Fichier modifié — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
  * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-06 — sonde réseau étendue.
- * Instrumentation de travail : sonde 30+ sources réelles, mesure le taux de succès global et
+ * Instrumentation de travail : sonde 47 sources réelles, mesure le taux de succès global et
  * imprime le type d'erreur par source. Ce test n'échoue jamais : il documente l'état réel du
- * réseau desktop. Filtrage : -Dprobe.sources=MANGADEX,MANGAFIRE_EN pour ne sonder qu'une liste.
+ * réseau desktop.
+ *
+ * Mode CI : la sonde réseau est DÉSACTIVÉE par défaut (les builds CI n'ont pas de réseau fiable
+ * et ce test dure plusieurs minutes). Elle ne s'exécute que si :
+ *   - la propriété système `runNetworkProbes=true` (ex. systemProp.runNetworkProbes=true dans
+ *     gradle.properties, car `./gradlew -D...` ne l'endosse pas au JVM de test), OU
+ *   - la variable d'environnement RUN_NETWORK_PROBES=true (héritée par le JVM de test).
+ * Sinon le test est ignoré (Assume) — CI verte hors ligne.
+ * Filtrage optionnel : -Dprobe.sources=MANGADEX,MANGAFIRE_EN (systemProp) ou PROBE_SOURCES env.
  */
 package org.koitharu.kotatsu
 
 import kotlinx.coroutines.runBlocking
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.koitharu.kotatsu.core.cache.MemoryContentCache
 import org.koitharu.kotatsu.core.network.NetworkModule
@@ -40,8 +49,22 @@ class SourcesProbeTest {
 		"LINEWEBTOONS_EN",
 	)
 
+	/**
+	 * Validation hors ligne (exécutée en CI) : les noms de la sonde existent bien dans
+	 * MangaParserSource.entries — protège la sonde contre les renommages du paquet parsers.
+	 */
+	@Test
+	fun probeCandidatesExistInParsersEnum() {
+		val unknown = candidates.filterNot { name -> MangaParserSource.entries.any { it.name == name } }
+		assumeTrue(unknown.joinToString(), unknown.isEmpty())
+	}
+
 	@Test
 	fun probeSources() = runBlocking {
+		assumeTrue(
+			"Sonde réseau ignorée : -DrunNetworkProbes=true (ou RUN_NETWORK_PROBES=true) pour l'activer",
+			isNetworkProbeEnabled(),
+		)
 		val dir = Files.createTempDirectory("kotatsu-probe").toFile()
 		val settingsStore = FileKeyValueStore(dir.resolve("settings.json").toPath())
 		val appSettings = AppSettings(settingsStore)
@@ -54,7 +77,8 @@ class SourcesProbeTest {
 			},
 		)
 		val factory = MangaRepository.Factory(ctx, MemoryContentCache(), MirrorSwitcher(appSettings, network.mangaHttpClient))
-		val filter = System.getProperty("probe.sources")?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }
+		val filter = (System.getProperty("probe.sources") ?: System.getenv("PROBE_SOURCES"))
+			?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }
 		val selected = candidates.filter { name ->
 			val exists = MangaParserSource.entries.any { it.name == name }
 			if (!exists) println("PROBE $name: SKIP (inconnu du paquet parsers)")
@@ -83,4 +107,8 @@ class SourcesProbeTest {
 		println("PROBE RESULT: $ok/${selected.size} OK ; erreurs: $summary")
 		println("PROBE RATE: ${ok * 100 / selected.size}%")
 	}
+
+	private fun isNetworkProbeEnabled(): Boolean =
+		System.getProperty("runNetworkProbes") == "true" ||
+			System.getenv("RUN_NETWORK_PROBES") == "true"
 }

@@ -37,7 +37,7 @@ class CommonHeadersInterceptor(
 		val request = chain.request()
 		val source = request.tag(MangaSource::class.java)
 			?: request.headers[CommonHeaders.MANGA_SOURCE]?.let { MangaSource(it) }
-		val sourceInfo = resolveSourceInfo(source)
+		val sourceInfo = resolveSourceInfo(source, request)
 		val headersBuilder = request.headers.newBuilder()
 			.removeAll(CommonHeaders.MANGA_SOURCE)
 		sourceInfo?.requestHeaders?.let {
@@ -60,8 +60,15 @@ class CommonHeadersInterceptor(
 		return sourceInfo?.interceptSafe(ProxyChain(chain, newRequest)) ?: chain.proceed(newRequest)
 	}
 
-	private fun resolveSourceInfo(source: MangaSource?): SourceInfo? {
-		if (source !is MangaParserSource) return null
+	private fun resolveSourceInfo(source: MangaSource?, request: Request): SourceInfo? {
+		// Priorité : tag de la requête (requêtes parser), puis résolution par domaine du host
+		// pour les requêtes d'images sans tag (Coil : covers, pages) — sans quoi certains CDN
+		// (uploads.mangadex.org) servent un challenge bot en HTTP 200 à l'UA par défaut.
+		return resolveForParserSource(source as? MangaParserSource) ?: resolveForHost(request)
+	}
+
+	private fun resolveForParserSource(source: MangaParserSource?): SourceInfo? {
+		if (source == null) return null
 		val repository = repositoryFactoryProvider?.invoke()?.create(source) as? ParserMangaRepository
 		if (repository != null) {
 			return SourceInfo(
@@ -73,14 +80,22 @@ class CommonHeadersInterceptor(
 		}
 		// Fallback desktop : fabrique de dépôts non câblée — parser brut via le contexte global.
 		val context = MangaLoaderContextImpl.globalInstance ?: return null
-		val parser = context.parserFor(source)
-		return SourceInfo(
-			requestHeaders = parser.getRequestHeaders(),
-			cloudFlareUserAgent = (parser.config as? SourceSettings)?.cloudFlareUserAgent,
-			domain = parser.domain,
-			delegate = parser,
-		)
+		return infoForParser(context.parserFor(source))
 	}
+
+	/** Requête sans source identifiable : tente la résolution par domaine du host. */
+	private fun resolveForHost(request: Request): SourceInfo? {
+		val context = MangaLoaderContextImpl.globalInstance ?: return null
+		val source = context.sourceForDomain(request.url.host) ?: return null
+		return infoForParser(context.parserFor(source))
+	}
+
+	private fun infoForParser(parser: org.koitharu.kotatsu.parsers.MangaParser): SourceInfo = SourceInfo(
+		requestHeaders = parser.getRequestHeaders(),
+		cloudFlareUserAgent = (parser.config as? SourceSettings)?.cloudFlareUserAgent,
+		domain = parser.domain,
+		delegate = parser,
+	)
 
 	private class SourceInfo(
 		val requestHeaders: Headers?,
