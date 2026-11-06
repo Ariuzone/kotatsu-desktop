@@ -50,6 +50,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import org.koitharu.kotatsu.core.APP_VERSION_NAME
 import org.koitharu.kotatsu.desktop.ui.nav.NavItem
+import org.koitharu.kotatsu.desktop.ui.screens.history.HistoryItem
 import org.koitharu.kotatsu.desktop.ui.strings.FR_HISTORY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_FAVOURITES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_EXPLORE
@@ -331,6 +332,117 @@ private fun MainScreen(container: AppContainer) {
 				}
 
 					else -> when (selected) {
+						NavItem.HISTORY -> {
+							// Historique réel depuis la DB Room (HistoryDao)
+							var historyItems by remember {
+								mutableStateOf<List<org.koitharu.kotatsu.desktop.ui.screens.history.HistoryItem>>(emptyList())
+							}
+							LaunchedEffect(Unit) {
+								val library = container.library
+								historyItems = library.getHistory().mapNotNull { row ->
+									val (manga, history) = library.run { row.toDisplay() }
+									org.koitharu.kotatsu.desktop.ui.screens.history.HistoryItem(
+										manga = manga,
+										chapter = null, // chapitre résolu au clic via getDetails
+										percent = history.percent,
+										updatedAt = java.time.Instant.ofEpochMilli(history.updatedAt),
+									)
+								}
+							}
+							org.koitharu.kotatsu.desktop.ui.screens.history.HistoryScreen(
+								historyItems = historyItems,
+								onMangaClick = { selectedManga = it },
+								onContinueClick = { item ->
+									// « Continue reading » : retrouve le chapitre courant via la source
+									scope.launch {
+										val details = runCatching { container.getDetails(item.manga) }.getOrNull()
+										val chapter = details?.chapters?.firstOrNull()
+										if (chapter != null) readerRequest = item.manga to chapter
+									}
+								},
+							)
+						}
+
+						NavItem.FAVORITES -> {
+							// Favoris réels depuis la DB Room (FavouritesDao + catégories)
+							var categories by remember {
+								mutableStateOf<List<org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouriteCategory>>(emptyList())
+							}
+							LaunchedEffect(Unit) {
+								val library = container.library
+								val all = library.getFavourites()
+								val cats = library.getFavouriteCategories()
+								categories = buildList {
+									add(
+										org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouriteCategory(
+											id = -1L,
+											title = null, // « All favorites » comme FavouritesTabConfigurationStrategy
+											count = all.size,
+										),
+									)
+									for (c in cats) {
+										add(
+											org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouriteCategory(
+												id = c.categoryId.toLong(),
+												title = c.title,
+												count = all.count { f -> f.favourite.categoryId == c.categoryId.toLong() },
+											),
+										)
+									}
+								}
+							}
+							org.koitharu.kotatsu.desktop.ui.screens.favourites.FavouritesScreen(
+								categories = categories,
+								fetchManga = { category ->
+									container.library.getFavourites()
+										.filter { category.id == -1L || it.favourite.categoryId.toLong() == category.id }
+										.map { it.manga.toManga(emptySet(), chapters = null) }
+								},
+								onMangaClick = { selectedManga = it },
+							)
+						}
+
+						NavItem.BOOKMARKS -> {
+							// Signets réels depuis la DB Room (BookmarksDao.observe())
+							var bookmarksMap by remember {
+								mutableStateOf<Map<org.koitharu.kotatsu.core.db.entity.MangaWithTags, List<org.koitharu.kotatsu.desktop.ui.screens.bookmarks.BookmarkUi>>>(emptyMap())
+							}
+							LaunchedEffect(Unit) {
+								container.database.getBookmarksDao().observe().collect { map ->
+									bookmarksMap = map.mapValues { (_, marks) ->
+										marks.map { b ->
+											org.koitharu.kotatsu.desktop.ui.screens.bookmarks.BookmarkUi(
+												pageId = b.pageId,
+												chapterId = b.chapterId,
+												page = b.page,
+												imageUrl = b.imageUrl,
+												percent = b.percent,
+											)
+										}
+									}
+								}
+							}
+							org.koitharu.kotatsu.desktop.ui.screens.bookmarks.BookmarksScreen(
+								bookmarksByManga = bookmarksMap,
+								onBookmarkClick = { mangaWithTags, bookmark ->
+									// ouvre le lecteur sur la page du signet
+									scope.launch {
+										val mangaEntity = mangaWithTags.manga
+										val manga = mangaEntity.toManga(
+											mangaWithTags.tags.map { it.toMangaTag() }.toSet(),
+											chapters = null,
+										)
+										val details = runCatching { container.getDetails(manga) }.getOrNull()
+										val chapter = details?.chapters?.firstOrNull { it.id == bookmark.chapterId }
+										if (chapter != null) readerRequest = details to chapter
+									}
+								},
+								onBookmarkDelete = { bookmark ->
+									scope.launch { container.database.getBookmarksDao().delete(bookmark.pageId) }
+								},
+							)
+						}
+
 						NavItem.EXPLORE ->
 							org.koitharu.kotatsu.desktop.ui.screens.discover.DiscoverScreen(
 								fetchSection = { section, _ ->
