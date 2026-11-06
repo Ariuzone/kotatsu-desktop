@@ -3,9 +3,10 @@
  * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation Compose Desktop.
  *
  * Écran « Détails du manga » — reproduit activity_details.xml + fragment_chapters.xml de l'app
- * d'origine : couverture avec fond, titre TitleLarge, sous-titre (auteur), chips de tags,
- * description (tronquée + « More »), liste des chapitres, barre d'actions Read / Download /
- * Favorite (chaîne exactes de strings.xml).
+ * d'origine : couverture avec fond flouté, badge 18+ (textView_nsfw_18), titre TitleLarge,
+ * sous-titre (auteur), chips de tags, description (tronquée + « Plus »/« Réduire »), liste des
+ * chapitres (chaîne « Chapitres »), barre d'actions Lire / Favoris / Télécharger (chaînes
+ * exactes de values-fr/strings.xml).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.details
 
@@ -57,13 +58,28 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.Manga
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ADD_TO_FAVOURITES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CHAPTERS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CHAPTERS_EMPTY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_COLLAPSE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DESCRIPTION
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOAD
+import org.koitharu.kotatsu.desktop.ui.strings.FR_MORE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NSFW
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READ
 
 private val DETAILS_COVER_WIDTH = 100.dp
 private val DETAILS_COVER_HEIGHT = 152.dp
 private val DETAILS_COVER_CORNER = 12.dp
 private val DETAILS_HEADER_HORIZONTAL_PADDING = 16.dp
 private val DETAILS_HEADER_VERTICAL_PADDING = 12.dp
+
+/** Badge 18+ si la source est Hentai (comme DetailsScreen d'origine, isNsfw). */
+private fun isNsfw(manga: Manga): Boolean =
+	(manga.source as? MangaParserSource)?.contentType == ContentType.HENTAI
 
 @Composable
 public fun DetailsScreen(
@@ -89,7 +105,7 @@ public fun DetailsScreen(
 			}
 			item {
 				Text(
-					text = "Chapters",
+					text = FR_CHAPTERS,
 					style = MaterialTheme.typography.titleMedium,
 					color = MaterialTheme.colorScheme.onSurface,
 					modifier = Modifier.padding(
@@ -97,6 +113,17 @@ public fun DetailsScreen(
 						vertical = 8.dp,
 					),
 				)
+			}
+			if (chapters.isEmpty()) {
+				// getEmptyState de ChaptersListViewModel (string chapters_empty)
+				item {
+					Text(
+						text = FR_CHAPTERS_EMPTY,
+						style = MaterialTheme.typography.bodyMedium,
+						color = MaterialTheme.colorScheme.onSurfaceVariant,
+						modifier = Modifier.padding(horizontal = DETAILS_HEADER_HORIZONTAL_PADDING),
+					)
+				}
 			}
 			items(chapters, key = { it }) { chapterTitle ->
 				ChapterRow(title = chapterTitle, onClick = { onChapterClick(chapters.indexOf(chapterTitle)) })
@@ -146,7 +173,7 @@ private fun DetailsHeader(manga: Manga, onBackClick: () -> Unit) {
 			IconButton(onClick = onBackClick) {
 				Icon(
 					imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-					contentDescription = "Back",
+					contentDescription = "Retour",
 					tint = MaterialTheme.colorScheme.onSurface,
 				)
 			}
@@ -176,6 +203,18 @@ private fun DetailsHeader(manga: Manga, onBackClick: () -> Unit) {
 						.weight(1f)
 						.padding(start = 16.dp),
 				) {
+					// Badge 18+ (textView_nsfw_18 d'origine, string nsfw)
+					if (isNsfw(manga)) {
+						Text(
+							text = FR_NSFW,
+							style = MaterialTheme.typography.labelSmall,
+							color = MaterialTheme.colorScheme.error,
+							modifier = Modifier
+								.clip(RoundedCornerShape(4.dp))
+								.background(MaterialTheme.colorScheme.errorContainer)
+								.padding(horizontal = 6.dp, vertical = 2.dp),
+						)
+					}
 					Text(
 						text = manga.title,
 						style = MaterialTheme.typography.titleLarge,
@@ -226,7 +265,7 @@ private fun DescriptionSection(description: String) {
 			),
 	) {
 		Text(
-			text = "Description",
+			text = FR_DESCRIPTION,
 			style = MaterialTheme.typography.titleMedium,
 			color = MaterialTheme.colorScheme.onSurface,
 		)
@@ -239,7 +278,7 @@ private fun DescriptionSection(description: String) {
 			modifier = Modifier.padding(top = 4.dp),
 		)
 		Text(
-			text = if (expanded) "Less" else "More",
+			text = if (expanded) FR_COLLAPSE else FR_MORE,
 			style = MaterialTheme.typography.labelLarge,
 			color = MaterialTheme.colorScheme.primary,
 			modifier = Modifier
@@ -282,21 +321,21 @@ private fun DetailsActionsBar(
 			horizontalArrangement = Arrangement.spacedBy(8.dp),
 			verticalAlignment = Alignment.CenterVertically,
 		) {
-			// « Read » (button_read d'origine — split button dans le sheet des chapitres)
+			// « Lire » (button_read d'origine — split button dans le sheet des chapitres)
 			Button(onClick = onReadClick, modifier = Modifier.weight(1f)) {
-				Text(text = "Read")
+				Text(text = FR_READ)
 			}
 			IconButton(onClick = onFavouriteClick) {
 				Icon(
 					imageVector = if (isFavourite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-					contentDescription = "Favorite this",
+					contentDescription = FR_ADD_TO_FAVOURITES,
 					tint = MaterialTheme.colorScheme.primary,
 				)
 			}
 			IconButton(onClick = onDownloadClick) {
 				Icon(
 					imageVector = Icons.Filled.Download,
-					contentDescription = "Download",
+					contentDescription = FR_DOWNLOAD,
 					tint = MaterialTheme.colorScheme.onSurfaceVariant,
 				)
 			}

@@ -3,11 +3,13 @@
  * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation Compose Desktop.
  *
  * Écran « Historique » — reproduit HistoryListFragment (fragment_list_simple.xml) :
- * liste de mangas groupée par date de dernière lecture (en-têtes DateTimeAgo, cf.
- * HistoryListViewModel#mapList + item_header.xml), items fidèles à item_manga_list_details.xml
- * (couverture 118dp ratio 2:3, coins 8dp, ReadingProgressView 32dp/offset 8dp, titre BodyLarge
- * 3 lignes/lineHeight 18dp, sous-titres BodyMedium/BodySmall) et état vide
- * (item_empty_state + ic_empty_history, « What you read will be displayed here »).
+ * barre de recherche pill + menu ⋮ (fidèle aux captures de référence ; menu = opt_history :
+ * Effacer l'historique, Options de liste, Mode incognito, Paramètres), liste de mangas groupée
+ * par date de dernière lecture (en-têtes DateTimeAgo, cf. HistoryListViewModel#mapList +
+ * item_header.xml), items fidèles à item_manga_list_details.xml (couverture 118dp ratio 2:3,
+ * coins 8dp, ReadingProgressView 32dp/offset 8dp, titre BodyLarge 3 lignes/lineHeight 18dp,
+ * sous-titres BodyMedium/BodySmall) et état vide (item_empty_state + ic_empty_history Totoro,
+ * textes values-fr exacts).
  *
  * Les données viennent en paramètres (la couche DB Room est portée ailleurs), comme
  * CatalogScreen reçoit `fetchList`.
@@ -32,15 +34,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.DeleteSweep
-import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,21 +58,29 @@ import org.koitharu.kotatsu.desktop.ui.components.CARD_INDICATOR_OFFSET
 import org.koitharu.kotatsu.desktop.ui.components.CARD_INDICATOR_SIZE
 import org.koitharu.kotatsu.desktop.ui.components.EmptyStateScreen
 import org.koitharu.kotatsu.desktop.ui.components.ReadingProgressIndicator
+import org.koitharu.kotatsu.desktop.ui.components.TotoroIllustration
+import org.koitharu.kotatsu.desktop.ui.components.TopSearchBar
+import org.koitharu.kotatsu.desktop.ui.components.TopSearchMenuAction
 import org.koitharu.kotatsu.desktop.ui.components.calculateTimeAgo
 import org.koitharu.kotatsu.desktop.ui.components.format
 import org.koitharu.kotatsu.desktop.ui.components.percentPattern
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CLEAR_HISTORY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_INCOGNITO_MODE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_LIST_OPTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SETTINGS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TEXT_HISTORY_HOLDER_PRIMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TEXT_HISTORY_HOLDER_SECONDARY
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
-// strings.xml d'origine
-public const val HISTORY_TITLE: String = "History"
-private const val EMPTY_PRIMARY = "What you read will be displayed here" // text_history_holder_primary
-private const val EMPTY_SECONDARY = "Find what to read in the «Explore» section" // text_history_holder_secondary
-private const val CONTINUE_READING_CD = "Continue reading" // action « lire la suite »
-private const val UNKNOWN = "Unknown" // string unknown
+// strings.xml d'origine (values-fr)
+private const val EMPTY_PRIMARY = FR_TEXT_HISTORY_HOLDER_PRIMARY // text_history_holder_primary
+private const val EMPTY_SECONDARY = FR_TEXT_HISTORY_HOLDER_SECONDARY // text_history_holder_secondary
+private const val CONTINUE_READING_CD = "Continuer la lecture" // action « lire la suite »
+private const val UNKNOWN = "Inconnu" // string unknown
 
 private val LIST_SPACING = 8.dp // list_spacing_normal (padding du RecyclerView)
 private val GRID_SPACING = 8.dp // grid_spacing (padding des en-têtes)
@@ -114,38 +124,38 @@ public fun HistoryScreen(
 	modifier: Modifier = Modifier,
 	isGroupingEnabled: Boolean = true,
 	onClearHistory: (() -> Unit)? = null,
+	onSearchClick: () -> Unit = {},
+	onSettingsClick: () -> Unit = {},
+	onIncognitoToggle: (Boolean) -> Unit = {},
 ) {
+	var incognito by remember { mutableStateOf(false) }
 	Column(modifier = modifier.fillMaxSize()) {
-		// Barre de titre (l'app d'origine affiche « History » dans l'app bar + menu opt_history)
-		Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
-			Row(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(horizontal = 16.dp, vertical = 4.dp),
-				verticalAlignment = Alignment.CenterVertically,
-			) {
-				Text(
-					text = HISTORY_TITLE,
-					style = MaterialTheme.typography.titleLarge,
-					color = MaterialTheme.colorScheme.onSurface,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.weight(1f),
-				)
+		// Barre de recherche pill + menu ⋮ (fidèle aux captures ; menu = opt_history)
+		TopSearchBar(
+			onSearchClick = onSearchClick,
+			menuActions = buildList {
 				if (onClearHistory != null) {
-					IconButton(onClick = onClearHistory) {
-						Icon(
-							imageVector = Icons.Outlined.DeleteSweep,
-							contentDescription = "Clear history", // string clear_history
-						)
-					}
+					add(TopSearchMenuAction(FR_CLEAR_HISTORY, onClearHistory))
 				}
-			}
-		}
+				add(TopSearchMenuAction(label = FR_LIST_OPTIONS, onClick = { }))
+				add(
+					TopSearchMenuAction(
+						label = FR_INCOGNITO_MODE,
+						onClick = {
+							incognito = !incognito
+							onIncognitoToggle(incognito)
+						},
+						checkable = true,
+						checked = incognito,
+					),
+				)
+				add(TopSearchMenuAction(FR_SETTINGS, onSettingsClick))
+			},
+		)
 		if (historyItems.isEmpty()) {
-			// getEmptyState(hasFilters = false) de HistoryListViewModel
+			// getEmptyState(hasFilters = false) de HistoryListViewModel (Totoro ic_empty_history)
 			EmptyStateScreen(
-				icon = Icons.Outlined.History, // ic_empty_history
+				illustration = TotoroIllustration.HISTORY,
 				textPrimary = EMPTY_PRIMARY,
 				textSecondary = EMPTY_SECONDARY,
 				modifier = Modifier.fillMaxSize(),

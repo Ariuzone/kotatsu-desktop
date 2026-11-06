@@ -6,7 +6,9 @@
  * mode paginé (HorizontalPager) ou webtoon (défilement vertical continu), zones de tap
  * (précédent / contrôles / suivant) équivalentes aux gestes de l'app d'origine, navigables aussi
  * au clavier (flèches / PageUp-PageDown = adaptation desktop indispensable, cf. UI_DIVERGENCES #5),
- * overlay de contrôles (titre du chapitre, compteur de pages).
+ * overlay de contrôles : panneau haut (retour, titres, compteur de pages) et panneau bas
+ * (layout_reader_actions.xml : chapitre précédent, curseur de pages, chapitre suivant, infos
+ * « Ch. %1$d/%2$d Pg. %3$d/%4$d ») — chaînes values-fr exactes.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.reader
 
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,9 +29,13 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.onKeyEvent
@@ -51,6 +59,9 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.fillMaxHeight
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NEXT_CHAPTER
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PREV_CHAPTER
+import org.koitharu.kotatsu.desktop.ui.strings.frReaderInfo
 
 public enum class ReaderMode { PAGER, WEBTOON }
 
@@ -61,6 +72,10 @@ public fun ReaderContent(
 	pageUrls: List<String>,
 	mode: ReaderMode,
 	onClose: () -> Unit,
+	chapterIndex: Int = 0,
+	chaptersCount: Int = 1,
+	onPrevChapter: (() -> Unit)? = null,
+	onNextChapter: (() -> Unit)? = null,
 ) {
 	var controlsVisible by remember { mutableStateOf(true) }
 	val scope = rememberCoroutineScope()
@@ -108,14 +123,23 @@ public fun ReaderContent(
 					visible = controlsVisible,
 					title = title,
 					chapterTitle = chapterTitle,
-					pageCounter = "${pagerState.currentPage + 1} / ${pageUrls.size}",
+					pageCounter = frReaderInfo(
+						chapter = chapterIndex + 1,
+						chaptersCount = chaptersCount,
+						page = pagerState.currentPage + 1,
+						pagesCount = pageUrls.size,
+					),
+					currentPage = pagerState.currentPage,
+					pageCount = pageUrls.size,
+					onPageSeek = { page -> scope.launch { pagerState.animateScrollToPage(page) } },
+					onPrevChapter = onPrevChapter,
+					onNextChapter = onNextChapter,
 					onClose = onClose,
 				)
 			}
 		}
 
 		ReaderMode.WEBTOON -> {
-			var counterText by remember { mutableStateOf("1 / ${pageUrls.size}") }
 			Box(
 				modifier = Modifier
 					.fillMaxSize()
@@ -132,7 +156,17 @@ public fun ReaderContent(
 					visible = controlsVisible,
 					title = title,
 					chapterTitle = chapterTitle,
-					pageCounter = counterText,
+					pageCounter = frReaderInfo(
+						chapter = chapterIndex + 1,
+						chaptersCount = chaptersCount,
+						page = 1,
+						pagesCount = pageUrls.size,
+					),
+					currentPage = 0,
+					pageCount = pageUrls.size,
+					onPageSeek = null, // le défilement webtoon est continu
+					onPrevChapter = onPrevChapter,
+					onNextChapter = onNextChapter,
 					onClose = onClose,
 				)
 			}
@@ -155,44 +189,54 @@ private fun ReaderPageImage(pageUrl: String?, fillHeight: Boolean = true) {
 	}
 }
 
+/**
+ * Contrôles du lecteur : panneau haut (activity_reader.xml : appbar_top avec retour + titres)
+ * et panneau bas (layout_reader_actions.xml : chapitre précédent / curseur / chapitre suivant).
+ */
 @Composable
 private fun ReaderControls(
 	visible: Boolean,
 	title: String,
 	chapterTitle: String,
 	pageCounter: String,
+	currentPage: Int,
+	pageCount: Int,
+	onPageSeek: ((Int) -> Unit)?,
+	onPrevChapter: (() -> Unit)?,
+	onNextChapter: (() -> Unit)?,
 	onClose: () -> Unit,
 ) {
 	if (!visible) return
-	Column(
-		modifier = Modifier
-			.fillMaxWidth()
-			.background(Color.Black.copy(alpha = 0.6f))
-			.padding(horizontal = 8.dp, vertical = 4.dp),
-	) {
+	Column(modifier = Modifier.fillMaxSize()) {
+		// Panneau haut
 		Row(
-			modifier = Modifier.fillMaxWidth(),
+			modifier = Modifier
+				.fillMaxWidth()
+				.background(Color.Black.copy(alpha = 0.6f))
+				.padding(horizontal = 8.dp, vertical = 4.dp),
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			IconButton(onClick = onClose) {
 				Icon(
 					imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-					contentDescription = "Close",
+					contentDescription = "Fermer",
 					tint = Color.White,
 				)
 			}
 			Column(modifier = Modifier.weight(1f)) {
 				Text(
-					text = title,
+					text = chapterTitle,
 					style = MaterialTheme.typography.titleMedium,
 					color = Color.White,
 					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
 				)
 				Text(
-					text = chapterTitle,
+					text = title,
 					style = MaterialTheme.typography.bodySmall,
 					color = Color.White.copy(alpha = 0.7f),
 					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
 				)
 			}
 			Text(
@@ -201,6 +245,47 @@ private fun ReaderControls(
 				color = Color.White,
 				modifier = Modifier.padding(end = 8.dp),
 			)
+		}
+		Spacer(modifier = Modifier.weight(1f))
+		// Panneau bas (layout_reader_actions.xml)
+		if (onPageSeek != null && pageCount > 0) {
+			Column(
+				modifier = Modifier
+					.fillMaxWidth()
+					.background(Color.Black.copy(alpha = 0.6f))
+					.padding(horizontal = 8.dp, vertical = 4.dp),
+			) {
+				Slider(
+					value = currentPage.toFloat(),
+					onValueChange = { value -> onPageSeek(value.toInt().coerceIn(0, pageCount - 1)) },
+					valueRange = 0f..(pageCount - 1).coerceAtLeast(1).toFloat(),
+					colors = SliderDefaults.colors(
+						thumbColor = Color.White,
+						activeTrackColor = Color.White,
+						inactiveTrackColor = Color.White.copy(alpha = 0.3f),
+					),
+				)
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					verticalAlignment = Alignment.CenterVertically,
+				) {
+					IconButton(onClick = { onPrevChapter?.invoke() }, enabled = onPrevChapter != null) {
+						Icon(
+							imageVector = Icons.AutoMirrored.Filled.Undo,
+							contentDescription = FR_PREV_CHAPTER,
+							tint = if (onPrevChapter != null) Color.White else Color.White.copy(alpha = 0.4f),
+						)
+					}
+					Spacer(modifier = Modifier.weight(1f))
+					IconButton(onClick = { onNextChapter?.invoke() }, enabled = onNextChapter != null) {
+						Icon(
+							imageVector = Icons.AutoMirrored.Filled.Redo,
+							contentDescription = FR_NEXT_CHAPTER,
+							tint = if (onNextChapter != null) Color.White else Color.White.copy(alpha = 0.4f),
+						)
+					}
+				}
+			}
 		}
 	}
 }
