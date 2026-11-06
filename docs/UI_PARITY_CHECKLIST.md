@@ -6,7 +6,7 @@ comparée rangée dans `docs/ui-parity/`), référence utilisée.
 | Écran | Référence (capture/fichier d'origine) | Statut | Preuve |
 |---|---|---|---|
 | Shell principal (rail de navigation) | `activity_main.xml` + tenInchScreenshots/1.png | **écart mineur** : structure identique (rail icônes+libellés à gauche, volet contenu) ; libellés exacts (« Explore », « History », « Favorites »…) ; à faire : barre de recherche en haut du volet | `ui-parity/desktop-explore.png` |
-| Explorateur (sources par langue) | `fragment_explore.xml`, `item_explore_source_grid.xml` | **écart mineur** : grille de cartes sources groupées par langue conforme ; icône placeholder au lieu de la favicon des sites | `ui-parity/desktop-explore.png` |
+| Explorateur (sources par langue) | `fragment_explore.xml`, `item_explore_source_grid.xml` | **écart mineur** : grille de cartes sources groupées par langue conforme ; favicons réels chargés depuis les sites (fallback icône quand le site n'en expose pas — l'app Android utilise sa propre base de favicons) | `ui-parity/desktop-explore-favicons.png` |
 | Liste de mangas (grille) | `fragment_list.xml`, `item_manga_grid.xml` | **implémenté** (MangaGrid : marge 2dp/padding 6dp, coins 12dp, titre 2 lignes) ; écart mineur : badges/anneaux de progression non encore portés | — |
 | Liste de mangas (liste) | `item_manga_list.xml` | **implémenté** (MangaList : couverture 40dp coins 4dp, titre+sous-titre) | — |
 | Recherche multi-sources | `activity_search.xml` | implémenté (hint exact, débounce 500 ms) ; écart mineur : suggestions de recherche non portées | — |
