@@ -43,6 +43,10 @@ compose.desktop {
 
 		buildTypes {
 			release.proguard {
+				// Désactivé : ProGuard casse des méthodes inline d'okio en release
+				// (VerifyError buffer$hash dans l'app packagée, cf. docs) — l'obfuscation
+				// n'apporte rien pour une app desktop avec JDK embarqué.
+				isEnabled = false
 				configurationFiles.from(project.file("compose-desktop.pro"))
 			}
 		}
