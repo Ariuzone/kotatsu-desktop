@@ -25,3 +25,15 @@
 - JDK : Android Studio JBR 25 (`C:/Program Files/Android/Android Studio/jbr`), `JAVA_HOME` à exporter pour chaque commande Gradle.
 - Versions épinglées : Kotlin 2.2.10, CMP 1.9.0, Room 2.8.4 JVM, OkHttp 5.3.2, Coil 3.4.0, parsers JitPack 68f3fed395.
 - `room-ktx` et `coil-gif` n'ont pas de variante JVM → retirés.
+
+## Refonte fidélité (2026-11-06, après retours client)
+
+Captures réelles fournies par le client → 2 agents relancés en continu :
+- **agent/ui-fr** : refonte complète des écrans (français exact, Totoro vectoriel, Discover
+  à sections, onglet Source, catalogue, recherche, Flux, LOCAL en cours) — lot 1+2 fusionnés
+  et intégrés dans Main.kt (rail 5 onglets FR). Backlog de fiabilité en cours.
+- **agent/net-rel** : sonde 36 sources — baseline 23/36 puis 25/36 (MANGADEX fixé via headers) ;
+  RetryInterceptor + DeadDomainException commités ; en cours : ordres de tri explicites
+  (MangaDex POPULARITY/UPDATED renvoient du HTML — cas transmis par l'orchestrateur) + SSL.
+- Orchestrateur : rail 5 onglets, mode incognito, ImageLoader Coil (Referer par source),
+  onglet de démarrage pour tests non intrusifs, restauration des routes DB après refonte.
