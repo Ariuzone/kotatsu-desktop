@@ -469,6 +469,17 @@ public class JSONObject {
     }
 
     /**
+     * Portage Windows de Kotatsu-Redo (2026-11-06) : méthodes présentes dans l'org.json du SDK
+     * Android mais absentes de la copie libcore — requises par kotatsu-parsers-redo
+     * (YuriGardenParser#optFloat). Sémantique identique à {@link #optDouble(String, double)}.
+     */
+    public float optFloat(String name, float fallback) {
+        Object object = opt(name);
+        Double result = JSON.toDouble(object);
+        return result != null ? result.floatValue() : fallback;
+    }
+
+    /**
      * Returns the value mapped by {@code name} if it exists and is an int or
      * can be coerced to an int, or throws otherwise.
      *
