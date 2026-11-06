@@ -13,8 +13,8 @@ comparée rangée dans `docs/ui-parity/`), référence utilisée.
 | Détails du manga | `activity_details.xml` | implémenté (couverture + fond flouté, titre, auteur, tags, description repliable, chapitres, barre Read/Favorite/Download) ; écart mineur : chips favori/communauté/scrobbling non portés | — |
 | Lecteur (pager) | `fragment_reader_pager.xml` | implémenté (pager + zones de tap + clavier + overlay contrôles) ; écart mineur : menu de config lecteur non porté | — |
 | Lecteur (webtoon) | `fragment_reader_webtoon.xml` | implémenté (défilement vertical continu) | — |
-| Favoris (catégories + liste) | `fragment_favourites_container.xml` | en cours (lot sous-agent) | — |
-| Historique | `fragment_list_simple.xml` + tenInchScreenshots/1.png | en cours (lot sous-agent) ; référence analysée : chips de filtres + groupement par date + anneaux de progression à reproduire | — |
-| Téléchargements | `activity_downloads.xml` | en cours (lot sous-agent) | — |
+| Favoris (catégories + liste) | `fragment_favourites_container.xml` | **implémenté** : onglets scrollables des catégories (« All favorites » comme l'original), grille, état vide exact ; câblé à la DB réelle | — |
+| Historique | `fragment_list_simple.xml` + tenInchScreenshots/1.png | **implémenté** : groupement par date (chaînes/pluriels exacts « Just now », « Today »…), lignes item_manga_list_details (couverture 118dp, pastille de progression 32dp), état vide exact ; câblé à la DB réelle ; écart mineur : chips de filtres de la référence non portés | — |
+| Téléchargements | `activity_downloads.xml` + `item_download.xml` | **implémenté** (statuts exacts « Downloading… »/« Queued »/« Downloaded »/« An error occurred », progression, chapitres dépliables, menus Pause/Cancel all/Remove completed) ; branchement au service de téléchargement P2 en cours | — |
 | Paramètres (apparence) | pref_appearance, AppearanceSettingsFragment | implémenté (thème Follow system/Light/Dark, AMOLED, 9 schémas d'accent avec noms exacts) ; écart mineur : disposition « liste de préférences » simplifiée | — |
 | Thème clair / sombre / AMOLED | `colors_kotatsu.xml`, `values-night/*`, overlay Amoled | **implémenté** : palettes générées à l'identique (10 schémas clair/sombre + AMOLED #000000) | Palettes.kt |
