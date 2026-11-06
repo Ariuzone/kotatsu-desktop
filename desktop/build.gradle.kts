@@ -6,6 +6,9 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 val composeVersion: String = libs.versions.compose.get()
 
+// Répertoire de build dédié (l'ancien desktop/build est verrouillé par un process tiers)
+layout.buildDirectory.set(layout.projectDirectory.dir("build-desktop"))
+
 plugins {
 	alias(libs.plugins.kotlin.jvm)
 	alias(libs.plugins.kotlin.serialization)
