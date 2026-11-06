@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
@@ -49,6 +50,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
 import java.util.Locale
 import org.koitharu.kotatsu.desktop.ui.components.EmptyStateScreen
 import org.koitharu.kotatsu.desktop.ui.components.TotoroIllustration
@@ -263,13 +267,29 @@ private fun SourceCatalogRow(
 			contentAlignment = Alignment.Center,
 		) {
 			if (faviconUrl != null) {
-				AsyncImage(
+				// Fallback visible si le favicon échoue (la ligne reste cliquable)
+				SubcomposeAsyncImage(
 					model = faviconUrl,
 					contentDescription = source.title,
 					contentScale = ContentScale.Fit,
 					modifier = Modifier
 						.fillMaxSize()
 						.padding(6.dp),
+				) {
+					when (painter.state) {
+						is AsyncImagePainter.State.Error -> Icon(
+							imageVector = Icons.AutoMirrored.Filled.MenuBook,
+							contentDescription = source.title,
+							tint = MaterialTheme.colorScheme.onSurfaceVariant,
+						)
+						else -> SubcomposeAsyncImageContent()
+					}
+				}
+			} else {
+				Icon(
+					imageVector = Icons.AutoMirrored.Filled.MenuBook,
+					contentDescription = source.title,
+					tint = MaterialTheme.colorScheme.onSurfaceVariant,
 				)
 			}
 		}

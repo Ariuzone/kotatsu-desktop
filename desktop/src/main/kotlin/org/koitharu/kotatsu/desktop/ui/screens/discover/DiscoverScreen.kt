@@ -70,7 +70,8 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_INCOGNITO_MODE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SETTINGS
 import org.koitharu.kotatsu.parsers.model.Manga
 
-private val SECTION_COVER_WIDTH = 128.dp
+private val SECTION_COVER_WIDTH = 88.dp // capture : ~172px à l'échelle 2x de l'app
+private val SECTION_ROW_HEIGHT = 180.dp // couverture 132dp + titre 2 lignes
 private val COVER_CORNER_RADIUS = 12.dp
 
 /** Chips du haut (capture : « ✓ Pour vous / Top / Mangas / Manhwa »). */
@@ -125,9 +126,9 @@ public fun DiscoverScreen(
 				TopSearchMenuAction(FR_SETTINGS, onSettingsClick),
 			),
 		)
-		// Chips « Pour vous / Top / Mangas / Manhwa »
+		// Chips « Pour vous / Top / Mangas / Manhwa » (inset 8dp comme la capture)
 		LazyRow(
-			contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+			contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
 			horizontalArrangement = Arrangement.spacedBy(8.dp),
 		) {
 			items(DiscoverChip.entries, key = { it.name }) { chip ->
@@ -185,7 +186,7 @@ private fun SectionHeader(title: String, onShowAllClick: () -> Unit) {
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
+			.padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 4.dp),
 		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Text(
@@ -231,7 +232,7 @@ private fun SectionRow(
 		Box(
 			modifier = Modifier
 				.fillMaxWidth()
-				.height(220.dp),
+				.height(SECTION_ROW_HEIGHT),
 			contentAlignment = Alignment.Center,
 		) {
 			CircularProgressIndicator()
@@ -250,9 +251,10 @@ private fun SectionRow(
 			)
 		}
 	} else {
+		// Espacement capture : inset effectif 24dp, 16dp entre couvertures
 		LazyRow(
-			contentPadding = PaddingValues(horizontal = 16.dp),
-			horizontalArrangement = Arrangement.spacedBy(8.dp),
+			contentPadding = PaddingValues(horizontal = 24.dp),
+			horizontalArrangement = Arrangement.spacedBy(16.dp),
 		) {
 			itemsIndexed(mangas, key = { _, manga -> "${section.name}_${manga.url}" }) { _, manga ->
 				DiscoverCover(
