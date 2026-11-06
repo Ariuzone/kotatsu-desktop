@@ -13,6 +13,10 @@ package org.koitharu.kotatsu.core.parser
 
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import org.koitharu.kotatsu.core.exceptions.CloudFlareProtectedException
 import org.koitharu.kotatsu.core.exceptions.InteractiveActionRequiredException
 import org.koitharu.kotatsu.core.network.cookies.MutableCookieJar
@@ -114,16 +118,27 @@ class MangaLoaderContextImpl(
 	}
 
 	private val domainIndex: Map<String, MangaParserSource> by lazy {
-		val index = HashMap<String, MangaParserSource>()
-		for (source in MangaParserSource.entries) {
-			runCatching {
-				for (domain in parserFor(source).configKeyDomain.presetValues) {
-					val key = domain.lowercase(Locale.ROOT).removePrefix("www.")
-					index.putIfAbsent(key, source)
+		// ~1400 parsers à instancier une seule fois (~3 s séquentiel) : parallélisé pour
+		// contenir le coût du premier chargement d'image (lookup ensuite quasi gratuit).
+		runBlocking {
+			val index = java.util.concurrent.ConcurrentHashMap<String, MangaParserSource>()
+			MangaParserSource.entries
+				.chunked(64)
+				.map { chunk ->
+					async(Dispatchers.Default) {
+						for (source in chunk) {
+							runCatching {
+								for (domain in parserFor(source).configKeyDomain.presetValues) {
+									val key = domain.lowercase(Locale.ROOT).removePrefix("www.")
+									index.putIfAbsent(key, source)
+								}
+							}
+						}
+					}
 				}
-			}
+				.awaitAll()
+			index
 		}
-		index
 	}
 
 	private val cachedParsers = ConcurrentHashMap<String, MangaParser>()
