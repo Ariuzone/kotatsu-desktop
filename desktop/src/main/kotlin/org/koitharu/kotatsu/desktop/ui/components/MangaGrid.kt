@@ -6,6 +6,10 @@
  * carte marge 2dp/padding 6dp, couverture coins 12dp (ShapeAppearanceOverlay.Kotatsu.Cover),
  * titre sur 2 lignes (TextAppearance.Kotatsu.GridTitle = Material3 TitleSmall, paddingV 4dp),
  * grille adaptative (preferred_grid_width = 120dp, manga_grid_spacing = 8dp).
+ *
+ * Contrat couvertures : l'AsyncImage est posé sur un Box clippé à fond surfaceContainer ;
+ * pendant le chargement et en cas d'échec réseau, coil3 ne dessine rien — le fond neutre
+ * reste visible (pas d'icône cassée). Tout nouveau site d'image doit respecter ce contrat.
  */
 package org.koitharu.kotatsu.desktop.ui.components
 
