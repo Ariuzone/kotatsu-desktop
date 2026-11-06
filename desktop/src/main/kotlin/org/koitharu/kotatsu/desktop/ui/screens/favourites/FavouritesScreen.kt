@@ -146,6 +146,7 @@ public fun FavouritesScreen(
 						text = {
 							Text(
 								text = category.title ?: ALL_FAVOURITES,
+								style = MaterialTheme.typography.bodyLarge, // ~16sp comme la capture
 								maxLines = 1,
 								overflow = TextOverflow.Ellipsis,
 							)
