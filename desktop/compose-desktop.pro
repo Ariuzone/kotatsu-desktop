@@ -10,3 +10,21 @@
 -dontwarn org.codehaus.mojo.animal_sniffer.*
 -dontwarn kotlinx.serialization.internal.*
 -keep class org.jetbrains.skiko.** { *; }
+
+# Room KMP + sqlite-bundled : pont JNI (méthodes natives appelées par nom depuis la
+# bibliothèque native) et chargement réflexif des implémentations générées (*_Impl).
+-keep class androidx.sqlite.** { *; }
+-keep class androidx.room.** { *; }
+-keep class org.koitharu.kotatsu.core.db.** { *; }
+-keep class org.koitharu.kotatsu.favourites.data.** { *; }
+-keep class org.koitharu.kotatsu.history.data.** { *; }
+-keep class org.koitharu.kotatsu.bookmarks.data.** { *; }
+-keep class org.koitharu.kotatsu.local.data.index.** { *; }
+-keep class org.koitharu.kotatsu.tracker.data.** { *; }
+-keep class org.koitharu.kotatsu.stats.data.** { *; }
+-keep class org.koitharu.kotatsu.scrobbling.** { *; }
+-keep class org.koitharu.kotatsu.explore.data.** { *; }
+-keep class org.koitharu.kotatsu.suggestions.data.** { *; }
+-keepclassmembers class * {
+    @androidx.room.* <methods>;
+}
