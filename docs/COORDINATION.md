@@ -37,3 +37,17 @@ Captures réelles fournies par le client → 2 agents relancés en continu :
   (MangaDex POPULARITY/UPDATED renvoient du HTML — cas transmis par l'orchestrateur) + SSL.
 - Orchestrateur : rail 5 onglets, mode incognito, ImageLoader Coil (Referer par source),
   onglet de démarrage pour tests non intrusifs, restauration des routes DB après refonte.
+
+## Fusion net-rel + Discover alimenté (2026-11-06 soir)
+
+- **Cause racine du « sources ne fonctionnent pas »** (agent net-rel) : le client desktop
+  n'envoyait jamais l'UA par parser (`Kotatsu/6.8…`) — `repositoryFactoryProvider` n'était pas
+  câblé dans NetworkModule, donc CommonHeadersInterceptor tombait sur un UA navigateur,
+  et les API (MangaDex…) répondaient par des challenges HTML. Fix : `globalInstance` +
+  `parserFor(source)`, en-têtes résolus par source comme sur Android.
+- Taux de succès : 63 % → **72 %** (34/47) ; RetryInterceptor ; DeadDomainException
+  (domaines morts masquables) ; certificats Let's Encrypt YE embarqués (MANGAPARK OK).
+- Discover vérifié visuellement : sections « Pour vous / Nouveautés pour vous » alimentées
+  en titres réels (docs/ui-parity/desktop-discover-data.png). Couvertures : diagnostic en cours
+  (agent net-rel).
+- Écran « On device » branché (CBZ locaux via LocalMangaRepository).
