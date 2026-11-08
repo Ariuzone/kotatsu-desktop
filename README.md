@@ -41,10 +41,41 @@ Desktop (Material 3).
 
 ## Installation
 
-1. Téléchargez `Kotatsu-<version>.exe` dans les [Releases](../../releases).
-2. Lancez l'installateur : raccourcis Menu Démarrer + Bureau, choix du dossier, JDK embarqué
-   (aucun Java à installer).
-3. Configuration minimale : Windows 10/11 64 bits.
+1. Téléchargez les fichiers de la release dans [Releases](../../releases).
+2. **Simple** : lancez `Kotatsu-Desktop-<version>.exe` (assistant graphique, JDK embarqué,
+   raccourcis Menu Démarrer + Bureau, choix du dossier).
+3. **Installateur personnalisé** (recommandé pour gérer mises à jour et migrations) :
+   placez `Kotatsu-Desktop-<version>.msi` à côté de `Installateur-Kotatsu-Desktop.cmd` +
+   `installateur-kotatsu.ps1` puis double-cliquez le .cmd. Il gère :
+   - **installation neuve** (assistant graphique) ;
+   - **mise à jour** d'une 1.x existante (major-upgrade MSI, données conservées) ;
+   - **migration depuis l'ancienne ligne produit 9.8.6** (proposition de désinstallation
+     propre, données conservées) avant installation.
+   - Variante silencieuse : `powershell -File installateur-kotatsu.ps1 -Silent`.
+4. Configuration minimale : Windows 10/11 64 bits.
+
+### Mises à jour
+
+Les versions de la ligne **1.x** se mettent à jour directement les unes sur les autres :
+lancez simplement l'installateur d'une version plus récente (major-upgrade MSI, données
+conservées). Les données utilisateur vivent dans `%APPDATA%\Kotatsu` et survivent aux
+mises à jour comme aux désinstallations.
+
+> Depuis un installateur 9.8.6 (ancienne ligne produit) : la mise à jour directe est
+> impossible (9.8.6 > 1.x pour MSI) — utilisez l'installateur personnalisé ci-dessus, qui
+> propose la désinstallation propre de l'ancienne version en conservant vos données.
+
+### Désinstallation
+
+Deux façons, vos données utilisateur (`%APPDATA%\Kotatsu`) ne sont **jamais** supprimées
+sans votre accord :
+
+- **Applications & fonctionnalités** (Windows) : désinstallation standard, données conservées.
+- **Désinstallateur personnalisé** (choix explicite) : `Desinstaller-Kotatsu-Desktop.cmd` +
+  `desinstaller-kotatsu.ps1` (fournis dans les releases, ou présents dans le dossier
+  d'installation `app\resources\uninstall\` si injectés) — il ferme l'app, désinstalle le
+  produit puis demande : *« Conserver ces données pour une éventuelle réinstallation ?
+  [O/n] »*. Répondez `n` pour tout supprimer.
 
 ## Compilation depuis les sources
 

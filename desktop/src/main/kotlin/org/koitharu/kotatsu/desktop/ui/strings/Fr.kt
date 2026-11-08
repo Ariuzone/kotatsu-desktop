@@ -154,7 +154,7 @@ public const val FR_NETWORK_SUMMARY: String = "Données mobiles, Proxy, DNS sur 
 public const val FR_ACCOUNTS: String = "Comptes et synchronisation" // accounts (capture vidéo 3:50)
 public const val FR_ACCOUNTS_SUMMARY: String = "Services de suivi, Community, Discord" // capture
 public const val FR_ABOUT: String = "À propos" // about
-public const val FR_ABOUT_VERSION: String = "Version 1.0" // version
+public const val FR_ABOUT_VERSION: String = "Version 1.1" // version
 public const val FR_COMING_SOON: String = "Cette section sera disponible dans une prochaine phase"
 
 /** Sous-titre « Sources des mangas » : « %1$d de %2$d activé(s) » (capture frame 8). */
