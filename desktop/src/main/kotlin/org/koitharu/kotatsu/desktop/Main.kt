@@ -157,6 +157,7 @@ private fun MainScreen(container: AppContainer) {
 	var showSourcesCatalog by remember { mutableStateOf(false) }
 	var showManageSources by remember { mutableStateOf(false) } // P3 : Gérer les sources
 	var showManageLinks by remember { mutableStateOf(false) } // P3 : Gérer les liens
+	var showFeedLog by remember { mutableStateOf(false) } // P4 : journal des nouveaux chapitres
 	// Options de liste (P2) : bottom sheet ouverte depuis le menu ⋮ Historique/Favoris ;
 	// état partagé pour que les écrans se recomposent dès qu'une valeur change.
 	var showListOptions by remember { mutableStateOf(false) }
@@ -243,7 +244,7 @@ private fun MainScreen(container: AppContainer) {
 				NavigationRailItem(
 				selected = selected == item && selectedManga == null && selectedSource == null &&
 						!showSettings && !showDownloads && !showSourcesCatalog && !showSearch &&
-						!showManageSources && !showManageLinks,
+						!showManageSources && !showManageLinks && !showFeedLog,
 				onClick = {
 					selected = item
 					selectedSource = null
@@ -253,6 +254,7 @@ private fun MainScreen(container: AppContainer) {
 					showSourcesCatalog = false
 					showManageSources = false
 					showManageLinks = false
+					showFeedLog = false
 					showSearch = false
 				},
 					icon = {
@@ -294,6 +296,14 @@ private fun MainScreen(container: AppContainer) {
 		) {
 			Box {
 			when {
+				showFeedLog ->
+					// P4 : journal des nouveaux chapitres (backend de log pas encore alimenté —
+					// état vide explicatif en attendant)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.FeedLogScreen(
+						entries = emptyList(),
+						onBackClick = { showFeedLog = false },
+					)
+
 				showManageSources ->
 					// P3 : « Gérer les sources » — toggle → hiddenSources (AppSettings)
 					org.koitharu.kotatsu.desktop.ui.screens.sources.ManageSourcesScreen(
@@ -396,6 +406,29 @@ private fun MainScreen(container: AppContainer) {
 							org.koitharu.kotatsu.desktop.ui.screens.settings.MaskedImagesScreen(
 								onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.READING },
 							)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.SUGGESTIONS ->
+						// P4 : écran « Suggestions » (remplace le stub)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.SuggestionsSettingsScreen(
+							appSettings = container.appSettings,
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+						)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.FEED_SETTINGS -> {
+						// P4 : écran « Nouveaux chapitres » (remplace le stub) ; catégories
+						// favorites réelles depuis la DB, « Rechercher les mises à jour » → scheduler
+						var feedCats by remember { mutableStateOf<List<String>>(emptyList()) }
+						LaunchedEffect(Unit) {
+							runCatching {
+								container.database.getFavouriteCategoriesDao().findAll().map { it.title }
+							}.getOrDefault(emptyList()).let { feedCats = it }
+						}
+						org.koitharu.kotatsu.desktop.ui.screens.settings.FeedSettingsScreen(
+							appSettings = container.appSettings,
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+							favouriteCategories = feedCats,
+							onUpdateNow = { scope.launch { runCatching { container.trackerScheduler.runOnce() } } },
+							onOpenLog = { showFeedLog = true },
+						)
+					}
 					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.SOURCES ->
 						// P3 : écran racine « Sources des mangas » (remplace le stub)
 						org.koitharu.kotatsu.desktop.ui.screens.sources.SourcesSettingsScreen(

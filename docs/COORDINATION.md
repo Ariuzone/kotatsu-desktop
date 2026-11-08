@@ -45,6 +45,19 @@ chaînes en constantes privées dans les fichiers de chaque agent (Fr.kt interdi
 | **P3-A racine Sources + Gérer les sources** | agent P3-A | nouveaux `ui/screens/sources/SourcesSettingsScreen.kt` + `ManageSourcesScreen.kt`, `core/prefs/AppSettings.kt` (si nouvelle clé) | Écran racine « Sources des mangas » avec menu ⋮ exact (Ordre de tri, Afficher en vue grille, Gérer les sources, Sources catalogue — Disponible : N, Activer toutes les sources de mangas, Choisir le miroir automatiquement, Gérer les liens) ; « Gérer les sources » : liste icône+nom+« Catégorie, Langue »+menu ⋮ par ligne+œil barré, recherche, menu global (« Désactiver le contenu explicite », « Tout désactiver »), toggle → `hiddenSources`, tri `sourcesOrder` ; compile OK |
 | **P3-B catalogue + installables + préréglages + liens** | agent P3-B | `SourcesCatalogScreen.kt`, `SourcePresetsScreen.kt`, nouveau `ManageLinksScreen.kt` (+ dialog créateur de préréglages) | Catalogue : chips conformes vidéo (« Toutes les langues ▾ / Nouveaux / Mangas / Hentais / Comics / Autre / Manhwa »), menu langues plein écran, état vide FR exact, « Disponible : N », bouton **+** fonctionnel (toggle `hiddenSources`) ; créateur de préréglages (« Nouveau préréglage », chips de langues, « Enregistrer » désactivé tant que vide) ; « Gérer les liens » (adaptation desktop documentée) ; compile OK |
 
+## Phase P4 — Suggestions & nouveaux chapitres (2026-11-08, en cours)
+
+Journal : `docs/P4_JOURNAL.md`. Spécification : `half1-inventory.md` lignes 62-64. Préférences
+P4 **déjà ajoutées** par le principal (compile verte) : `excludedSuggestionGenres`,
+`isSuggestionsIncludeDisabled`, `trackerFrequency`, `trackerFavouriteCategories` →
+**`AppSettings.kt` INTERDIT aux deux agents**. `Main.kt` et `Fr.kt` interdits (principal).
+Chaînes en `private const` locaux.
+
+| Lot | Agent | Périmètre exclusif | Critères de fin |
+|---|---|---|---|
+| **P4-A Suggestions** | agent P4-A | nouveau `ui/screens/settings/SuggestionsSettingsScreen.kt` | Écran « Suggestions » : bandeau interrupteur « Activer les suggestions », « Inclure les sources désactivées », « Exclure des genres » (+ dialog saisie, Annuler/OK), bannière note locale exacte (« Toutes les données sont analysées localement… ») ; compile OK |
+| **P4-B Nouveaux chapitres** | agent P4-B | nouveau `ui/screens/settings/FeedSettingsScreen.kt` (+ sous-écran journal si besoin) | Écran « Nouveaux chapitres » : « Vérifier les nouveaux chapitres et les notifier » (KEY_TRACKER_ENABLED), « Fréquence de vérification » (trackerFrequency), « Rechercher les mises à jour » (action → TrackerScheduler si appelable), « Catégories favorites — N de M activé(s) » (dialog multi-choix, trackerFavouriteCategories), « Télécharger de nouveaux chapitres » (TrackerDownloadStrategy), « Dépannage » + journal de vérification, « Désactiver l'optimisation de la batterie » divergente desktop ; compile OK |
+
 ## Notes d'environnement
 
 - **RÈGLE DE TEST (consigne client, 2026-11-08) : avant CHAQUE test/lancement de l'app, effacer

@@ -132,8 +132,15 @@ class TrackerScheduler(
 		}
 	}
 
-	/** Même formule que l'original : 18 h de base / fréquence, borné à 2 h minimum. */
+	/** Même formule que l'original : 18 h de base / fréquence, borné à 2 h minimum.
+	 * P4 : la préférence « Fréquence de vérification » (tracker_frequency : DEFAULT/HOURLY/
+	 * EVERY6H/DAILY) prime quand elle est définie explicitement. */
 	private fun intervalMillis(): Long {
+		when (settings.trackerFrequency) {
+			"HOURLY" -> return TimeUnit.HOURS.toMillis(1)
+			"EVERY6H" -> return TimeUnit.HOURS.toMillis(6)
+			"DAILY" -> return TimeUnit.HOURS.toMillis(24)
+		}
 		val factor = frequencyFactor.coerceAtLeast(0.1f)
 		val hours = (BASE_INTERVAL_HOURS / factor).roundToInt().coerceAtLeast(MIN_INTERVAL_HOURS)
 		return TimeUnit.HOURS.toMillis(hours.toLong())

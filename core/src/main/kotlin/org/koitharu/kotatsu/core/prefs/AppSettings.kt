@@ -213,6 +213,26 @@ class AppSettings(
 	val isSuggestionsExcludeNsfw: Boolean
 		get() = store.getBoolean(KEY_SUGGESTIONS_EXCLUDE_NSFW, false)
 
+	/** Inclure les sources désactivées dans les suggestions (P4). */
+	var isSuggestionsIncludeDisabled: Boolean
+		get() = store.getBoolean(KEY_SUGGESTIONS_INCLUDE_DISABLED, false)
+		set(value) = store.edit { putBoolean(KEY_SUGGESTIONS_INCLUDE_DISABLED, value) }
+
+	/** Genres exclus des suggestions (P4) — clé desktop dédiée, style du module list non porté. */
+	var excludedSuggestionGenres: Set<String>
+		get() = store.getStringSet(KEY_SUGGESTIONS_EXCLUDED_GENRES, emptySet()).orEmpty()
+		set(value) = store.edit { putStringSet(KEY_SUGGESTIONS_EXCLUDED_GENRES, value) }
+
+	/** Fréquence de vérification des nouveaux chapitres (P4) — « DEFAULT » = Par défaut. */
+	var trackerFrequency: String
+		get() = store.getString(KEY_TRACKER_FREQUENCY, "DEFAULT") ?: "DEFAULT"
+		set(value) = store.edit { putString(KEY_TRACKER_FREQUENCY, value) }
+
+	/** Catégories favorites suivies pour les nouveaux chapitres (P4) — vide = toutes. */
+	var trackerFavouriteCategories: Set<String>
+		get() = store.getStringSet(KEY_TRACKER_FAV_CATEGORIES, emptySet()).orEmpty()
+		set(value) = store.edit { putStringSet(KEY_TRACKER_FAV_CATEGORIES, value) }
+
 	var allowDownloadOnMeteredNetwork: TriStateOption
 		get() = store.getEnumValue(KEY_DOWNLOADS_METERED_NETWORK, TriStateOption.ASK)
 		set(value) = store.edit { putString(KEY_DOWNLOADS_METERED_NETWORK, value.name) }
@@ -368,8 +388,12 @@ class AppSettings(
 		const val KEY_TRACKER_DOWNLOAD = "tracker_download"
 		const val KEY_TRACKER_NOTIFICATIONS = "tracker_notifications"
 		const val KEY_TRACKER_NO_NSFW = "tracker_no_nsfw"
-		const val KEY_SUGGESTIONS = "suggestions"
-		const val KEY_SUGGESTIONS_WIFI_ONLY = "suggestions_wifi"
+	const val KEY_SUGGESTIONS = "suggestions"
+	const val KEY_SUGGESTIONS_WIFI_ONLY = "suggestions_wifi"
+	const val KEY_SUGGESTIONS_EXCLUDED_GENRES = "suggestions_excluded_genres"
+	const val KEY_TRACKER_FREQUENCY = "tracker_frequency"
+	const val KEY_TRACKER_FAV_CATEGORIES = "tracker_fav_categories"
+	const val KEY_SUGGESTIONS_INCLUDE_DISABLED = "suggestions_include_disabled"
 		const val KEY_SUGGESTIONS_EXCLUDE_NSFW = "suggestions_exclude_nsfw"
 		const val KEY_DOWNLOADS_METERED_NETWORK = "downloads_metered_network"
 		const val KEY_DOWNLOADS_FORMAT = "downloads_format"
