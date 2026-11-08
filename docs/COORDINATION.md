@@ -80,6 +80,18 @@ les écrans.
 | **P6-A Comptes** | agent P6-A | nouveau `ui/screens/settings/AccountsScreen.kt` + `ui/strings/FrAccounts.kt` | Écran « Comptes et synchronisation » : « Services de suivi » (AniList, Kitsu, MyAnimeList, Shikimori — chacun « Désactivé » + dialog de connexion reportée, divergence OAuth/WebView), Community (EN d'origine) + sous-titres exacts, Discord ; compile OK |
 | **P6-B Confidentialité** | agent P6-B | nouveau `ui/screens/settings/PrivacySettingsScreen.kt` (chaînes → FrSettings.kt) | Écran « Confidentialité et contenu » : « Contenu pour adultes » (switch KEY_DISABLE_NSFW), « Politique des captures d'écran » (dialog ScreenshotsPolicy), « Statistiques de lecture » (switch KEY_STATS_ENABLED), « Partager la fiabilité des sources » (état réel ou désactivé+divergence), incognito (état), « Protéger l'application » (état via ProtectManager — lecture) ; compile OK |
 
+## Phase P7 — Lecteur avancé (2026-11-08, en cours) — 2 vagues
+
+Journal : `docs/P7_JOURNAL.md`. Vague 1 en parallèle, **vague 2 = P7-A réintégrant les
+composants de P7-B**. Chaînes : P7-A et P7-B ajoutent dans `FrSettings.kt` — CONFLIT POSSIBLE :
+P7-B crée `ui/strings/FrReader.kt` (seul propriétaire), P7-A utilise `Fr.kt` (lecture+import) et
+crée ses chaînes dans `FrReader.kt` **après** la vague 2 (ou les demande au rapport).
+
+| Lot | Agent | Périmètre exclusif | Critères de fin |
+|---|---|---|---|
+| **P7-A cœur lecteur** | agent P7-A | `ui/screens/reader/ReaderScreen.kt`, `Main.kt` ReaderHost (autorisé pour ce lot), `core/prefs/AppSettings.kt` (méthodes par manga), `core/prefs/ReaderMode.kt` | Menu lecteur complet : Sauvegarder la page (export PNG), Ajouter un marque-page (BookmarksDao), Mode lecture segmenté 4 modes **mémorisé par manga**, Pages doubles paysage (bêta), Faire pivoter, chapitres préc./suiv. câblés, toast « Images masquées » ; itération 2 : intégration des composants P7-B ; compile OK |
+| **P7-B composants purs** | agent P7-B | nouveaux `ui/screens/reader/components/ColorCorrectionDialog.kt`, `AutoScrollDialog.kt`, `EraserTutorialDialog.kt` + `ui/strings/FrReader.kt` | Correction des couleurs (aperçu avant/après, Inverser/Niveaux de gris/Luminosité/Contraste/Fond jaunâtre/Réinitialiser + `Modifier.colorCorrection(state)`) ; Défilement automatique (dialog Activer + Vitesse xN slider + FAB flottant + état) ; Didacticiel gomme (« Passer ») + overlay gomme générique (callbacks) ; signatures documentées pour P7-A ; compile OK |
+
 ## Notes d'environnement
 
 - **RÈGLE DE TEST (consigne client, 2026-11-08) : avant CHAQUE test/lancement de l'app, effacer

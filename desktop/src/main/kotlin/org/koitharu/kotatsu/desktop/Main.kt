@@ -9,15 +9,27 @@
  * (rail de navigation latéral + volet de contenu), cf. activity_main.xml + navigation_rail_fab.xml.
  * Navigation : Explore → catalogue d'une source → détails d'un manga → lecteur (fenêtre dédiée,
  * comme ReaderActivity est une activité dédiée).
+ * Modification : 2026-11-08 — phase P7 (vague 1) : bloc lecteur (ReaderHost) — mémorisation du
+ * mode de lecture par manga (priorité : mode par manga > détection webtoon > mode global),
+ * marque-pages (toggle via BookmarksDao.find/insert/delete), « Sauvegarder la page » (export
+ * PNG/JPG vers %USERPROFILE%/Pictures, repli presse-papiers de l'URL), toggle incognito du menu,
+ * toast temporaire « Images masquées » à l'ouverture (hidden_pages) et toasts de retour.
+ * Modification : 2026-11-08 — phase P7 (vague 2) : persistance des zones gomme (webtoon) —
+ * les rectangles normalisés 0..1 par page sont encodés dans PageScanEntity.bands (table
+ * page_scans de HiddenImagesDatabase, champs x1,y1,x2,y2 séparés par « ; » ; matcherVersion 0),
+ * chargés à l'ouverture du chapitre et remontés à ReaderContent (masque = rect couleur fond
+ * dessiné par-dessus la page).
  */
 package org.koitharu.kotatsu.desktop
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.PlayArrow
@@ -32,8 +44,10 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,6 +55,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.input.key.Key
@@ -77,12 +92,19 @@ import org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderContent
 import org.koitharu.kotatsu.desktop.tracker.TrackerTray
 import org.koitharu.kotatsu.desktop.ui.settings.DesktopSettings
 import org.koitharu.kotatsu.desktop.ui.theme.KotatsuTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koitharu.kotatsu.bookmarks.data.BookmarkEntity
 import org.koitharu.kotatsu.core.db.entity.toManga
 import org.koitharu.kotatsu.core.db.entity.toMangaTag
+import org.koitharu.kotatsu.core.prefs.ReaderMode
+import org.koitharu.kotatsu.reader.data.erase.PageScanEntity
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
+import org.koitharu.kotatsu.parsers.model.MangaPage
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 
 fun main() = application {
@@ -849,6 +871,7 @@ private fun MainScreen(container: AppContainer) {
 			container = container,
 			request = request,
 			isIncognito = incognito,
+			onToggleIncognito = { incognito = it },
 			onClose = { readerRequest = null },
 			onNavigate = { readerRequest = it },
 		)
@@ -862,11 +885,42 @@ private data class ReaderRequest(
 	val chapters: List<MangaChapter>,
 )
 
+// TODO(vague 2) : chaînes temporaires — migrer vers FrReader.kt (créé par l'agent P7-B)
+private const val FR_READER_BOOKMARK_ADDED = "Marque-page ajouté"
+private const val FR_READER_BOOKMARK_REMOVED = "Marque-page retiré"
+private const val FR_READER_PAGE_SAVED = "Page enregistrée"
+private const val FR_READER_PAGE_URL_COPIED = "Enregistrement impossible : URL de la page copiée"
+
+// --- Gomme webtoon (vague 2) : encodage des rectangles normalisés dans PageScanEntity.bands ---
+// Format « x1,y1,x2,y2;x1,y1,x2,y2 » (coordonnées 0..1, page-scans de HiddenImagesDatabase,
+// matcherVersion 0 : jamais produit par le matcher d'origine). Choix d'entité documenté :
+// PageScanEntity est la table « régions par page » existante (HiddenPageEntity ne sait que
+// marquer une page entière, HiddenImageEntity n'a pas de paire yStart/yEnd).
+
+/** Encode des rectangles normalisés pour PageScanEntity.bands. */
+private fun encodeErasedRegions(regions: List<Rect>): String =
+	regions.joinToString(";") { "${it.left},${it.top},${it.right},${it.bottom}" }
+
+/** Décode PageScanEntity.bands en rectangles normalisés (entrées invalides ignorées). */
+private fun decodeErasedRegions(bands: String): List<Rect> = bands.split(";").mapNotNull { part ->
+	val v = part.split(',')
+	if (v.size != 4) return@mapNotNull null
+	runCatching {
+		Rect(
+			left = v[0].trim().toFloat(),
+			top = v[1].trim().toFloat(),
+			right = v[2].trim().toFloat(),
+			bottom = v[3].trim().toFloat(),
+		)
+	}.getOrNull()
+}
+
 @Composable
 private fun ReaderWindow(
 	container: AppContainer,
 	request: ReaderRequest,
 	isIncognito: Boolean,
+	onToggleIncognito: (Boolean) -> Unit,
 	onClose: () -> Unit,
 	onNavigate: (ReaderRequest) -> Unit,
 ) {
@@ -883,8 +937,41 @@ private fun ReaderWindow(
 		icon = kotatsuIcon(),
 		state = windowState,
 	) {
+		var mangaPages by remember(request) { mutableStateOf<List<MangaPage>>(emptyList()) }
 		var pageUrls by remember(request) { mutableStateOf<List<String>>(emptyList()) }
 		var pagesError by remember(request) { mutableStateOf<String?>(null) }
+		// Toast temporaire (2 s) : « Images masquées » à l'ouverture + retours du menu (P7)
+		var readerNotice by remember(request) { mutableStateOf<String?>(null) }
+		LaunchedEffect(readerNotice) {
+			if (readerNotice != null) {
+				delay(2000)
+				readerNotice = null
+			}
+		}
+		// Toast « Images masquées » (vidéo t≈7:25) : la base du mode gomme (HiddenImagesDatabase)
+		// n'est pas câblée dans AppContainer ; ouverture locale unique ici. Choix minimal (P7) :
+		// une seule requête getHiddenPages() (pages entièrement masquées) au lieu d'un
+		// getScan(pageId) par page. TODO(vague 2) : brancher via le composant gomme de P7-B.
+		val hiddenImagesDb = remember {
+			runCatching {
+				org.koitharu.kotatsu.reader.data.erase.createHiddenImagesDatabase(
+					java.io.File(container.appDir, "hidden-images.db"),
+				)
+			}.getOrNull()
+		}
+		DisposableEffect(hiddenImagesDb) {
+			onDispose { runCatching { hiddenImagesDb?.close() } }
+		}
+		LaunchedEffect(hiddenImagesDb, pageUrls) {
+			val db = hiddenImagesDb ?: return@LaunchedEffect
+			if (pageUrls.isEmpty()) return@LaunchedEffect
+			val hiddenPageIds = runCatching {
+				withContext(Dispatchers.IO) { db.getDao().getHiddenPages() }
+			}.getOrDefault(emptyList())
+			if (mangaPages.any { it.id in hiddenPageIds }) {
+				readerNotice = org.koitharu.kotatsu.desktop.ui.strings.FR_IMAGES_MASKED
+			}
+		}
 		LaunchedEffect(request) {
 			// Mode incognito (comme l'app d'origine) : aucune progression enregistrée
 			if (!isIncognito) {
@@ -892,19 +979,49 @@ private fun ReaderWindow(
 			}
 			runCatching {
 				val pages = container.getPages(chapter)
+				mangaPages = pages
 				pageUrls = pages.map { container.getPageUrl(it) }
 			}.onFailure {
 				pagesError = it.message ?: it.javaClass.simpleName
 			}
 		}
-		// Mode effectif : détection automatique webtoon par tags (comme l'app d'origine)
-		val effectiveMode = remember(request) {
-			val detected = settings.isReaderModeDetect && request.manga.tags.any {
+		// Page courante (index 0-based, tenue à jour par le lecteur) pour marque-page / sauvegarde
+		var currentPage by remember(request) { mutableIntStateOf(0) }
+		// Marque-page de la page courante (menu « Ajouter un marque-page » : toggle)
+		var isCurrentPageBookmarked by remember(request) { mutableStateOf(false) }
+		LaunchedEffect(currentPage, mangaPages) {
+			if (currentPage in mangaPages.indices) {
+				isCurrentPageBookmarked = runCatching {
+					container.database.getBookmarksDao().find(mangaPages[currentPage].id) != null
+				}.getOrDefault(false)
+			}
+		}
+		// Zones gomme (vague 2) : index de page → rectangles normalisés 0..1, chargés depuis
+		// PageScanEntity.bands (HiddenImagesDatabase locale, cf. vague 1)
+		var erasedRegions by remember(request) { mutableStateOf<Map<Int, List<Rect>>>(emptyMap()) }
+		LaunchedEffect(hiddenImagesDb, mangaPages) {
+			val db = hiddenImagesDb ?: return@LaunchedEffect
+			if (mangaPages.isEmpty()) return@LaunchedEffect
+			val map = mutableMapOf<Int, List<Rect>>()
+			mangaPages.forEachIndexed { index, page ->
+				val scan = runCatching {
+					withContext(Dispatchers.IO) { db.getDao().getScan(page.id) }
+				}.getOrNull()
+				val regions = scan?.let { decodeErasedRegions(it.bands) }.orEmpty()
+				if (regions.isNotEmpty()) map[index] = regions
+			}
+			erasedRegions = map
+		}
+		// Mode effectif (phase P7) : mémorisé par manga > détection webtoon par tags > global
+		var modeOverride by remember(request) { mutableStateOf(settings.getReaderModeFor(request.manga.id)) }
+		val detectedWebtoon = remember(request) {
+			settings.isReaderModeDetect && request.manga.tags.any {
 				it.title.equals("Webtoon", ignoreCase = true) ||
 					it.title.equals("Long Strip", ignoreCase = true)
 			}
-			if (detected) org.koitharu.kotatsu.core.prefs.ReaderMode.WEBTOON else settings.readerMode
 		}
+		val effectiveMode = modeOverride
+			?: (if (detectedWebtoon) ReaderMode.WEBTOON else settings.readerMode)
 		ReaderContent(
 			title = request.manga.title,
 			chapterTitle = chapter.name,
@@ -918,6 +1035,94 @@ private fun ReaderWindow(
 			isIncognito = isIncognito,
 			chapterIndex = request.chapterIndex,
 			chaptersCount = request.chapters.size,
+			isBookmarked = isCurrentPageBookmarked,
+			onModeChange = { mode ->
+				// applique immédiatement + mémorise par manga (clé reader_mode_<id>)
+				modeOverride = mode
+				settings.setReaderModeFor(request.manga.id, mode)
+			},
+			onSavePage = {
+				// « Sauvegarder la page » (P7) : octets de l'image → %USERPROFILE%/Pictures ;
+				// si le téléchargement échoue (referer/cookie exigé par la source), repli
+				// presse-papiers de l'URL de la page — limite documentée au rapport.
+				scope.launch {
+					val page = mangaPages.getOrNull(currentPage) ?: return@launch
+					val url = runCatching { container.getPageUrl(page) }.getOrNull() ?: page.url
+					val saved = runCatching {
+						val request2 = okhttp3.Request.Builder()
+							.url(url)
+							.header("Referer", "https://" + java.net.URI(url).host + "/")
+							.build()
+						container.network.mangaHttpClient.newCall(request2).execute().use { response ->
+							check(response.isSuccessful) { "HTTP ${response.code}" }
+							val bytes = response.body.bytes()
+							val ext = when {
+								bytes.size > 4 && bytes[0] == 0x89.toByte() && bytes[1] == 'P'.code.toByte() -> "png"
+								bytes.size > 3 && bytes[0] == 0xFF.toByte() && bytes[1] == 0xD8.toByte() -> "jpg"
+								bytes.size > 3 && bytes[0] == 'G'.code.toByte() && bytes[1] == 'I'.code.toByte() -> "gif"
+								bytes.size > 12 && bytes[0] == 'R'.code.toByte() && bytes[8] == 'W'.code.toByte() -> "webp"
+								else -> "jpg"
+							}
+							val pictures = java.io.File(System.getProperty("user.home"), "Pictures").apply { mkdirs() }
+							val safeTitle = request.manga.title.replace(Regex("[\\\\/:*?\"<>|]"), "_")
+							val base = "$safeTitle-${currentPage + 1}"
+							var file = java.io.File(pictures, "$base.$ext")
+							var counter = 1
+							while (file.exists()) file = java.io.File(pictures, "$base (${counter++}).$ext")
+							file.writeBytes(bytes)
+						}
+						true
+					}.getOrElse { false }
+					if (saved) {
+						readerNotice = FR_READER_PAGE_SAVED
+					} else {
+						// limite : les octets ne sont pas récupérables directement depuis le
+						// cache Coil depuis l'écran, on copie l'URL de la page
+						runCatching {
+							java.awt.Toolkit.getDefaultToolkit().systemClipboard.setContents(
+								java.awt.datatransfer.StringSelection(url),
+								null,
+							)
+						}
+						readerNotice = FR_READER_PAGE_URL_COPIED
+					}
+				}
+			},
+			onToggleBookmark = {
+				// « Ajouter un marque-page » (P7) : insert ou delete selon l'état existant
+				scope.launch {
+					val page = mangaPages.getOrNull(currentPage) ?: return@launch
+					val dao = runCatching { container.database.getBookmarksDao() }.getOrNull() ?: return@launch
+					val existing = runCatching { dao.find(page.id) }.getOrNull()
+					if (existing != null) {
+						runCatching { dao.delete(existing) }
+						isCurrentPageBookmarked = false
+						readerNotice = FR_READER_BOOKMARK_REMOVED
+					} else {
+						val inserted = runCatching {
+							dao.insert(
+								BookmarkEntity(
+									mangaId = request.manga.id,
+									pageId = page.id,
+									chapterId = chapter.id,
+									page = currentPage,
+									scroll = 0,
+									imageUrl = page.preview ?: "",
+									createdAt = System.currentTimeMillis(),
+									percent = if (pageUrls.isEmpty()) {
+										0f
+									} else {
+										(currentPage + 1f) / pageUrls.size * 100f
+									},
+								),
+							)
+						}.isSuccess
+						isCurrentPageBookmarked = inserted
+						readerNotice = if (inserted) FR_READER_BOOKMARK_ADDED else FR_READER_BOOKMARK_REMOVED
+					}
+				}
+			},
+			onToggleIncognito = onToggleIncognito,
 			onClose = onClose,
 			onPrevChapter = if (request.chapterIndex > 0) {
 				{ onNavigate(request.copy(chapterIndex = request.chapterIndex - 1)) }
@@ -926,13 +1131,61 @@ private fun ReaderWindow(
 				{ onNavigate(request.copy(chapterIndex = request.chapterIndex + 1)) }
 			} else null,
 			onPageChange = { page ->
+				currentPage = page
 				if (!isIncognito) {
 					scope.launch {
 						runCatching { container.library.saveProgress(request.manga, chapter, page = page) }
 					}
 				}
 			},
+			erasedRegions = erasedRegions,
+			onErasePageRegion = { pageIndex, region ->
+				// Gomme webtoon (vague 2) : persiste la région (PageScanEntity.bands, REPLACE
+				// sur page_id) et met à jour le masque rendu par-dessus la page
+				scope.launch {
+					val page = mangaPages.getOrNull(pageIndex) ?: return@launch
+					val db = hiddenImagesDb ?: return@launch
+					val saved = runCatching {
+						withContext(Dispatchers.IO) {
+							val existing = db.getDao().getScan(page.id)
+							val regions = existing?.let { decodeErasedRegions(it.bands) }.orEmpty() + region
+							db.getDao().upsertScan(
+								PageScanEntity(
+									pageId = page.id,
+									newestRuleId = 0L,
+									ruleIds = "",
+									isHidden = false,
+									sourceWidth = 0,
+									sourceHeight = 0,
+									bands = encodeErasedRegions(regions),
+									patches = "",
+									scannedAt = System.currentTimeMillis(),
+									matcherVersion = 0,
+								),
+							)
+						}
+					}.isSuccess
+					if (saved) {
+						erasedRegions = erasedRegions +
+							(pageIndex to (erasedRegions[pageIndex].orEmpty() + region))
+					}
+				}
+			},
 		)
+		// Toast temporaire en haut de la fenêtre lecteur (équivalent Toast Android, 2 s)
+		readerNotice?.let { notice ->
+			Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+				Text(
+					text = notice,
+					style = MaterialTheme.typography.bodyMedium,
+					color = MaterialTheme.colorScheme.onSurface,
+					modifier = Modifier
+						.padding(top = 16.dp)
+						.background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+						.padding(horizontal = 16.dp, vertical = 8.dp),
+				)
+			}
+		}
 		if (pagesError != null) {
 			LaunchedEffect(pagesError) {
 				println("Reader pages error: $pagesError")

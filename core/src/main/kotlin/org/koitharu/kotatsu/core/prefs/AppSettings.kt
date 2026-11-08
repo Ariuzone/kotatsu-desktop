@@ -4,7 +4,9 @@
  * 2026-11-08 — phase P2 : préférence isHistoryGroupingEnabled (« Groupe » de la bottom sheet
  * Options de liste, clé history_grouping) ;
  * 2026-11-08 — phase P3 : isSourcesGrid (« Afficher en vue grille », clé sources_grid) et
- * isAutoMirrorEnabled (« Choisir le miroir automatiquement », clé auto_mirror) de pref_sources.
+ * isAutoMirrorEnabled (« Choisir le miroir automatiquement », clé auto_mirror) de pref_sources ;
+ * 2026-11-08 — phase P7 : mémorisation du mode de lecture par manga (getReaderModeFor /
+ * setReaderModeFor, clés « reader_mode_<id> », cf. MangaSettingsRepository d'origine).
  * Adaptation : façade desktop sur KeyValueStore (à la place de SharedPreferences) portant les
  * préférences P1. Les mêmes noms de clés KEY_* que l'original sont conservés quand ils existent.
  * Les préférences liées à l'UI Android (navigation, notifications, backups DocumentFile, WebView,
@@ -90,6 +92,27 @@ class AppSettings(
 	var isReaderModeDetect: Boolean
 		get() = store.getBoolean(KEY_READER_MODE_DETECT, true)
 		set(value) = store.edit { putBoolean(KEY_READER_MODE_DETECT, value) }
+
+	/**
+	 * Mode de lecture mémorisé pour un manga donné (phase P7) : clé « reader_mode_<id »,
+	 * équivalent desktop de MangaSettingsRepository d'origine. Le lecteur l'applique avec la
+	 * priorité : mode par manga > détection webtoon (isReaderModeDetect) > mode global.
+	 */
+	fun getReaderModeFor(mangaId: Long): ReaderMode? {
+		val raw = store.getString(readerModeKey(mangaId), null) ?: return null
+		return try {
+			ReaderMode.valueOf(raw)
+		} catch (_: IllegalArgumentException) {
+			null
+		}
+	}
+
+	/** Mémorise le mode de lecture d'un manga (sélection dans le menu du lecteur, phase P7). */
+	fun setReaderModeFor(mangaId: Long, mode: ReaderMode) {
+		store.edit { putString(readerModeKey(mangaId), mode.name) }
+	}
+
+	private fun readerModeKey(mangaId: Long): String = "reader_mode_$mangaId"
 
 	var readerAnimation: ReaderAnimation
 		get() = store.getEnumValue(KEY_READER_ANIMATION, ReaderAnimation.DEFAULT)
