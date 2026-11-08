@@ -84,6 +84,8 @@ public enum class SettingsRoute {
 	SUGGESTIONS, // Suggestions (P4)
 	FEED_SETTINGS, // Nouveaux chapitres (P4)
 	DATA, // Téléchargements et stockage (P5)
+	DATA_USAGE, // Utilisation du stockage (P5)
+	DATA_REMOVAL, // Data removal (P5)
 	BACKUP, // Sauvegarde et restauration (P5)
 	NOTIFICATIONS, // Notifications (P5)
 	NETWORK, // Réseau (P5)

@@ -437,9 +437,52 @@ private fun MainScreen(container: AppContainer) {
 							totalCount = MangaParserSource.entries.size,
 							availableCount = MangaParserSource.entries.filterNot { it.isBroken }.size,
 							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
-							onOpenManageSources = { showManageSources = true },
-							onOpenCatalog = { showSourcesCatalog = true },
-							onOpenLinks = { showManageLinks = true },
+						onOpenManageSources = { showManageSources = true },
+						onOpenCatalog = { showSourcesCatalog = true },
+						onOpenLinks = { showManageLinks = true },
+					)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.DATA ->
+						// P5 : « Téléchargements et stockage » (remplace le stub)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.DownloadsStorageSettingsScreen(
+							appDir = container.appDir,
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+							onOpenUsage = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.DATA_USAGE },
+							onOpenDataRemoval = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.DATA_REMOVAL },
+							onOpenBackup = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.BACKUP },
+						)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.DATA_USAGE ->
+						org.koitharu.kotatsu.desktop.ui.screens.settings.StorageUsageScreen(
+							appDir = container.appDir,
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.DATA },
+						)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.DATA_REMOVAL ->
+						org.koitharu.kotatsu.desktop.ui.screens.settings.DataRemovalScreen(
+							appSettings = container.appSettings,
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.DATA },
+						)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.BACKUP ->
+						// P5 : « Sauvegarde et restauration » (remplace le stub)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.BackupRestoreScreen(
+							appDir = container.appDir,
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.DATA },
+						)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.NOTIFICATIONS ->
+						// P5 : « Notifications » (remplace le stub)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.NotificationsSettingsScreen(
+							appSettings = container.appSettings,
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+							onOpenFeedSettings = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.FEED_SETTINGS },
+						)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.NETWORK ->
+						// P5 : « Réseau » (remplace le stub)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.NetworkSettingsScreen(
+							appSettings = container.appSettings,
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+						)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ABOUT ->
+						// P5 : « À propos » (remplace le stub)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.AboutScreen(
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
 						)
 						else -> {
 							val title = when (route) {

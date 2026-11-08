@@ -197,8 +197,9 @@ class AppSettings(
 		get() = store.getBoolean(KEY_TRACKER_ENABLED, true)
 		set(value) = store.edit { putBoolean(KEY_TRACKER_ENABLED, value) }
 
-	val isTrackerWiFiOnly: Boolean
+	var isTrackerWiFiOnly: Boolean
 		get() = store.getBoolean(KEY_TRACKER_WIFI_ONLY, false)
+		set(value) = store.edit { putBoolean(KEY_TRACKER_WIFI_ONLY, value) }
 
 	val trackerDownloadStrategy: TrackerDownloadStrategy
 		get() = store.getEnumValue(KEY_TRACKER_DOWNLOAD, TrackerDownloadStrategy.DISABLED)
@@ -207,8 +208,9 @@ class AppSettings(
 		get() = store.getBoolean(KEY_SUGGESTIONS, true)
 		set(value) = store.edit { putBoolean(KEY_SUGGESTIONS, value) }
 
-	val isSuggestionsWiFiOnly: Boolean
+	var isSuggestionsWiFiOnly: Boolean
 		get() = store.getBoolean(KEY_SUGGESTIONS_WIFI_ONLY, false)
+		set(value) = store.edit { putBoolean(KEY_SUGGESTIONS_WIFI_ONLY, value) }
 
 	val isSuggestionsExcludeNsfw: Boolean
 		get() = store.getBoolean(KEY_SUGGESTIONS_EXCLUDE_NSFW, false)
@@ -252,23 +254,28 @@ class AppSettings(
 		get() = store.getBoolean(KEY_MIRROR_SWITCHING, false)
 		set(value) = store.edit { putBoolean(KEY_MIRROR_SWITCHING, value) }
 
-	val proxyType: Proxy.Type
+	var proxyType: Proxy.Type
 		get() {
 			val raw = store.getString(KEY_PROXY_TYPE, null) ?: return Proxy.Type.DIRECT
 			return enumValues<Proxy.Type>().find { it.name == raw } ?: Proxy.Type.DIRECT
 		}
+		set(value) = store.edit { putString(KEY_PROXY_TYPE, value.name) }
 
-	val proxyAddress: String?
+	var proxyAddress: String?
 		get() = store.getString(KEY_PROXY_ADDRESS, null)
+		set(value) = store.edit { putString(KEY_PROXY_ADDRESS, value) }
 
-	val proxyPort: Int
+	var proxyPort: Int
 		get() = store.getString(KEY_PROXY_PORT, null)?.toIntOrNull() ?: 0
+		set(value) = store.edit { putString(KEY_PROXY_PORT, value.toString()) }
 
-	val proxyLogin: String?
+	var proxyLogin: String?
 		get() = store.getString(KEY_PROXY_LOGIN, null)?.nullIfEmpty()
+		set(value) = store.edit { putString(KEY_PROXY_LOGIN, value) }
 
-	val proxyPassword: String?
+	var proxyPassword: String?
 		get() = store.getString(KEY_PROXY_PASSWORD, null)?.nullIfEmpty()
+		set(value) = store.edit { putString(KEY_PROXY_PASSWORD, value) }
 
 	val imagesProxy: Int
 		get() = store.getString(KEY_IMAGES_PROXY, null)?.toIntOrNull() ?: -1
@@ -327,11 +334,13 @@ class AppSettings(
 		get() = trackerDownloadStrategy
 		set(value) = store.edit { putString(KEY_TRACKER_DOWNLOAD, value.name) }
 
-	val isTrackerNotificationsEnabled: Boolean
+	var isTrackerNotificationsEnabled: Boolean
 		get() = store.getBoolean(KEY_TRACKER_NOTIFICATIONS, true)
+		set(value) = store.edit { putBoolean(KEY_TRACKER_NOTIFICATIONS, value) }
 
-	val isTrackerNoNsfw: Boolean
+	var isTrackerNoNsfw: Boolean
 		get() = store.getBoolean(KEY_TRACKER_NO_NSFW, false)
+		set(value) = store.edit { putBoolean(KEY_TRACKER_NO_NSFW, value) }
 
 	fun observe(vararg keys: String): Flow<String?> = store.observeChanges()
 		.filter { key -> key == null || key in keys }

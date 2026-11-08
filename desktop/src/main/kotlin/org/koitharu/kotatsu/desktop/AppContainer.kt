@@ -34,6 +34,10 @@ import java.nio.file.Path
 
 public class AppContainer private constructor(appDir: File) {
 
+	/** Dossier de données de l'application (%APPDATA%\Kotatsu) — exposé pour les écrans
+	 * « Téléchargements et stockage » / sauvegarde (P5). */
+	public val appDir: File = appDir
+
 	private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
 	public val appSettings: AppSettings

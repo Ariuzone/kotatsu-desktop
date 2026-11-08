@@ -58,6 +58,16 @@ Chaînes en `private const` locaux.
 | **P4-A Suggestions** | agent P4-A | nouveau `ui/screens/settings/SuggestionsSettingsScreen.kt` | Écran « Suggestions » : bandeau interrupteur « Activer les suggestions », « Inclure les sources désactivées », « Exclure des genres » (+ dialog saisie, Annuler/OK), bannière note locale exacte (« Toutes les données sont analysées localement… ») ; compile OK |
 | **P4-B Nouveaux chapitres** | agent P4-B | nouveau `ui/screens/settings/FeedSettingsScreen.kt` (+ sous-écran journal si besoin) | Écran « Nouveaux chapitres » : « Vérifier les nouveaux chapitres et les notifier » (KEY_TRACKER_ENABLED), « Fréquence de vérification » (trackerFrequency), « Rechercher les mises à jour » (action → TrackerScheduler si appelable), « Catégories favorites — N de M activé(s) » (dialog multi-choix, trackerFavouriteCategories), « Télécharger de nouveaux chapitres » (TrackerDownloadStrategy), « Dépannage » + journal de vérification, « Désactiver l'optimisation de la batterie » divergente desktop ; compile OK |
 
+## Phase P5 — Vos données & Application (2026-11-08, en cours)
+
+Journal : `docs/P5_JOURNAL.md`. `Main.kt`/`Fr.kt`/`AppSettings.kt` INTERDITS aux agents
+(toutes les clés nécessaires existent déjà). Chaînes en `private const` locaux.
+
+| Lot | Agent | Périmètre exclusif | Critères de fin |
+|---|---|---|---|
+| **P5-A Vos données** | agent P5-A | nouveaux `ui/screens/settings/DownloadsStorageSettingsScreen.kt`, `StorageUsageScreen.kt`, `DataRemovalScreen.kt`, `BackupRestoreScreen.kt` | Écran « Téléchargements et stockage » : « Dossier pour les téléchargements » (chemin réel + ouvrir), « Utilisation du stockage » (tailles réelles DB/téléchargements/cache), « Data removal » (actions réelles : historique, cache, suggestions) ; « Sauvegarde et restauration » : « Create or restore a backup » (EN conservé, libellé vidéo) + « Sauvegardes » → créer/restaurer un zip (kotatsu.db + settings.json) via JFileChooser ; compile OK |
+| **P5-B Application** | agent P5-B | nouveaux `ui/screens/settings/NotificationsSettingsScreen.kt`, `NetworkSettingsScreen.kt`, `AboutScreen.kt` | « Notifications » : tracker notifications + no NSFW ; « Réseau » : Données mobiles (metered TriState, Wi-Fi only suggestions/tracker), « Proxy » (type/adresse/port/login), « DNS sur HTTPS » (DoHProvider) ; « À propos » : Version 9.8.6, licence, liens ; compile OK |
+
 ## Notes d'environnement
 
 - **RÈGLE DE TEST (consigne client, 2026-11-08) : avant CHAQUE test/lancement de l'app, effacer
