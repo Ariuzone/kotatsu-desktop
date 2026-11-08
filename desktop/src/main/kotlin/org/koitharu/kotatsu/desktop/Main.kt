@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.collectAsState
@@ -56,8 +57,18 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_FAVOURITES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_EXPLORE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_FEED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SETTINGS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_SETTINGS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_MANGA_SOURCES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NEW_CHAPTERS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOADS_STORAGE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACKUP_RESTORE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NOTIFICATIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NETWORK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PRIVACY_CONTENT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ABOUT
 import org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderContent
-import org.koitharu.kotatsu.desktop.ui.screens.reader.ReaderMode
 import org.koitharu.kotatsu.desktop.tracker.TrackerTray
 import org.koitharu.kotatsu.desktop.ui.settings.DesktopSettings
 import org.koitharu.kotatsu.desktop.ui.theme.KotatsuTheme
@@ -77,8 +88,16 @@ fun main() = application {
 	TrackerTray(notifier = container.trackerNotifier)
 	LaunchedEffect(Unit) { container.trackerScheduler.start() }
 
+	// « Confirmation de sortie » (P2) : dialog avant fermeture si activé
+	var pendingExit by remember { mutableStateOf(false) }
 	Window(
-		onCloseRequest = ::exitApplication,
+		onCloseRequest = {
+			if (container.appSettings.isExitConfirmationEnabled) {
+				pendingExit = true
+			} else {
+				exitApplication()
+			}
+		},
 		title = "Kotatsu $APP_VERSION_NAME",
 		icon = kotatsuIcon(),
 	) {
@@ -98,6 +117,12 @@ fun main() = application {
 			Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 				MainScreen(container)
 			}
+		}
+		if (pendingExit) {
+			ExitConfirmationDialog(
+				onDismiss = { pendingExit = false },
+				onConfirm = { exitApplication() },
+			)
 		}
 		}
 	}
@@ -119,6 +144,9 @@ private fun MainScreen(container: AppContainer) {
 	var selectedSource by remember { mutableStateOf<MangaParserSource?>(null) }
 	var selectedManga by remember { mutableStateOf<Manga?>(null) }
 	var showSettings by remember { mutableStateOf(false) }
+	var settingsRoute by remember {
+		mutableStateOf(org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT)
+	}
 	var showSearch by remember { mutableStateOf(false) }
 	var showDownloads by remember { mutableStateOf(false) }
 	var showSourcesCatalog by remember { mutableStateOf(false) }
@@ -126,6 +154,34 @@ private fun MainScreen(container: AppContainer) {
 		mutableStateOf(container.appSettings.isIncognitoModeEnabled)
 	}
 	var suggestions by remember { mutableStateOf<List<Manga>>(emptyList()) }
+	var favouriteUrls by remember { mutableStateOf(emptySet<String>()) }
+	LaunchedEffect(incognito) {
+		if (container.appSettings.isListBadgesEnabled) {
+			favouriteUrls = runCatching {
+				container.library.getFavourites().map { it.manga.url }.toSet()
+			}.getOrDefault(emptySet())
+		}
+	}
+	// Bouton flottant « Continuer » (P2) : premier item d'historique non incognito
+	var continueItem by remember { mutableStateOf<org.koitharu.kotatsu.desktop.ui.screens.history.HistoryItem?>(null) }
+	LaunchedEffect(incognito) {
+		if (!incognito && container.appSettings.isFloatingContinueEnabled) {
+			runCatching {
+				container.library.getHistory(limit = 1).firstOrNull()?.let { row ->
+					container.library.run { row.toDisplay() }.let { (manga, history) ->
+						continueItem = org.koitharu.kotatsu.desktop.ui.screens.history.HistoryItem(
+							manga = manga,
+							chapter = null,
+							percent = history.percent,
+							updatedAt = java.time.Instant.ofEpochMilli(history.updatedAt),
+						)
+					}
+				}
+			}
+		} else {
+			continueItem = null
+		}
+	}
 	val sourcesList = remember {
 		MangaParserSource.entries.filterNot { it.isBroken }.sortedBy { it.title }
 	}
@@ -137,7 +193,13 @@ private fun MainScreen(container: AppContainer) {
 		}.getOrDefault(emptyList()).let { suggestions = it }
 	}
 	var searchResults by remember { mutableStateOf<List<Manga>>(emptyList()) }
-	var readerRequest by remember { mutableStateOf<Pair<Manga, MangaChapter>?>(null) }
+	var readerRequest by remember { mutableStateOf<ReaderRequest?>(null) }
+	/** Ouvre le lecteur sur un chapitre donné (index résolu dans la liste fournie). */
+	fun openReader(manga: Manga, chapters: List<MangaChapter>, chapter: MangaChapter?) {
+		if (chapter == null) return
+		val index = chapters.indexOfFirst { it.id == chapter.id }
+		if (index >= 0) readerRequest = ReaderRequest(manga, index, chapters)
+	}
 	val scope = rememberCoroutineScope()
 
 	Box(
@@ -158,9 +220,15 @@ private fun MainScreen(container: AppContainer) {
 			},
 	) {
 		// Rail de navigation latéral — mise en page « tablette/desktop » de l'app d'origine ;
-		// onglets = navigation basse du téléphone (Historique, Favoris, Explorer, Source, Flux)
+		// onglets = « Principales sections de l'écran » (ordre réordonnable, P2) ;
+		// relecture à chaque retour des Paramètres (settingsRoute change)
+		val railItems = remember(settingsRoute) {
+			container.appSettings.mainSections.mapNotNull { name ->
+				runCatching { NavItem.valueOf(name) }.getOrNull()
+			}.ifEmpty { listOf(NavItem.HISTORY, NavItem.FAVORITES, NavItem.EXPLORE, NavItem.SOURCES, NavItem.FEED) }
+		}
 		NavigationRail(modifier = Modifier.align(Alignment.CenterStart)) {
-			for (item in listOf(NavItem.HISTORY, NavItem.FAVORITES, NavItem.EXPLORE, NavItem.SOURCES, NavItem.FEED)) {
+			for (item in railItems) {
 				NavigationRailItem(
 					selected = selected == item && selectedManga == null && selectedSource == null &&
 						!showSettings && !showDownloads && !showSourcesCatalog && !showSearch,
@@ -180,15 +248,7 @@ private fun MainScreen(container: AppContainer) {
 						)
 					},
 					label = {
-						Text(
-							when (item) {
-								NavItem.HISTORY -> FR_HISTORY
-								NavItem.FAVORITES -> FR_FAVOURITES
-								NavItem.EXPLORE -> FR_EXPLORE
-								NavItem.SOURCES -> FR_SOURCE
-								else -> FR_FEED
-							},
-						)
+						Text(org.koitharu.kotatsu.desktop.ui.strings.frNavItemLabel(item))
 					},
 				)
 			}
@@ -203,9 +263,12 @@ private fun MainScreen(container: AppContainer) {
 			)
 			NavigationRailItem(
 				selected = showSettings,
-				onClick = { showSettings = true },
-				icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
-				label = { Text("Settings") },
+				onClick = {
+					showSettings = true
+					settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT
+				},
+				icon = { Icon(Icons.Filled.Settings, contentDescription = FR_SETTINGS) },
+				label = { Text(FR_SETTINGS) },
 			)
 		}
 		// Volet de contenu
@@ -215,6 +278,7 @@ private fun MainScreen(container: AppContainer) {
 				.padding(start = 80.dp),
 			color = MaterialTheme.colorScheme.surface,
 		) {
+			Box {
 			when {
 				showSourcesCatalog ->
 					org.koitharu.kotatsu.desktop.ui.screens.sources.SourcesCatalogScreen(
@@ -268,10 +332,62 @@ private fun MainScreen(container: AppContainer) {
 					)
 				}
 
-				showSettings ->
-					org.koitharu.kotatsu.desktop.ui.screens.settings.AppearanceSettingsScreen(
-						settings = DesktopSettings.getInstance(),
-					)
+				showSettings -> {
+					// Paramètres : écran racine (P0) puis sous-destinations ; Apparence est la
+					// seule destination pleinement implémentée pour l'instant.
+					val route = settingsRoute
+					when (route) {
+						org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT ->
+							org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRootScreen(
+								enabledSources = sourcesList.size,
+								totalSources = MangaParserSource.entries.size,
+								onNavigate = { settingsRoute = it },
+								onBackClick = { showSettings = false },
+								onSearchClick = { showSearch = true },
+							)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.APPEARANCE ->
+							org.koitharu.kotatsu.desktop.ui.screens.settings.AppearanceSettingsScreen(
+								settings = DesktopSettings.getInstance(),
+								appSettings = container.appSettings,
+								onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+								onNavigate = { settingsRoute = it },
+							)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.MAIN_SECTIONS ->
+							org.koitharu.kotatsu.desktop.ui.screens.settings.SectionsSettingsScreen(
+								appSettings = container.appSettings,
+								onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+							)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.READING ->
+							org.koitharu.kotatsu.desktop.ui.screens.settings.ReaderSettingsScreen(
+								settings = container.appSettings,
+								onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+								onNavigate = { settingsRoute = it },
+							)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.MASKED_IMAGES ->
+							org.koitharu.kotatsu.desktop.ui.screens.settings.MaskedImagesScreen(
+								onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.READING },
+							)
+						else -> {
+							val title = when (route) {
+								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.READING -> FR_READER_SETTINGS
+								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.SOURCES -> FR_MANGA_SOURCES
+								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.SUGGESTIONS -> FR_SUGGESTIONS
+								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.FEED_SETTINGS -> FR_NEW_CHAPTERS
+								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.DATA -> FR_DOWNLOADS_STORAGE
+								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.BACKUP -> FR_BACKUP_RESTORE
+								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.NOTIFICATIONS -> FR_NOTIFICATIONS
+								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.NETWORK -> FR_NETWORK
+								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.PRIVACY -> FR_PRIVACY_CONTENT
+								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ABOUT -> FR_ABOUT
+								else -> FR_SETTINGS
+							}
+							org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsStubScreen(
+								title = title,
+								onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+							)
+						}
+					}
+				}
 
 				showSearch -> org.koitharu.kotatsu.desktop.ui.screens.search.SearchScreen(
 					results = searchResults,
@@ -310,15 +426,16 @@ private fun MainScreen(container: AppContainer) {
 						manga = details ?: seed,
 						chapters = chapters.map { it.name },
 						isFavourite = false,
+						collapseLongDescription = container.appSettings.isLongDescriptionCollapsed,
 						onBackClick = { selectedManga = null },
 						onChapterClick = { index ->
-							chapters.getOrNull(index)?.let { readerRequest = (details ?: seed) to it }
+							openReader(details ?: seed, chapters, chapters.getOrNull(index))
 						},
 						onFavouriteClick = {},
 						onDownloadClick = {
 							container.downloadManager.enqueue(manga = details ?: seed)
 						},
-						onReadClick = { chapters.firstOrNull()?.let { readerRequest = (details ?: seed) to it } },
+						onReadClick = { openReader(details ?: seed, chapters, chapters.firstOrNull()) },
 					)
 					if (error != null) {
 						LaunchedEffect(error) {
@@ -359,13 +476,18 @@ private fun MainScreen(container: AppContainer) {
 							}
 							org.koitharu.kotatsu.desktop.ui.screens.history.HistoryScreen(
 								historyItems = historyItems,
+								listMode = container.appSettings.listMode,
+								gridSize = container.appSettings.gridSize,
+								progressMode = container.appSettings.progressIndicators,
+								isBadgesEnabled = container.appSettings.isListBadgesEnabled,
+								favouriteUrls = favouriteUrls,
 								onMangaClick = { selectedManga = it },
 								onContinueClick = { item ->
 									// « Continue reading » : retrouve le chapitre courant via la source
 									scope.launch {
 										val details = runCatching { container.getDetails(item.manga) }.getOrNull()
 										val chapter = details?.chapters?.firstOrNull()
-										if (chapter != null) readerRequest = item.manga to chapter
+										if (details != null) openReader(item.manga, details.chapters.orEmpty(), chapter)
 									}
 								},
 							)
@@ -442,7 +564,7 @@ private fun MainScreen(container: AppContainer) {
 										)
 										val details = runCatching { container.getDetails(manga) }.getOrNull()
 										val chapter = details?.chapters?.firstOrNull { it.id == bookmark.chapterId }
-										if (chapter != null) readerRequest = details to chapter
+										if (details != null) openReader(manga, details.chapters.orEmpty(), chapter)
 									}
 								},
 								onBookmarkDelete = { bookmark ->
@@ -540,30 +662,128 @@ private fun MainScreen(container: AppContainer) {
 
 						else -> PlaceholderScreen(selected)
 					}
+				}
+			// Bouton flottant « Continuer » : onglet principal, hors overlays/incognito
+			val mainTabShown = selectedManga == null && selectedSource == null &&
+				!showSettings && !showDownloads && !showSourcesCatalog && !showSearch
+			if (mainTabShown && !incognito && continueItem != null &&
+				container.appSettings.isFloatingContinueEnabled
+			) {
+				androidx.compose.material3.ExtendedFloatingActionButton(
+					onClick = {
+						val item = continueItem ?: return@ExtendedFloatingActionButton
+						scope.launch {
+							val details = runCatching { container.getDetails(item.manga) }.getOrNull()
+							val chapter = details?.chapters?.firstOrNull()
+							if (details != null) openReader(item.manga, details.chapters.orEmpty(), chapter)
+						}
+					},
+					icon = { Icon(Icons.Filled.PlayArrow, contentDescription = null) },
+					text = { Text("Continuer la lecture") },
+					modifier = Modifier
+						.align(Alignment.BottomEnd)
+						.padding(16.dp),
+				)
+			}
 			}
 		}
 	}
-	// Fenêtre lecteur (comme ReaderActivity d'origine : une fenêtre dédiée) ;
-	// l'ouverture enregistre la progression dans l'historique (HistoryDao, comme l'app d'origine)
+	// Fenêtre lecteur (comme ReaderActivity d'origine : une fenêtre dédiée)
 	val request = readerRequest
 	if (request != null) {
-		val (readerManga, chapter) = request
+		ReaderWindow(
+			container = container,
+			request = request,
+			isIncognito = incognito,
+			onClose = { readerRequest = null },
+			onNavigate = { readerRequest = it },
+		)
+	}
+}
+
+/** Demande d'ouverture du lecteur : manga, index du chapitre courant, liste des chapitres. */
+private data class ReaderRequest(
+	val manga: Manga,
+	val chapterIndex: Int,
+	val chapters: List<MangaChapter>,
+)
+
+@Composable
+private fun ReaderWindow(
+	container: AppContainer,
+	request: ReaderRequest,
+	isIncognito: Boolean,
+	onClose: () -> Unit,
+	onNavigate: (ReaderRequest) -> Unit,
+) {
+	val windowState = androidx.compose.ui.window.rememberWindowState(
+		width = 1100.dp,
+		height = 850.dp,
+	)
+	val scope = rememberCoroutineScope()
+	val settings = container.appSettings
+	val chapter = request.chapters[request.chapterIndex]
+	Window(
+		onCloseRequest = onClose,
+		title = "Kotatsu",
+		icon = kotatsuIcon(),
+		state = windowState,
+	) {
 		var pageUrls by remember(request) { mutableStateOf<List<String>>(emptyList()) }
+		var pagesError by remember(request) { mutableStateOf<String?>(null) }
 		LaunchedEffect(request) {
 			// Mode incognito (comme l'app d'origine) : aucune progression enregistrée
-			if (!incognito) {
-				container.library.saveProgress(readerManga, chapter, page = 0)
+			if (!isIncognito) {
+				runCatching { container.library.saveProgress(request.manga, chapter, page = 0) }
 			}
-			val pages = container.getPages(chapter)
-			pageUrls = pages.map { container.getPageUrl(it) }
+			runCatching {
+				val pages = container.getPages(chapter)
+				pageUrls = pages.map { container.getPageUrl(it) }
+			}.onFailure {
+				pagesError = it.message ?: it.javaClass.simpleName
+			}
+		}
+		// Mode effectif : détection automatique webtoon par tags (comme l'app d'origine)
+		val effectiveMode = remember(request) {
+			val detected = settings.isReaderModeDetect && request.manga.tags.any {
+				it.title.equals("Webtoon", ignoreCase = true) ||
+					it.title.equals("Long Strip", ignoreCase = true)
+			}
+			if (detected) org.koitharu.kotatsu.core.prefs.ReaderMode.WEBTOON else settings.readerMode
 		}
 		ReaderContent(
-			title = readerManga.title,
-			chapterTitle = chapter.title ?: chapter.name,
+			title = request.manga.title,
+			chapterTitle = chapter.name,
 			pageUrls = pageUrls,
-			mode = ReaderMode.PAGER,
-			onClose = { readerRequest = null },
+			mode = effectiveMode,
+			animation = settings.readerAnimation,
+			background = settings.readerBackground,
+			scaleMode = settings.readerScaleMode,
+			isPagesNumbered = settings.isPagesNumberingEnabled,
+			isWebtoonSeparators = settings.isWebtoonSeparatorsEnabled,
+			isIncognito = isIncognito,
+			chapterIndex = request.chapterIndex,
+			chaptersCount = request.chapters.size,
+			onClose = onClose,
+			onPrevChapter = if (request.chapterIndex > 0) {
+				{ onNavigate(request.copy(chapterIndex = request.chapterIndex - 1)) }
+			} else null,
+			onNextChapter = if (request.chapterIndex < request.chapters.lastIndex) {
+				{ onNavigate(request.copy(chapterIndex = request.chapterIndex + 1)) }
+			} else null,
+			onPageChange = { page ->
+				if (!isIncognito) {
+					scope.launch {
+						runCatching { container.library.saveProgress(request.manga, chapter, page = page) }
+					}
+				}
+			},
 		)
+		if (pagesError != null) {
+			LaunchedEffect(pagesError) {
+				println("Reader pages error: $pagesError")
+			}
+		}
 	}
 }
 
@@ -576,4 +796,28 @@ private fun PlaceholderScreen(item: NavItem) {
 			color = MaterialTheme.colorScheme.onSurface,
 		)
 	}
+}
+
+
+/** Dialog « Quitter Kotatsu ? » (P2 : Confirmation de sortie, adaptation desktop du double-back). */
+@Composable
+private fun ExitConfirmationDialog(
+	onDismiss: () -> Unit,
+	onConfirm: () -> Unit,
+) {
+	androidx.compose.material3.AlertDialog(
+		onDismissRequest = onDismiss,
+		title = { Text(text = org.koitharu.kotatsu.desktop.ui.strings.FR_EXIT_DIALOG_TITLE) },
+		text = {},
+		confirmButton = {
+			androidx.compose.material3.TextButton(onClick = onConfirm) {
+				Text(text = org.koitharu.kotatsu.desktop.ui.strings.FR_EXIT_DIALOG_CONFIRM)
+			}
+		},
+		dismissButton = {
+			androidx.compose.material3.TextButton(onClick = onDismiss) {
+				Text(text = org.koitharu.kotatsu.desktop.ui.strings.FR_CANCEL)
+			}
+		},
+	)
 }

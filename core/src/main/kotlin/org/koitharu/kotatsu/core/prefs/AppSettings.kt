@@ -69,8 +69,9 @@ class AppSettings(
 		get() = store.getEnumValue(KEY_READER_MODE, ReaderMode.STANDARD)
 		set(value) = store.edit { putString(KEY_READER_MODE, value.name) }
 
-	val isReaderModeDetect: Boolean
+	var isReaderModeDetect: Boolean
 		get() = store.getBoolean(KEY_READER_MODE_DETECT, true)
+		set(value) = store.edit { putBoolean(KEY_READER_MODE_DETECT, value) }
 
 	var readerAnimation: ReaderAnimation
 		get() = store.getEnumValue(KEY_READER_ANIMATION, ReaderAnimation.DEFAULT)
@@ -83,6 +84,55 @@ class AppSettings(
 	var readerBackground: ReaderBackground
 		get() = store.getEnumValue(KEY_READER_BACKGROUND, ReaderBackground.DEFAULT)
 		set(value) = store.edit { putString(KEY_READER_BACKGROUND, value.name) }
+
+	/** « Mode mise à l'échelle » du lecteur (pref_reader d'origine). */
+	var readerScaleMode: ScaleMode
+		get() = store.getEnumValue(KEY_READER_SCALE, ScaleMode.FIT_CENTER)
+		set(value) = store.edit { putString(KEY_READER_SCALE, value.name) }
+
+	/** « Pages numérotées » : afficher le numéro de page dans le coin inférieur. */
+	var isPagesNumberingEnabled: Boolean
+		get() = store.getBoolean(KEY_PAGES_NUMBERING, false)
+		set(value) = store.edit { putBoolean(KEY_PAGES_NUMBERING, value) }
+
+	/** « Séparateurs en mode webtoon » : espaces verticaux entre les pages. */
+	var isWebtoonSeparatorsEnabled: Boolean
+		get() = store.getBoolean(KEY_WEBTOON_SEPARATORS, false)
+		set(value) = store.edit { putBoolean(KEY_WEBTOON_SEPARATORS, value) }
+
+	// --- Phase P2 : apparence ---
+
+	/** « Afficher les filtres rapides » dans les listes. */
+	var isQuickFilterEnabled: Boolean
+		get() = store.getBoolean(KEY_LIST_FILTERS, true)
+		set(value) = store.edit { putBoolean(KEY_LIST_FILTERS, value) }
+
+	/** « Badges dans les listes » (mangas sauvegardés / favoris). */
+	var isListBadgesEnabled: Boolean
+		get() = store.getBoolean(KEY_LIST_BADGES, true)
+		set(value) = store.edit { putBoolean(KEY_LIST_BADGES, value) }
+
+	/** « Réduire la description longue » sur l'écran de détails. */
+	var isLongDescriptionCollapsed: Boolean
+		get() = store.getBoolean(KEY_COLLAPSE_DESCRIPTIONS, true)
+		set(value) = store.edit { putBoolean(KEY_COLLAPSE_DESCRIPTIONS, value) }
+
+	/** « Confirmation de sortie » : dialog avant fermeture de la fenêtre. */
+	var isExitConfirmationEnabled: Boolean
+		get() = store.getBoolean(KEY_EXIT_CONFIRMATION, false)
+		set(value) = store.edit { putBoolean(KEY_EXIT_CONFIRMATION, value) }
+
+	/** « Afficher le bouton flottant Continuer » (hors incognito et historique non vide). */
+	var isFloatingContinueEnabled: Boolean
+		get() = store.getBoolean(KEY_NAV_CONTINUE_FAB, true)
+		set(value) = store.edit { putBoolean(KEY_NAV_CONTINUE_FAB, value) }
+
+	/** Ordre du rail (Principales sections de l'écran), noms NavItem séparés par des virgules. */
+	var mainSections: List<String>
+		get() = store.getString(KEY_MAIN_SECTIONS_ORDER, DEFAULT_MAIN_SECTIONS)
+			?.split(",")?.mapNotNull { it.trim().takeIf { n -> n.isNotEmpty() } }
+			?: DEFAULT_MAIN_SECTIONS.split(",")
+		set(value) = store.edit { putString(KEY_MAIN_SECTIONS_ORDER, value.joinToString(",")) }
 
 	var readerControls: Set<ReaderControl>
 		get() = store.getStringSet(KEY_READER_CONTROLS, null)
@@ -100,12 +150,14 @@ class AppSettings(
 		get() = store.getEnumValue(KEY_SCREENSHOTS_POLICY, ScreenshotsPolicy.ALLOW)
 		set(value) = store.edit { putString(KEY_SCREENSHOTS_POLICY, value.name) }
 
-	val progressIndicators: ProgressIndicatorMode
+	var progressIndicators: ProgressIndicatorMode
 		get() = store.getEnumValue(KEY_PROGRESS_INDICATORS, ProgressIndicatorMode.PERCENT_READ)
+		set(value) = store.edit { putString(KEY_PROGRESS_INDICATORS, value.name) }
 
 	/** Politique réseau pour le préchargement des pages (desktop : isMetered choisi par l'hôte). */
-	val pagesPreloadPolicy: NetworkPolicy
+	var pagesPreloadPolicy: NetworkPolicy
 		get() = NetworkPolicy.from(store.getString(KEY_PAGES_PRELOAD, null), NetworkPolicy.NON_METERED)
+		set(value) = store.edit { putString(KEY_PAGES_PRELOAD, value.name) }
 
 	/** Politique réseau pour le préchargement du contenu (suggestions, détails). */
 	val contentPrefetchPolicy: NetworkPolicy
@@ -261,6 +313,10 @@ class AppSettings(
 
 	companion object {
 
+		/** Ordre par défaut du rail (les 5 onglets visibles de l'app d'origine). */
+		public const val DEFAULT_MAIN_SECTIONS: String = "HISTORY,FAVORITES,EXPLORE,SOURCES,FEED"
+
+
 		const val KEY_HIDDEN_SOURCES = "hidden_sources"
 
 		// Noms de clés identiques à l'app Android d'origine
@@ -277,6 +333,9 @@ class AppSettings(
 		const val KEY_READER_MODE = "reader_mode"
 		const val KEY_READER_MODE_DETECT = "reader_mode_detect"
 		const val KEY_READER_BACKGROUND = "reader_background"
+		const val KEY_READER_SCALE = "reader_scale_mode"
+		const val KEY_PAGES_NUMBERING = "reader_pages_numbering"
+		const val KEY_WEBTOON_SEPARATORS = "reader_webtoon_separators"
 		const val KEY_TRACKER_ENABLED = "tracker_enabled"
 		const val KEY_TRACKER_WIFI_ONLY = "tracker_wifi"
 		const val KEY_TRACKER_DOWNLOAD = "tracker_download"
@@ -291,6 +350,12 @@ class AppSettings(
 		const val KEY_INCOGNITO_MODE = "incognito"
 		const val KEY_INCOGNITO_NSFW = "incognito_nsfw"
 		const val KEY_PROGRESS_INDICATORS = "progress_indicators"
+		const val KEY_LIST_FILTERS = "list_filters"
+		const val KEY_LIST_BADGES = "list_badges"
+		const val KEY_COLLAPSE_DESCRIPTIONS = "collapse_descriptions"
+		const val KEY_EXIT_CONFIRMATION = "exit_confirmation"
+		const val KEY_NAV_CONTINUE_FAB = "nav_continue_fab"
+		const val KEY_MAIN_SECTIONS_ORDER = "main_sections_order"
 		const val KEY_PAGES_PRELOAD = "pages_preload"
 		const val KEY_PREFETCH_CONTENT = "prefetch_content"
 		const val KEY_SCREENSHOTS_POLICY = "screenshots_policy"

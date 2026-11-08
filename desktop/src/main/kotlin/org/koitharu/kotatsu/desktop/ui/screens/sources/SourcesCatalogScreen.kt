@@ -212,7 +212,7 @@ public fun SourcesCatalogScreen(
 				items(filtered, key = { it.name }) { source ->
 					SourceCatalogRow(
 						source = source,
-						faviconUrl = domainOf(source),
+						domain = domainOf(source),
 						added = isAdded(source),
 						onClick = { onSourceClick(source) },
 						onToggle = { onSourceToggle(source) },
@@ -246,7 +246,7 @@ private fun LanguageMenuItem(label: String, onClick: () -> Unit) {
 @Composable
 private fun SourceCatalogRow(
 	source: MangaParserSource,
-	faviconUrl: String?,
+	domain: String?,
 	added: Boolean,
 	onClick: () -> Unit,
 	onToggle: () -> Unit,
@@ -266,32 +266,14 @@ private fun SourceCatalogRow(
 				.background(MaterialTheme.colorScheme.surfaceContainerHighest),
 			contentAlignment = Alignment.Center,
 		) {
-			if (faviconUrl != null) {
-				// Fallback visible si le favicon échoue (la ligne reste cliquable)
-				SubcomposeAsyncImage(
-					model = faviconUrl,
-					contentDescription = source.title,
-					contentScale = ContentScale.Fit,
-					modifier = Modifier
-						.fillMaxSize()
-						.padding(6.dp),
-				) {
-					when (painter.state) {
-						is AsyncImagePainter.State.Error -> Icon(
-							imageVector = Icons.AutoMirrored.Filled.MenuBook,
-							contentDescription = source.title,
-							tint = MaterialTheme.colorScheme.onSurfaceVariant,
-						)
-						else -> SubcomposeAsyncImageContent()
-					}
-				}
-			} else {
-				Icon(
-					imageVector = Icons.AutoMirrored.Filled.MenuBook,
-					contentDescription = source.title,
-					tint = MaterialTheme.colorScheme.onSurfaceVariant,
-				)
-			}
+			// Chaîne de secours : favicon du site → service Google → icône générique
+			org.koitharu.kotatsu.desktop.ui.components.SourceFavicon(
+				domain = domain,
+				contentDescription = source.title,
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(6.dp),
+			)
 		}
 		Column(
 			modifier = Modifier

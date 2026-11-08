@@ -29,10 +29,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,12 +53,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import org.koitharu.kotatsu.core.prefs.ListMode
+import org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode
 import org.koitharu.kotatsu.core.ui.model.DateTimeAgo
 import org.koitharu.kotatsu.desktop.ui.components.CARD_INDICATOR_OFFSET
 import org.koitharu.kotatsu.desktop.ui.components.CARD_INDICATOR_SIZE
@@ -123,6 +132,11 @@ public fun HistoryScreen(
 	onContinueClick: (HistoryItem) -> Unit,
 	modifier: Modifier = Modifier,
 	isGroupingEnabled: Boolean = true,
+	listMode: ListMode = ListMode.DETAILED_LIST,
+	gridSize: Int = 100,
+	progressMode: ProgressIndicatorMode = ProgressIndicatorMode.PERCENT_READ,
+	isBadgesEnabled: Boolean = false,
+	favouriteUrls: Set<String> = emptySet(),
 	onClearHistory: (() -> Unit)? = null,
 	onSearchClick: () -> Unit = {},
 	onSettingsClick: () -> Unit = {},
@@ -177,24 +191,83 @@ public fun HistoryScreen(
 					}
 				}
 			}
-			LazyColumn(
-				modifier = Modifier.fillMaxSize(),
-				contentPadding = PaddingValues(LIST_SPACING),
-				verticalArrangement = Arrangement.spacedBy(LIST_SPACING),
-			) {
-				items(rows, key = { row ->
-					when (row) {
-						is HistoryRow.Header -> "header_${row.text}"
-						is HistoryRow.Entry -> row.item.manga.url
+			when (listMode) {
+				ListMode.GRID -> {
+					// « Taille de la grille » : 100 % = 110dp (tuile de référence de l'app)
+					val cellWidth = (110.dp * gridSize.coerceIn(50, 200) / 100f)
+					LazyVerticalGrid(
+						columns = GridCells.Adaptive(cellWidth),
+						modifier = Modifier.fillMaxSize(),
+						contentPadding = PaddingValues(LIST_SPACING),
+						horizontalArrangement = Arrangement.spacedBy(LIST_SPACING),
+						verticalArrangement = Arrangement.spacedBy(LIST_SPACING),
+					) {
+						items(rows, key = { row ->
+							when (row) {
+								is HistoryRow.Header -> "header_${row.text}"
+								is HistoryRow.Entry -> row.item.manga.url
+							}
+						}, span = { row ->
+							if (row is HistoryRow.Header) GridItemSpan(maxLineSpan) else GridItemSpan(1)
+						}) { row ->
+							when (row) {
+								is HistoryRow.Header -> ListHeaderRow(text = row.text)
+								is HistoryRow.Entry -> HistoryGridCard(
+									item = row.item,
+									progressText = progressText(progressMode, row.item),
+									showBadge = isBadgesEnabled && row.item.manga.url in favouriteUrls,
+									onClick = { onMangaClick(row.item.manga) },
+								)
+							}
+						}
 					}
-				}) { row ->
-					when (row) {
-						is HistoryRow.Header -> ListHeaderRow(text = row.text)
-						is HistoryRow.Entry -> HistoryListCard(
-							item = row.item,
-							onClick = { onMangaClick(row.item.manga) },
-							onContinueClick = { onContinueClick(row.item) },
-						)
+				}
+				ListMode.LIST -> {
+					// « Compact » : couverture réduite, titre 2 lignes
+					LazyColumn(
+						modifier = Modifier.fillMaxSize(),
+						contentPadding = PaddingValues(LIST_SPACING),
+						verticalArrangement = Arrangement.spacedBy(LIST_SPACING),
+					) {
+						items(rows, key = { row ->
+							when (row) {
+								is HistoryRow.Header -> "header_${row.text}"
+								is HistoryRow.Entry -> row.item.manga.url
+							}
+						}) { row ->
+							when (row) {
+								is HistoryRow.Header -> ListHeaderRow(text = row.text)
+								is HistoryRow.Entry -> HistoryCompactCard(
+									item = row.item,
+									progressText = progressText(progressMode, row.item),
+									onClick = { onMangaClick(row.item.manga) },
+								)
+							}
+						}
+					}
+				}
+				ListMode.DETAILED_LIST -> {
+					LazyColumn(
+						modifier = Modifier.fillMaxSize(),
+						contentPadding = PaddingValues(LIST_SPACING),
+						verticalArrangement = Arrangement.spacedBy(LIST_SPACING),
+					) {
+						items(rows, key = { row ->
+							when (row) {
+								is HistoryRow.Header -> "header_${row.text}"
+								is HistoryRow.Entry -> row.item.manga.url
+							}
+						}) { row ->
+							when (row) {
+								is HistoryRow.Header -> ListHeaderRow(text = row.text)
+								is HistoryRow.Entry -> HistoryListCard(
+									item = row.item,
+									progressText = progressText(progressMode, row.item),
+									onClick = { onMangaClick(row.item.manga) },
+									onContinueClick = { onContinueClick(row.item) },
+								)
+							}
+						}
 					}
 				}
 			}
@@ -227,6 +300,7 @@ private fun ListHeaderRow(text: String) {
 @Composable
 private fun HistoryListCard(
 	item: HistoryItem,
+	progressText: String?,
 	onClick: () -> Unit,
 	onContinueClick: () -> Unit,
 	modifier: Modifier = Modifier,
@@ -258,14 +332,16 @@ private fun HistoryListCard(
 				)
 			}
 			// progressView : bottom|end de la couverture, marge card_indicator_offset (8dp)
-			ReadingProgressIndicator(
-				percent = item.percent,
-				text = percentPattern(item.percent),
-				modifier = Modifier
-					.align(Alignment.BottomEnd)
-					.padding(CARD_INDICATOR_OFFSET)
-					.size(CARD_INDICATOR_SIZE),
-			)
+			if (progressText != null) {
+				ReadingProgressIndicator(
+					percent = item.percent,
+					text = progressText,
+					modifier = Modifier
+						.align(Alignment.BottomEnd)
+						.padding(CARD_INDICATOR_OFFSET)
+						.size(CARD_INDICATOR_SIZE),
+				)
+			}
 		}
 		Column(
 			modifier = Modifier
@@ -303,5 +379,145 @@ private fun HistoryListCard(
 				tint = MaterialTheme.colorScheme.primary,
 			)
 		}
+	}
+}
+
+
+/** Texte de l'indicateur de progression selon la préférence ; null = indicateur masqué. */
+private fun progressText(mode: ProgressIndicatorMode, item: HistoryItem): String? = when (mode) {
+	ProgressIndicatorMode.NONE -> null
+	ProgressIndicatorMode.PERCENT_READ -> percentPattern(item.percent)
+	ProgressIndicatorMode.PERCENT_LEFT -> percentPattern((1f - item.percent).coerceIn(0f, 1f))
+	// Chapitres lus/restants : le compteur fiable arrive avec la fusion DB (P8) ;
+	// en attendant, repli sur le pourcentage.
+	ProgressIndicatorMode.CHAPTERS_READ, ProgressIndicatorMode.CHAPTERS_LEFT -> percentPattern(item.percent)
+}
+
+/** Carte en mode Grille : couverture + pastille de progression + badge favori (capture). */
+@Composable
+private fun HistoryGridCard(
+	item: HistoryItem,
+	progressText: String?,
+	showBadge: Boolean,
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier,
+) {
+	Column(
+		modifier = modifier
+			.fillMaxWidth()
+			.clickable(onClick = onClick)
+			.padding(vertical = 2.dp),
+		horizontalAlignment = Alignment.CenterHorizontally,
+	) {
+		Box {
+			Box(
+				modifier = Modifier
+					.fillMaxWidth()
+					.aspectRatio(2f / 3f)
+					.clip(RoundedCornerShape(DETAILED_COVER_CORNER))
+					.background(MaterialTheme.colorScheme.surfaceContainer),
+				contentAlignment = Alignment.Center,
+			) {
+				AsyncImage(
+					model = ImageRequest.Builder(coil3.PlatformContext.INSTANCE)
+						.data(item.manga.coverUrl)
+						.crossfade(true)
+						.build(),
+					contentDescription = item.manga.title,
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.fillMaxSize(),
+				)
+			}
+			if (showBadge) {
+				Icon(
+					imageVector = Icons.Filled.Favorite,
+					contentDescription = null,
+					tint = MaterialTheme.colorScheme.primary,
+					modifier = Modifier
+						.align(Alignment.TopEnd)
+						.padding(6.dp)
+						.size(18.dp),
+				)
+			}
+			if (progressText != null) {
+				ReadingProgressIndicator(
+					percent = item.percent,
+					text = progressText,
+					modifier = Modifier
+						.align(Alignment.BottomEnd)
+						.padding(CARD_INDICATOR_OFFSET)
+						.size(CARD_INDICATOR_SIZE),
+				)
+			}
+		}
+		Text(
+			text = item.manga.title,
+			style = MaterialTheme.typography.bodyMedium,
+			color = MaterialTheme.colorScheme.onSurface,
+			maxLines = 2,
+			overflow = TextOverflow.Ellipsis,
+			textAlign = TextAlign.Center,
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(top = 4.dp),
+		)
+	}
+}
+
+/** Ligne compacte : couverture 56dp, titre 2 lignes (Options de liste « Compact »). */
+@Composable
+private fun HistoryCompactCard(
+	item: HistoryItem,
+	progressText: String?,
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier,
+) {
+	Row(
+		modifier = modifier
+			.fillMaxWidth()
+			.clickable(onClick = onClick)
+			.padding(vertical = 4.dp),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		Box {
+			Box(
+				modifier = Modifier
+					.width(56.dp)
+					.aspectRatio(2f / 3f)
+					.clip(RoundedCornerShape(6.dp))
+					.background(MaterialTheme.colorScheme.surfaceContainer),
+				contentAlignment = Alignment.Center,
+			) {
+				AsyncImage(
+					model = ImageRequest.Builder(coil3.PlatformContext.INSTANCE)
+						.data(item.manga.coverUrl)
+						.crossfade(true)
+						.build(),
+					contentDescription = item.manga.title,
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.fillMaxSize(),
+				)
+			}
+			if (progressText != null) {
+				ReadingProgressIndicator(
+					percent = item.percent,
+					text = progressText,
+					modifier = Modifier
+						.align(Alignment.BottomEnd)
+						.padding(2.dp)
+						.size(24.dp),
+				)
+			}
+		}
+		Text(
+			text = item.manga.title,
+			style = MaterialTheme.typography.bodyLarge,
+			color = MaterialTheme.colorScheme.onSurface,
+			maxLines = 2,
+			overflow = TextOverflow.Ellipsis,
+			modifier = Modifier
+				.weight(1f)
+				.padding(horizontal = ROW_START_MARGIN),
+		)
 	}
 }

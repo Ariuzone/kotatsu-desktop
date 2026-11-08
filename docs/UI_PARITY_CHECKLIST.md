@@ -5,6 +5,7 @@ comparée rangée dans `docs/ui-parity/`), référence utilisée.
 
 | Écran | Référence (capture/fichier d'origine) | Statut | Preuve |
 |---|---|---|---|
+| Paramètres (écran racine, 4 sections) | vidéo de référence frames 7–8 (`pref_main` + SettingsActivity) | **écart mineur** : structure et sous-titres exacts (« Mode lecture, Mode mise à l'échelle… », compteur « N de M activé(s) », « Version 9.8.6 ») ; sous-écrans non portés affichent un état vide (P1–P6) | `ui-parity/desktop-settings-root.png` |
 | Shell principal (rail de navigation) | `activity_main.xml` + tenInchScreenshots/1.png | **écart mineur** : structure identique (rail icônes+libellés à gauche, volet contenu) ; libellés exacts (« Explore », « History », « Favorites »…) ; à faire : barre de recherche en haut du volet | `ui-parity/desktop-explore.png` |
 | Explorateur (sources par langue) | `fragment_explore.xml`, `item_explore_source_grid.xml` | **écart mineur** : grille de cartes sources groupées par langue conforme ; favicons réels chargés depuis les sites (fallback icône quand le site n'en expose pas — l'app Android utilise sa propre base de favicons) | `ui-parity/desktop-explore-favicons.png` |
 | Liste de mangas (grille) | `fragment_list.xml`, `item_manga_grid.xml` | **implémenté** (MangaGrid : marge 2dp/padding 6dp, coins 12dp, titre 2 lignes) ; écart mineur : badges/anneaux de progression non encore portés | — |

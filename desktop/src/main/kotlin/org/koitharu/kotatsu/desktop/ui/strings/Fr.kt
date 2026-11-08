@@ -116,3 +116,156 @@ public const val FR_IMPORT: String = "Importer"
 /** Barre d'infos du lecteur (string/reader_info_pattern) : « Ch. %1$d/%2$d Pg. %3$d/%4$d ». */
 public fun frReaderInfo(chapter: Int, chaptersCount: Int, page: Int, pagesCount: Int): String =
 	"Ch. $chapter/$chaptersCount Pg. $page/$pagesCount"
+
+// --- Paramètres racine (strings des pref_*.xml de l'app d'origine + captures frames 7-8) ---
+public const val FR_CANCEL: String = "Annuler" // android.R.string.cancel (values-fr)
+public const val FR_OK: String = "OK" // ok
+public const val FR_READING: String = "Lecture" // pref_sections_reading
+public const val FR_FIND_MANGA: String = "Trouver des mangas" // pref_sections_find_manga
+public const val FR_YOUR_DATA: String = "Vos données" // pref_sections_your_data
+public const val FR_APPLICATION: String = "Application" // pref_sections_application
+public const val FR_APPEARANCE: String = "Apparence" // appearance
+public const val FR_APPEARANCE_SUMMARY: String = "Thème, Mode liste, Langue" // capture
+public const val FR_READER_SETTINGS_SUMMARY: String =
+	"Mode lecture, Mode mise à l'échelle, Changer de pages" // capture
+public const val FR_NEW_CHAPTERS: String = "Nouveaux chapitres" // new_chapters
+public const val FR_NEW_CHAPTERS_SUMMARY: String =
+	"Fréquence de vérification, Rechercher les mises à jour" // capture
+public const val FR_SUGGESTIONS_SUMMARY: String = "Activé" // capture
+public const val FR_DOWNLOADS_STORAGE: String = "Téléchargements et stockage" // capture
+public const val FR_DOWNLOADS_STORAGE_SUMMARY: String =
+	"Dossier pour les téléchargements, Utilisation du stockage, Data removal" // capture
+public const val FR_BACKUP_RESTORE: String = "Sauvegarde et restauration" // capture
+// Chaîne non traduite dans l'app d'origine — reproduite telle quelle (parité)
+public const val FR_BACKUP_RESTORE_SUMMARY: String = "Create or restore a backup, Sauvegardes"
+public const val FR_NOTIFICATIONS: String = "Notifications" // notifications
+public const val FR_NOTIFICATIONS_SUMMARY: String = "Nouveaux chapitres, Suggestions" // capture
+public const val FR_PRIVACY_CONTENT: String = "Confidentialité et contenu" // capture
+public const val FR_PRIVACY_SUMMARY: String =
+	"Contenu pour adultes, Sécurité de l'application, Votre activité" // capture
+public const val FR_NETWORK: String = "Réseau" // network
+public const val FR_NETWORK_SUMMARY: String = "Données mobiles, Proxy, DNS sur HTTPS" // capture
+public const val FR_ABOUT: String = "À propos" // about
+public const val FR_ABOUT_VERSION: String = "Version 9.8.6" // version (capture)
+public const val FR_COMING_SOON: String = "Cette section sera disponible dans une prochaine phase"
+
+/** Sous-titre « Sources des mangas » : « %1$d de %2$d activé(s) » (capture frame 8). */
+public fun frSourcesEnabled(enabled: Int, total: Int): String = "$enabled de $total activé(s)"
+
+// --- Paramètres du lecteur : valeurs affichées (labels values-fr de l'app d'origine) ---
+public const val FR_IMAGES_MASKED: String = "Images masquées" // masked_images
+public const val FR_IMAGES_MASKED_SUMMARY: String =
+	"Tout ce que vous avez effacé. Retirez une image pour la revoir" // capture
+public const val FR_IMAGES_MASKED_EMPTY: String =
+	"Rien de masqué pour l'instant. Frottez une image du pouce pendant la lecture pour la masquer"
+
+/** « Mode par défaut » : Standard / De droite à gauche / Vertical / Webtoon (captures §2.1). */
+public fun frReaderModeLabel(mode: org.koitharu.kotatsu.core.prefs.ReaderMode): String = when (mode) {
+	org.koitharu.kotatsu.core.prefs.ReaderMode.STANDARD -> "Standard"
+	org.koitharu.kotatsu.core.prefs.ReaderMode.REVERSED -> "De droite à gauche"
+	org.koitharu.kotatsu.core.prefs.ReaderMode.VERTICAL -> "Vertical"
+	org.koitharu.kotatsu.core.prefs.ReaderMode.WEBTOON -> "Webtoon"
+}
+
+/** « Mode mise à l'échelle » (values-fr : Ajuster au centre…). */
+public fun frReaderScaleLabel(mode: org.koitharu.kotatsu.core.prefs.ScaleMode): String = when (mode) {
+	org.koitharu.kotatsu.core.prefs.ScaleMode.FIT_CENTER -> "Ajuster au centre"
+	org.koitharu.kotatsu.core.prefs.ScaleMode.FIT_WIDTH -> "Ajuster à la largeur"
+	org.koitharu.kotatsu.core.prefs.ScaleMode.FIT_HEIGHT -> "Ajuster à la hauteur"
+	org.koitharu.kotatsu.core.prefs.ScaleMode.CROP -> "Recadrer"
+}
+
+/** « Animation de page » (enum ReaderAnimation : NONE / DEFAULT / ADVANCED). */
+public fun frReaderAnimationLabel(animation: org.koitharu.kotatsu.core.prefs.ReaderAnimation): String =
+	when (animation) {
+		org.koitharu.kotatsu.core.prefs.ReaderAnimation.NONE -> "Aucune"
+		org.koitharu.kotatsu.core.prefs.ReaderAnimation.DEFAULT -> "Par défaut"
+		org.koitharu.kotatsu.core.prefs.ReaderAnimation.ADVANCED -> "Avancée"
+	}
+
+/** « Arrière-plan » (enum ReaderBackground). */
+public fun frReaderBackgroundLabel(background: org.koitharu.kotatsu.core.prefs.ReaderBackground): String =
+	when (background) {
+		org.koitharu.kotatsu.core.prefs.ReaderBackground.DEFAULT -> "Par défaut"
+		org.koitharu.kotatsu.core.prefs.ReaderBackground.LIGHT -> "Clair"
+		org.koitharu.kotatsu.core.prefs.ReaderBackground.DARK -> "Sombre"
+		org.koitharu.kotatsu.core.prefs.ReaderBackground.WHITE -> "Blanc"
+		org.koitharu.kotatsu.core.prefs.ReaderBackground.BLACK -> "Noir"
+	}
+
+/** « Précharger les pages » (enum NetworkPolicy : Toujours / Uniquement en Wi-Fi / Jamais). */
+public fun frNetworkPolicyLabel(policy: org.koitharu.kotatsu.core.prefs.NetworkPolicy): String =
+	when (policy) {
+		org.koitharu.kotatsu.core.prefs.NetworkPolicy.ALWAYS -> "Toujours"
+		org.koitharu.kotatsu.core.prefs.NetworkPolicy.NON_METERED -> "Uniquement en Wi-Fi"
+		org.koitharu.kotatsu.core.prefs.NetworkPolicy.NEVER -> "Jamais"
+	}
+
+// --- Phase P2 : Apparence (libellés exacts des captures frames 21-25) ---
+public const val FR_LIST_SECTION: String = "Liste des mangas"
+public const val FR_MANGA_PAGE_SECTION: String = "Page du manga"
+public const val FR_NAVIGATION_SECTION: String = "Navigation"
+public const val FR_LIST_MODE: String = "Mode liste"
+public const val FR_GRID_SIZE: String = "Taille de la grille"
+public const val FR_QUICK_FILTERS: String = "Afficher les filtres rapides"
+public const val FR_QUICK_FILTERS_SUMMARY: String =
+	"Fournit la capacité de filtrer les listes de manga par certains paramètres"
+public const val FR_PROGRESS_INDICATORS: String = "Afficher les indicateurs de progression de lecture"
+public const val FR_LIST_BADGES: String = "Badges dans les listes"
+public const val FR_LIST_BADGES_SUMMARY: String = "Mangas sauvegardés, Favoris"
+public const val FR_COLLAPSE_LONG_DESCRIPTION: String = "Réduire la description longue"
+public const val FR_PAGES_THUMBNAILS: String = "Afficher les miniatures des pages"
+public const val FR_PAGES_THUMBNAILS_SUMMARY: String = "Active l'onglet « Pages » sur l'écran de détails"
+public const val FR_DEFAULT_TAB: String = "Onglet par défaut"
+public const val FR_DEFAULT_TAB_SUMMARY: String = "Dernière utilisation"
+public const val FR_READING_TIME: String = "Afficher le temps de lecture estimé"
+public const val FR_READING_TIME_SUMMARY: String = "Le temps estimé peut être inexact"
+public const val FR_RELATED_MANGA: String = "Mangas connexes"
+public const val FR_RELATED_MANGA_SUMMARY: String =
+	"Afficher une liste de mangas connexes. Dans certains cas, elle peut être inexacte ou manquante"
+public const val FR_PIN_NAVIGATION: String = "Épingler l'interface de navigation"
+public const val FR_PIN_NAVIGATION_SUMMARY: String =
+	"Ne pas masquer la barre de navigation et la vue de recherche lors du défilement"
+public const val FR_FLOATING_CONTINUE: String = "Afficher le bouton flottant Continuer"
+public const val FR_FLOATING_CONTINUE_SUMMARY: String =
+	"Permet de continuer la lecture en un clic. Ce bouton n'apparaîtra pas en mode navigation privée ou lorsque l'historique est vide"
+public const val FR_EXIT_CONFIRMATION: String = "Confirmation de sortie"
+public const val FR_SEARCH_SUGGESTIONS: String = "Suggestions de recherche"
+public const val FR_SEARCH_SUGGESTIONS_SUMMARY: String =
+	"Sources des mangas, Genres, Requêtes récentes, Auteurs, Requêtes suggérées, Sources récentes, Mangas"
+public const val FR_RECENT_SHORTCUTS: String = "Afficher les raccourcis des mangas récents"
+public const val FR_MAIN_SECTIONS: String = "Principales sections de l'écran"
+public const val FR_ADD: String = "Ajouter"
+public const val FR_LANGUAGE: String = "Langue"
+public const val FR_LANGUAGE_SUMMARY: String = "Suivre le système (français seul sur desktop)"
+// Confirmation de sortie (dialog desktop, adaptation de « Appuyez deux fois sur la touche Retour »)
+public const val FR_EXIT_DIALOG_TITLE: String = "Quitter Kotatsu ?"
+public const val FR_EXIT_DIALOG_CONFIRM: String = "Quitter"
+
+/** « Mode liste » : Compact / Détails / Grille (bottom sheet Options de liste, frame 0:30). */
+public fun frListModeLabel(mode: org.koitharu.kotatsu.core.prefs.ListMode): String = when (mode) {
+	org.koitharu.kotatsu.core.prefs.ListMode.LIST -> "Compact"
+	org.koitharu.kotatsu.core.prefs.ListMode.DETAILED_LIST -> "Détails"
+	org.koitharu.kotatsu.core.prefs.ListMode.GRID -> "Grille"
+}
+
+/** « Afficher les indicateurs de progression de lecture » (dialog radio, frame 1:45). */
+public fun frProgressModeLabel(mode: org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode): String =
+	when (mode) {
+		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.NONE -> "Désactivé"
+		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.PERCENT_READ -> "Pourcentage lu"
+		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.PERCENT_LEFT -> "Pourcentage restant"
+		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.CHAPTERS_READ -> "Chapitres lus"
+		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.CHAPTERS_LEFT -> "Chapitres restants"
+	}
+
+/** Libellés FR du rail (Principales sections de l'écran + rail principal). */
+public fun frNavItemLabel(item: org.koitharu.kotatsu.desktop.ui.nav.NavItem): String = when (item) {
+	org.koitharu.kotatsu.desktop.ui.nav.NavItem.HISTORY -> FR_HISTORY
+	org.koitharu.kotatsu.desktop.ui.nav.NavItem.FAVORITES -> FR_FAVOURITES
+	org.koitharu.kotatsu.desktop.ui.nav.NavItem.EXPLORE -> FR_EXPLORE
+	org.koitharu.kotatsu.desktop.ui.nav.NavItem.SOURCES -> FR_SOURCE
+	org.koitharu.kotatsu.desktop.ui.nav.NavItem.FEED -> FR_FEED
+	org.koitharu.kotatsu.desktop.ui.nav.NavItem.LOCAL -> FR_LOCAL_STORAGE
+	org.koitharu.kotatsu.desktop.ui.nav.NavItem.BOOKMARKS -> FR_BOOKMARKS
+}

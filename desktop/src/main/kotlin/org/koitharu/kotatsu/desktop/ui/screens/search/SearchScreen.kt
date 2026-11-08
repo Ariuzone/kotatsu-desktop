@@ -311,17 +311,14 @@ private fun SourceSuggestions(
 					.background(MaterialTheme.colorScheme.surfaceContainerHighest),
 				contentAlignment = Alignment.Center,
 			) {
-				val favicon = domainOf(source)
-				if (favicon != null) {
-					AsyncImage(
-						model = favicon,
-						contentDescription = source.title,
-						contentScale = ContentScale.Fit,
-						modifier = Modifier
-							.fillMaxSize()
-							.padding(6.dp),
-					)
-				}
+				// Chaîne de secours : favicon du site → service Google → icône générique
+				org.koitharu.kotatsu.desktop.ui.components.SourceFavicon(
+					domain = domainOf(source),
+					contentDescription = source.title,
+					modifier = Modifier
+						.fillMaxSize()
+						.padding(6.dp),
+				)
 			}
 			Column(modifier = Modifier.padding(start = 16.dp)) {
 				Text(

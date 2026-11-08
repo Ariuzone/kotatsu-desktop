@@ -95,6 +95,7 @@ public fun DetailsScreen(
 	onDownloadClick: () -> Unit,
 	onReadClick: () -> Unit,
 	modifier: Modifier = Modifier,
+	collapseLongDescription: Boolean = true, // P2 : « Réduire la description longue »
 ) {
 	Column(modifier = modifier.fillMaxSize()) {
 		LazyColumn(modifier = Modifier.weight(1f)) {
@@ -104,7 +105,10 @@ public fun DetailsScreen(
 				}
 			}
 			item {
-				DescriptionSection(description = manga?.description.orEmpty())
+				DescriptionSection(
+					description = manga?.description.orEmpty(),
+					initialExpanded = !collapseLongDescription,
+				)
 			}
 			item {
 				// chips_tags : sous la description comme activity_details.xml
@@ -279,9 +283,9 @@ private fun TagsSection(tags: Set<org.koitharu.kotatsu.parsers.model.MangaTag>) 
 }
 
 @Composable
-private fun DescriptionSection(description: String) {
+private fun DescriptionSection(description: String, initialExpanded: Boolean = false) {
 	if (description.isBlank()) return
-	var expanded by remember { mutableStateOf(false) }
+	var expanded by remember { mutableStateOf(initialExpanded) }
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()

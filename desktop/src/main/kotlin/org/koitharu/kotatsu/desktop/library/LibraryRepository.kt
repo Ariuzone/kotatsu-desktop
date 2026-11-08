@@ -11,6 +11,8 @@ package org.koitharu.kotatsu.desktop.library
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koitharu.kotatsu.core.db.MangaDatabase
+import org.koitharu.kotatsu.core.db.entity.toEntities
+import org.koitharu.kotatsu.core.db.entity.toEntity
 import org.koitharu.kotatsu.core.db.entity.toManga
 import org.koitharu.kotatsu.core.db.entity.toMangaTags
 import org.koitharu.kotatsu.favourites.data.FavouriteCategoryEntity
@@ -28,6 +30,8 @@ public class LibraryRepository(
 	private val historyDao = db.getHistoryDao()
 	private val favouritesDao = db.getFavouritesDao()
 	private val categoriesDao = db.getFavouriteCategoriesDao()
+	private val mangaDao = db.getMangaDao()
+	private val tagsDao = db.getTagsDao()
 
 	// ---- Historique ----
 
@@ -37,6 +41,22 @@ public class LibraryRepository(
 	public fun observeHistory(limit: Int = 50): Flow<List<HistoryWithManga>> =
 		historyDao.observeAll(limit)
 
+	/**
+	 * Persiste le manga dans la table « manga » (et ses tags) avant tout écriture qui le
+	 * référence par clé étrangère (history, favourites) — équivalent desktop de ce que fait
+	 * SaveHistoryUseCase/AddToFavouritesUseCase côté Android. Sans cela, Room renvoie
+	 * « FOREIGN KEY constraint failed » (code 787) pour tout manga jamais vu dans la bibliothèque.
+	 */
+	private suspend fun ensureMangaStored(manga: Manga) {
+		val tagEntities = manga.tags.toEntities()
+		if (tagEntities.isNotEmpty()) {
+			// Les entités tags doivent exister dans la table « tags » avant leurs relations
+			// (manga_tags a une FK vers tags) — sinon « FOREIGN KEY constraint failed ».
+			tagsDao.upsert(tagEntities)
+		}
+		mangaDao.upsert(manga.toEntity(), tagEntities)
+	}
+
 	public suspend fun saveProgress(
 		manga: Manga,
 		chapter: MangaChapter,
@@ -44,6 +64,7 @@ public class LibraryRepository(
 		scroll: Float = 0f,
 		percent: Float = 0f,
 	) {
+		ensureMangaStored(manga)
 		val existing = historyDao.find(manga.id)
 		val now = System.currentTimeMillis()
 		historyDao.upsert(
@@ -73,6 +94,7 @@ public class LibraryRepository(
 
 
 	public suspend fun addFavourite(manga: Manga, categoryId: Long) {
+		ensureMangaStored(manga)
 		favouritesDao.upsert(
 			FavouriteEntity(
 				mangaId = manga.id,

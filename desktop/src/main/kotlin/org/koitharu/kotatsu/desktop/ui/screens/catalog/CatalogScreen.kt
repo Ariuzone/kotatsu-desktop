@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +28,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,6 +42,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.layout.Arrangement
 import org.koitharu.kotatsu.desktop.ui.components.MangaGridCard
+import kotlinx.coroutines.launch
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 
@@ -56,7 +60,11 @@ public fun CatalogScreen(
 	var isLoading by remember(source) { mutableStateOf(true) }
 	var isLoadingMore by remember(source) { mutableStateOf(false) }
 	var error by remember(source) { mutableStateOf<String?>(null) }
+	// Pagination : fin de liste atteinte / erreur de la dernière page (pied item_error_footer)
+	var canLoadMore by remember(source) { mutableStateOf(true) }
+	var loadMoreError by remember(source) { mutableStateOf<String?>(null) }
 	val gridState = rememberLazyGridState()
+	val scope = rememberCoroutineScope()
 
 	LaunchedEffect(source) {
 		try {
@@ -67,6 +75,39 @@ public fun CatalogScreen(
 		} finally {
 			isLoading = false
 		}
+	}
+
+	/** Charge la page suivante (déclenchée par le défilement ou le bouton « Réessayer »). */
+	suspend fun loadMore() {
+		if (isLoadingMore || !canLoadMore) return
+		isLoadingMore = true
+		loadMoreError = null
+		try {
+			val next = fetchList(source, items.size)
+			if (next.isEmpty()) {
+				canLoadMore = false // fin de liste
+			} else {
+				items = (items + next).distinctBy { it.url }
+			}
+		} catch (e: Exception) {
+			loadMoreError = e.message ?: e.javaClass.simpleName
+		} finally {
+			isLoadingMore = false
+		}
+	}
+
+	// Pagination : charge la page suivante quand on approche de la fin (comme l'app d'origine) ;
+	// snapshotFlow reste actif après chaque échec, contrairement à l'ancien effet à clés figées.
+	LaunchedEffect(gridState, items.size, canLoadMore, loadMoreError) {
+		if (items.isEmpty()) return@LaunchedEffect
+		snapshotFlow { gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1 }
+			.collect { lastVisible ->
+				if (!isLoadingMore && canLoadMore && loadMoreError == null &&
+					lastVisible >= items.size - 6
+				) {
+					loadMore()
+				}
+			}
 	}
 
 	Column(modifier = modifier.fillMaxSize()) {
@@ -114,31 +155,30 @@ public fun CatalogScreen(
 					MangaGridCard(manga = manga, onClick = { onMangaClick(manga) })
 				}
 				item(span = { GridItemSpan(maxLineSpan) }) {
-					Box(
+					// Pied de liste : spinner de chargement ou erreur + « Réessayer »
+					// (item_loading_state / item_error_footer de l'app d'origine)
+					Column(
 						modifier = Modifier
 							.fillMaxWidth()
 							.padding(12.dp),
-						contentAlignment = Alignment.Center,
+						horizontalAlignment = Alignment.CenterHorizontally,
 					) {
 						if (isLoadingMore) {
 							CircularProgressIndicator()
 						}
-					}
-				}
-			}
-			// Pagination : charge la page suivante quand on approche de la fin (comme l'app d'origine)
-			val shouldLoadMore = !isLoading && !isLoadingMore &&
-				gridState.layoutInfo.visibleItemsInfo.any { it.index >= items.size - 6 } && items.isNotEmpty()
-			LaunchedEffect(shouldLoadMore, items.size) {
-				if (shouldLoadMore) {
-					isLoadingMore = true
-					try {
-						val next = fetchList(source, items.size)
-						items = items + next
-					} catch (_: Exception) {
-						// pied d'erreur silencieux comme item_error_footer
-					} finally {
-						isLoadingMore = false
+						if (loadMoreError != null) {
+							Text(
+								text = loadMoreError.orEmpty(),
+								style = MaterialTheme.typography.bodyMedium,
+								color = MaterialTheme.colorScheme.error,
+							)
+							FilledTonalButton(
+								onClick = { scope.launch { loadMore() } },
+								modifier = Modifier.padding(top = 8.dp),
+							) {
+								Text("Réessayer")
+							}
+						}
 					}
 				}
 			}

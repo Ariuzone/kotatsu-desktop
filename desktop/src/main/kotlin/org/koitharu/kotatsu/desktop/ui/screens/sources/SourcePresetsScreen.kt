@@ -138,34 +138,36 @@ public fun SourcePresetsScreen(
 			onTrailingIconClick = onCatalogClick,
 		)
 		LazyVerticalGrid(
-			columns = GridCells.Fixed(3),
+			// Colonnes adaptatives : sur desktop, la fenêtre est bien plus large qu'un téléphone ;
+			// les tuiles gardent une taille raisonnable au lieu d'occuper un tiers d'écran
+			columns = GridCells.Adaptive(110.dp),
 			modifier = Modifier.fillMaxSize(),
 			contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
 			horizontalArrangement = Arrangement.spacedBy(12.dp),
 			verticalArrangement = Arrangement.spacedBy(12.dp),
 		) {
 			// Boutons rapides : 2x2 + pleine largeur (captures)
-			item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(3) }) {
+			item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
 				QuickButtons(
 					onQuickAction = onQuickAction,
 				)
 			}
 			// « Suggestions » + « Plus »
-			item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(3) }) {
+			item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
 				SectionHeader(
 					title = FR_SUGGESTIONS,
 					actionLabel = FR_MORE,
 					onActionClick = onMoreSuggestionsClick,
 				)
 			}
-			item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(3) }) {
+			item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
 				SuggestionsPager(
 					suggestions = suggestions,
 					onSuggestionClick = onSuggestionClick,
 				)
 			}
 			// « Sources des mangas » + « Catalogue »
-			item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(3) }) {
+			item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
 				SectionHeader(
 					title = FR_MANGA_SOURCES,
 					actionLabel = FR_CATALOG,
@@ -175,7 +177,7 @@ public fun SourcePresetsScreen(
 			items(sources, key = { it.name }) { source ->
 				SourceIcon(
 					source = source,
-					faviconUrl = domainOf(source),
+					domain = domainOf(source),
 					hasNewChapters = hasNewChapters(source),
 					onClick = { onSourceClick(source) },
 				)
@@ -392,7 +394,7 @@ private fun SuggestionsPager(
 @Composable
 private fun SourceIcon(
 	source: MangaParserSource,
-	faviconUrl: String?,
+	domain: String?,
 	hasNewChapters: Boolean,
 	onClick: () -> Unit,
 ) {
@@ -415,32 +417,14 @@ private fun SourceIcon(
 				.background(MaterialTheme.colorScheme.surfaceContainerHighest),
 			contentAlignment = Alignment.Center,
 		) {
-			if (faviconUrl != null) {
-				// Fallback visible si le favicon échoue (la tuile reste cliquable)
-				SubcomposeAsyncImage(
-					model = faviconUrl,
-					contentDescription = source.title,
-					contentScale = ContentScale.Fit,
-					modifier = Modifier
-						.fillMaxSize()
-						.padding(12.dp),
-				) {
-					when (painter.state) {
-						is AsyncImagePainter.State.Error -> Icon(
-							imageVector = Icons.AutoMirrored.Filled.MenuBook,
-							contentDescription = source.title,
-							tint = MaterialTheme.colorScheme.onSurfaceVariant,
-						)
-						else -> SubcomposeAsyncImageContent()
-					}
-				}
-			} else {
-				Icon(
-					imageVector = Icons.AutoMirrored.Filled.MenuBook,
-					contentDescription = source.title,
-					tint = MaterialTheme.colorScheme.onSurfaceVariant,
-				)
-			}
+			// Chaîne de secours : favicon du site → service Google → icône générique
+			org.koitharu.kotatsu.desktop.ui.components.SourceFavicon(
+				domain = domain,
+				contentDescription = source.title,
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(12.dp),
+			)
 		}
 		Text(
 			text = (if (hasNewChapters) "🔥 " else "") + source.title,
