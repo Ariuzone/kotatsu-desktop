@@ -4,5 +4,5 @@
  */
 package org.koitharu.kotatsu.core
 
-/** Version affichée par l'app desktop, alignée sur l'app Android d'origine. */
-public const val APP_VERSION_NAME: String = "9.8.6"
+/** Version de l'app desktop (indépendante de l'app Android d'origine). */
+public const val APP_VERSION_NAME: String = "1.0"

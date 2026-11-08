@@ -131,7 +131,7 @@ fun main() = application {
 				exitApplication()
 			}
 		},
-		title = "Kotatsu $APP_VERSION_NAME",
+		title = "Kotatsu Desktop $APP_VERSION_NAME",
 		icon = kotatsuIcon(),
 	) {
 		KotatsuTheme(

@@ -51,18 +51,21 @@ compose.desktop {
 			}
 		}
 
-		// Métadonnées dérivées de l'app d'origine (versionName 9.8.6)
+		// Métadonnées propres au portage desktop
 		group = "org.koitharu.kotatsu"
-		version = "9.8.6"
+		version = "1.0"
 
 		nativeDistributions {
 			targetFormats(TargetFormat.Exe, TargetFormat.Msi)
-			packageName = "Kotatsu"
+			packageName = "Kotatsu Desktop"
+			packageVersion = "1.0.0"
 			description = "Lecteur de manga — portage Windows de Kotatsu-Redo"
 			vendor = "Portage non officiel de Kotatsu-Redo (GPLv3)"
 			// UUID stable pour les mises à niveau (installation/désinstallation propres)
 			// NOTE : à régénérer une seule fois puis conserver.
 			windows {
+				exePackageVersion = "1.0.0"
+				msiPackageVersion = "1.0.0"
 				iconFile.set(project.file("src/main/resources/kotatsu.ico"))
 				menu = true
 				shortcut = true
