@@ -16,18 +16,21 @@ Desktop (Material 3).
 
 ## Fonctionnalités
 
-### Portées (P1/P2)
-- Liste et exploration des 1200+ sources manga (bibliothèque [kotatsu-parsers-redo](https://github.com/Kotatsu-Redo/kotatsu-parsers-redo) réutilisée telle quelle via JitPack)
+### Portées (P1 → P4)
+- Liste et exploration des 1300+ sources manga (bibliothèque [kotatsu-parsers-redo](https://github.com/Kotatsu-Redo/kotatsu-parsers-redo) réutilisée telle quelle via JitPack)
 - **Interface en français** (chaînes exactes de l'app Android, illustrations d'états vides d'origine)
 - Écran Explorer avec sections « Pour vous / Nouveautés pour vous / Plus pour vous » (MangaDex et presets), onglet Source (boutons rapides, suggestions, grille de sources), catalogue des sources
+- **Paramètres complets** : écran racine 4 sections, Paramètres du lecteur (Pages/Webtoon/Commandes/Écran/Avancé, images masquées), Apparence (cartes de palette des 9 schémas d'origine, Liste des mangas, Page du manga, Navigation), **Sources des mangas** (tri, vue grille, Gérer les sources avec recherche + activation/désactivation, Sources catalogue avec filtres et langues, miroir automatique, Gérer les liens), **Suggestions** (activation, inclusion des sources désactivées, exclusion de genres), **Nouveaux chapitres** (fréquence branchée au scheduler, catégories favorites, téléchargement auto, journal), « Principales sections de l'écran » réordonnables
+- **Options de liste** (bottom sheet Historique/Favoris : mode Compact/Détails/Grille, taille de grille, tri, groupement) appliquées en direct
 - Catalogue par source, recherche multi-sources avec filtres
 - Détails d'un manga (couverture, auteur, tags, description, chapitres)
 - Lecteur : mode paginé + mode webtoon, zones de tap, navigation clavier (adaptation desktop)
 - Favoris, historique et signets persistants (base Room v28 identique à l'app Android)
 - Téléchargements hors-ligne + lecture de CBZ locaux
-- Notifications de nouveaux chapitres (icône tray + bulles Windows, vérification périodique)
+- Notifications de nouveaux chapitres (icône tray + bulles Windows, vérification périodique paramétrable)
 - Verrouillage par mot de passe (même hachage que l'app Android)
 - Thème clair / sombre / AMOLED, 9 schémas de couleurs d'origine (Miku, Sakura, Totoro…)
+- Créateur de préréglages de sources (langues, persistance Room)
 - Installateur Windows `.exe` (JDK embarqué, raccourcis, désinstallation propre)
 
 ### Non portées (voir [Limitations](#limitations))
