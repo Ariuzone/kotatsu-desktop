@@ -87,8 +87,8 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_TEXT_EMPTY_HOLDER_PRIMARY
 import org.koitharu.kotatsu.parsers.model.Manga
 
 // strings.xml d'origine (values-fr)
-public const val FAVOURITES_TITLE: String = FR_FAVOURITES // string favourites
-public const val ALL_FAVOURITES: String = FR_ALL_FAVOURITES // string all_favourites
+public var FAVOURITES_TITLE: String = FR_FAVOURITES // string favourites
+public var ALL_FAVOURITES: String = FR_ALL_FAVOURITES // string all_favourites
 
 private val GRID_CONTENT_PADDING = 2.dp // grid card margin
 private val GRID_SPACING = 6.dp // espacement de grille (comme CatalogScreen)

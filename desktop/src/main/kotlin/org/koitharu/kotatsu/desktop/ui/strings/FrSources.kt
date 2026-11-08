@@ -15,20 +15,20 @@ package org.koitharu.kotatsu.desktop.ui.strings
 import org.koitharu.kotatsu.parsers.model.SortOrder
 
 // --- Écran « Sources des mangas » (SourcesSettingsScreen, pref_sources, frames 29-30/39/45) ---
-public const val FR_SORT_ORDER: String = "Ordre de tri" // dialog « Ordre de tri »
+public var FR_SORT_ORDER: String = "Ordre de tri" // dialog « Ordre de tri »
 // Option du dialog de tri — non traduite dans l'original (vidéo : « Popular & reliable »)
-public const val FR_SORT_ORDER_SCORE: String = "Popular & reliable"
-public const val FR_SORT_ORDER_ALPHABETIC: String = "Alphabétique" // option alphabetical
-public const val FR_SHOW_GRID: String = "Afficher en vue grille" // pref_sources d'origine
-public const val FR_ENABLE_ALL_SOURCES: String = "Activer toutes les sources de mangas"
-public const val FR_ENABLE_ALL_SOURCES_SUMMARY: String =
+public var FR_SORT_ORDER_SCORE: String = "Popular & reliable"
+public var FR_SORT_ORDER_ALPHABETIC: String = "Alphabétique" // option alphabetical
+public var FR_SHOW_GRID: String = "Afficher en vue grille" // pref_sources d'origine
+public var FR_ENABLE_ALL_SOURCES: String = "Activer toutes les sources de mangas"
+public var FR_ENABLE_ALL_SOURCES_SUMMARY: String =
 	"Toutes les sources de mangas disponibles seront activées de façon permanente" // vidéo frame 45
-public const val FR_AUTO_MIRROR: String = "Choisir le miroir automatiquement"
-public const val FR_AUTO_MIRROR_SUMMARY: String =
+public var FR_AUTO_MIRROR: String = "Choisir le miroir automatiquement"
+public var FR_AUTO_MIRROR_SUMMARY: String =
 	"Changement automatique de domaine pour les sources de mangas en cas d'erreur " +
 		"si des miroirs sont disponibles" // vidéo frame 45
-public const val FR_MANAGE_LINKS: String = "Gérer les liens"
-public const val FR_MANAGE_LINKS_SUMMARY: String =
+public var FR_MANAGE_LINKS: String = "Gérer les liens"
+public var FR_MANAGE_LINKS_SUMMARY: String =
 	"Gérer les liens vers des mangas à partir d'applications externes (par exemple, un navigateur web)"
 // vidéo frames 39/45, texte tronqué dans la capture
 
@@ -40,94 +40,94 @@ public fun frItemsCount(count: Int): String =
 public fun frAvailableCount(count: Int): String = FR_AVAILABLE_COUNT + count
 
 // --- Écran « Gérer les sources » (ManageSourcesScreen, frames 30, 36-37) ---
-public const val FR_SEARCH_SOURCES: String = "Rechercher" // placeholder du champ (frame 37)
-public const val FR_SOURCE_DISABLED: String = "Désactivée" // menu ⋮ par ligne (case cochée)
-public const val FR_DISABLE_EXPLICIT: String = "Désactiver le contenu explicite" // menu ⋮ global
-public const val FR_DISABLE_ALL: String = "Tout désactiver" // menu ⋮ global
-public const val FR_ENABLE_ALL: String = "Activer toutes les sources" // menu ⋮ global
-public const val FR_CATEGORY_COMICS: String = "Comics" // sous-titre de ligne (catégorie)
-public const val FR_CATEGORY_OTHER: String = "Autre" // sous-titre de ligne (catégorie)
-public const val FR_NO_SOURCES_FOUND: String = "Aucune source trouvée" // état vide de recherche
+public var FR_SEARCH_SOURCES: String = "Rechercher" // placeholder du champ (frame 37)
+public var FR_SOURCE_DISABLED: String = "Désactivée" // menu ⋮ par ligne (case cochée)
+public var FR_DISABLE_EXPLICIT: String = "Désactiver le contenu explicite" // menu ⋮ global
+public var FR_DISABLE_ALL: String = "Tout désactiver" // menu ⋮ global
+public var FR_ENABLE_ALL: String = "Activer toutes les sources" // menu ⋮ global
+public var FR_CATEGORY_COMICS: String = "Comics" // sous-titre de ligne (catégorie)
+public var FR_CATEGORY_OTHER: String = "Autre" // sous-titre de ligne (catégorie)
+public var FR_NO_SOURCES_FOUND: String = "Aucune source trouvée" // état vide de recherche
 
 // --- Écran « Sources catalogue » (SourcesCatalogScreen, phase P3) ---
-public const val FR_EMPTY_SOURCES_CATALOG_TITLE: String = "Aucune source de mangas"
-public const val FR_EMPTY_SOURCES_CATALOG_TEXT: String =
+public var FR_EMPTY_SOURCES_CATALOG_TITLE: String = "Aucune source de mangas"
+public var FR_EMPTY_SOURCES_CATALOG_TEXT: String =
 	"Il n'y a pas de sources disponibles dans cette section, ou tout cela aurait pu être ajouté. " +
 		"Restez à l'écoute" // état vide FR exact de la vidéo
-public const val FR_AVAILABLE_COUNT: String = "Disponible : " // compteur du catalogue
-public const val FR_ACTION_REMOVE: String = "Retirer" // contentDescription du bouton ✓ (installée)
-public const val FR_BACK: String = "Retour" // contentDescription de la flèche ← (top bars)
+public var FR_AVAILABLE_COUNT: String = "Disponible : " // compteur du catalogue
+public var FR_ACTION_REMOVE: String = "Retirer" // contentDescription du bouton ✓ (installée)
+public var FR_BACK: String = "Retour" // contentDescription de la flèche ← (top bars)
 
 // --- Écran « Source » / préréglages (SourcePresetsScreen + PresetCreatorDialog, vidéo t≈5:30) ---
-public const val FR_NEW_PRESET: String = "Nouveau préréglage" // action du menu ⋮ + titre du dialog
-public const val FR_SAVE: String = "Enregistrer" // bouton du créateur de préréglages
+public var FR_NEW_PRESET: String = "Nouveau préréglage" // action du menu ⋮ + titre du dialog
+public var FR_SAVE: String = "Enregistrer" // bouton du créateur de préréglages
 
 // --- Écran « Gérer les liens » (ManageLinksScreen, adaptation desktop minimale) ---
-public const val FR_MANAGE_LINKS_EXPLANATION: String =
+public var FR_MANAGE_LINKS_EXPLANATION: String =
 	"Gérer les liens vers des mangas à partir d'applications externes (par exemple, un navigateur " +
 		"web). Il se peut que vous deviez également l'activer manuellement dans les paramètres " +
 		"système de l'application." // texte explicatif de la vidéo
-public const val FR_MANAGE_LINKS_DESKTOP_NOTE: String =
+public var FR_MANAGE_LINKS_DESKTOP_NOTE: String =
 	"Sur la version de bureau, les liens profonds (deep links) d'applications externes ne sont " +
 		"pas pris en charge : ouvrez directement un lien de manga dans Kotatsu-Redo. Les domaines " +
 		"miroir, s'il en existe, seront listés ici en lecture seule." // note spécifique desktop
 
 // --- Écran « Signets » (BookmarksScreen, values-fr text_bookmark_holder_*) ---
-public const val FR_BOOKMARKS_EMPTY_PRIMARY: String = "Aucun marque-page"
-public const val FR_BOOKMARKS_EMPTY_SECONDARY: String =
+public var FR_BOOKMARKS_EMPTY_PRIMARY: String = "Aucun marque-page"
+public var FR_BOOKMARKS_EMPTY_SECONDARY: String =
 	"Vous pouvez créer un marque-page pendant la lecture d'un manga"
 
 /** Libellé « Page N » sous chaque signet (N = index de page + 1). */
 public fun frBookmarkPage(page: Int): String = "Page ${page + 1}"
 
 // --- Écran « Favoris » (FavouritesScreen, string manage) ---
-public const val FR_MANAGE: String = "Gérer" // action « Gérer » des catégories
+public var FR_MANAGE: String = "Gérer" // action « Gérer » des catégories
 
 // --- Écran « Historique » (HistoryScreen) ---
-public const val FR_CONTINUE_READING_CD: String = "Continuer la lecture" // action « lire la suite »
-public const val FR_UNKNOWN: String = "Inconnu" // string unknown (values-fr)
+public var FR_CONTINUE_READING_CD: String = "Continuer la lecture" // action « lire la suite »
+public var FR_UNKNOWN: String = "Inconnu" // string unknown (values-fr)
 
 // --- Écran « Téléchargements » (DownloadsScreen) — chaînes non traduites dans l'original ---
-public const val FR_DOWNLOADS_TITLE: String = "Downloads" // string downloads (non traduit)
-public const val FR_STATUS_DOWNLOADING: String = "Downloading…" // manga_downloading_ (non traduit)
-public const val FR_STATUS_QUEUED: String = "Queued" // queued (non traduit)
-public const val FR_STATUS_PAUSED: String = "Paused" // paused (non traduit)
-public const val FR_STATUS_COMPLETE: String = "Downloaded" // download_complete (non traduit)
-public const val FR_STATUS_ERROR: String = "An error occurred" // error_occurred (non traduit)
-public const val FR_STATUS_CANCELED: String = "Canceled" // canceled (non traduit)
-public const val FR_STATUS_STUCK: String = "Stuck" // stuck (non traduit)
-public const val FR_ACTION_PAUSE: String = "Pause" // pause (non traduit)
-public const val FR_ACTION_RESUME: String = "Resume" // resume (non traduit)
-public const val FR_ACTION_RETRY: String = "Retry" // retry (non traduit)
-public const val FR_ACTION_SKIP: String = "Skip" // skip (non traduit)
-public const val FR_ACTION_SKIP_ALL: String = "Skip all" // skip_all (non traduit)
-public const val FR_ACTION_CANCEL: String = "Cancel" // android.R.string.cancel (non traduit)
-public const val FR_ACTION_CANCEL_ALL: String = "Cancel all" // cancel_all (non traduit)
-public const val FR_ACTION_REMOVE_COMPLETED: String = "Remove completed" // remove_completed (non traduit)
-public const val FR_DOWNLOADS_EMPTY_PRIMARY: String = "You don't have any downloads" // text_downloads_list_holder (non traduit)
-public const val FR_STATUS_UNKNOWN: String = "Unknown" // unknown (non traduit)
-public const val FR_CD_BACK: String = "Back" // contentDescription ← (non traduit)
-public const val FR_CD_MORE_OPTIONS: String = "More options" // contentDescription ⋮ (non traduit)
+public var FR_DOWNLOADS_TITLE: String = "Downloads" // string downloads (non traduit)
+public var FR_STATUS_DOWNLOADING: String = "Downloading…" // manga_downloading_ (non traduit)
+public var FR_STATUS_QUEUED: String = "Queued" // queued (non traduit)
+public var FR_STATUS_PAUSED: String = "Paused" // paused (non traduit)
+public var FR_STATUS_COMPLETE: String = "Downloaded" // download_complete (non traduit)
+public var FR_STATUS_ERROR: String = "An error occurred" // error_occurred (non traduit)
+public var FR_STATUS_CANCELED: String = "Canceled" // canceled (non traduit)
+public var FR_STATUS_STUCK: String = "Stuck" // stuck (non traduit)
+public var FR_ACTION_PAUSE: String = "Pause" // pause (non traduit)
+public var FR_ACTION_RESUME: String = "Resume" // resume (non traduit)
+public var FR_ACTION_RETRY: String = "Retry" // retry (non traduit)
+public var FR_ACTION_SKIP: String = "Skip" // skip (non traduit)
+public var FR_ACTION_SKIP_ALL: String = "Skip all" // skip_all (non traduit)
+public var FR_ACTION_CANCEL: String = "Cancel" // android.R.string.cancel (non traduit)
+public var FR_ACTION_CANCEL_ALL: String = "Cancel all" // cancel_all (non traduit)
+public var FR_ACTION_REMOVE_COMPLETED: String = "Remove completed" // remove_completed (non traduit)
+public var FR_DOWNLOADS_EMPTY_PRIMARY: String = "You don't have any downloads" // text_downloads_list_holder (non traduit)
+public var FR_STATUS_UNKNOWN: String = "Unknown" // unknown (non traduit)
+public var FR_CD_BACK: String = "Back" // contentDescription ← (non traduit)
+public var FR_CD_MORE_OPTIONS: String = "More options" // contentDescription ⋮ (non traduit)
 
 // --- Écran de protection (ProtectScreen, res/values/strings.xml d'origine, non traduits) ---
-public const val FR_PROTECT_TITLE: String = "Kotatsu" // app_name
-public const val FR_PROTECT_SUBTITLE: String = "Enter password" // enter_password (non traduit)
-public const val FR_PROTECT_WRONG_PASSWORD: String = "Wrong password" // wrong_password (non traduit)
-public const val FR_PROTECT_NEXT: String = "Next" // next (non traduit)
-public const val FR_PROTECT_CANCEL: String = "Cancel" // android.R.string.cancel (non traduit)
+public var FR_PROTECT_TITLE: String = "Kotatsu" // app_name
+public var FR_PROTECT_SUBTITLE: String = "Enter password" // enter_password (non traduit)
+public var FR_PROTECT_WRONG_PASSWORD: String = "Wrong password" // wrong_password (non traduit)
+public var FR_PROTECT_NEXT: String = "Next" // next (non traduit)
+public var FR_PROTECT_CANCEL: String = "Cancel" // android.R.string.cancel (non traduit)
 
 // --- Lecteur (ReaderScreen, overlay incognito + zoom) ---
-public const val FR_CLOSE: String = "Fermer" // contentDescription ← du panneau haut
-public const val FR_INCOGNITO: String = "Incognito" // badge du panneau haut (mode incognito)
-public const val FR_ZOOM_OUT: String = "Zoom -" // contentDescription bouton zoom arrière
-public const val FR_ZOOM_IN: String = "Zoom +" // contentDescription bouton zoom avant
+public var FR_CLOSE: String = "Fermer" // contentDescription ← du panneau haut
+public var FR_INCOGNITO: String = "Incognito" // badge du panneau haut (mode incognito)
+public var FR_ZOOM_OUT: String = "Zoom -" // contentDescription bouton zoom arrière
+public var FR_ZOOM_IN: String = "Zoom +" // contentDescription bouton zoom avant
 
 // --- Écran « Catalogue d'une source » (CatalogScreen, vidéo t≈6:50-7:10 Source Weeb Central) ---
-public const val FR_SORT_AND_FILTER: String = "Trier et filtrer" // titre de la bottom sheet filtres (string sort_and_filter)
-public const val FR_GENRES: String = "Genres" // section « Genres » de la sheet (string genres)
-public const val FR_SORT_POPULARITY: String = "Populaires" // SortOrder.POPULARITY (entry popularity)
-public const val FR_SORT_RATING: String = "Mieux notés" // SortOrder.RATING (entry rating)
-public const val FR_RETRY: String = "Réessayer" // bouton du pied d'erreur catalogue (item_error_footer)
+public var FR_SORT_AND_FILTER: String = "Trier et filtrer" // titre de la bottom sheet filtres (string sort_and_filter)
+public var FR_GENRES: String = "Genres" // section « Genres » de la sheet (string genres)
+public var FR_SORT_POPULARITY: String = "Populaires" // SortOrder.POPULARITY (entry popularity)
+public var FR_SORT_RATING: String = "Mieux notés" // SortOrder.RATING (entry rating)
+public var FR_RETRY: String = "Réessayer" // bouton du pied d'erreur catalogue (item_error_footer)
 
 /**
  * Libellé FR d'un ordre de tri des parsers (radios « Ordre de tri » de la bottom sheet du

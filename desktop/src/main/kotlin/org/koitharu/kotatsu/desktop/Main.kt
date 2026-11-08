@@ -115,6 +115,15 @@ import java.io.File
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 
 fun main(args: Array<String>) {
+	// i18n 1.1.1 : applique la langue choisie avant toute UI (défaut = langue du
+	// système Windows, repli anglais si indisponible)
+	runCatching {
+		val appData = java.io.File(System.getenv("APPDATA"), "Kotatsu")
+		val prefs = org.koitharu.kotatsu.core.prefs.AppSettings(
+			org.koitharu.kotatsu.core.prefs.FileKeyValueStore(appData.resolve("settings.json").toPath()),
+		)
+		org.koitharu.kotatsu.desktop.ui.strings.applyUiLanguagePreference(prefs.appLanguage)
+	}
 	// Mode maintenance : désinstallateur GUI (-Dkotatsu.mode=uninstaller, lanceur « Uninstall
 	// Kotatsu Desktop » créé au premier lancement, cf. setupMaintenanceLauncher).
 	val mode = System.getProperty("kotatsu.mode")

@@ -1,0 +1,1454 @@
+[
+[
+"FR_SEARCH_MANGA",
+"Rechercher un manga"
+],
+[
+"FR_SEARCH_HINT",
+"Entrez le titre du manga, le genre ou le nom de la source"
+],
+[
+"FR_HISTORY",
+"Historique"
+],
+[
+"FR_FAVOURITES",
+"Favoris"
+],
+[
+"FR_EXPLORE",
+"Explorer"
+],
+[
+"FR_SOURCE",
+"Source"
+],
+[
+"FR_FEED",
+"Flux"
+],
+[
+"FR_TEXT_HISTORY_HOLDER_PRIMARY",
+"Ce que vous lisez sera affiché ici"
+],
+[
+"FR_TEXT_HISTORY_HOLDER_SECONDARY",
+"Trouver quoi lire dans la section « Explorer »"
+],
+[
+"FR_TEXT_EMPTY_HOLDER_PRIMARY",
+"C'est un peu vide ici…"
+],
+[
+"FR_FAVOURITES_CATEGORY_EMPTY",
+"Catégorie vide"
+],
+[
+"FR_TEXT_FEED_HOLDER",
+"Les nouveaux chapitres de ce que vous lisez sont affichés ici"
+],
+[
+"FR_ALL_FAVOURITES",
+"Tous les favoris"
+],
+[
+"FR_READ_LATER",
+"Lire plus tard"
+],
+[
+"FR_HENTAI",
+"Hentai\" // catégorie de l'utilisateur (capture)"
+],
+[
+"FR_CLEAR_HISTORY",
+"Effacer l'historique"
+],
+[
+"FR_LIST_OPTIONS",
+"Options de liste"
+],
+[
+"FR_FAVOURITES_CATEGORIES",
+"Catégories favorites"
+],
+[
+"FR_INCOGNITO_MODE",
+"Mode incognito"
+],
+[
+"FR_SETTINGS",
+"Paramètres"
+],
+[
+"FR_UPDATE",
+"Mettre à Jour"
+],
+[
+"FR_SHOW_DISMISSED",
+"Réafficher ce que j'ai écarté"
+],
+[
+"FR_SOURCE_PRESETS",
+"Préréglages de sources"
+],
+[
+"FR_MANAGE_SOURCES",
+"Gérer les sources"
+],
+[
+"FR_FOR_YOU",
+"Pour vous"
+],
+[
+"FR_TOP",
+"Top"
+],
+[
+"FR_MANGAS",
+"Mangas\" // chip (capture)"
+],
+[
+"FR_MANHWA",
+"Manhwa\" // chip (capture)"
+],
+[
+"FR_SHOW_ALL",
+"Tout afficher"
+],
+[
+"FR_NEW_FINDS",
+"Nouveautés pour vous"
+],
+[
+"FR_MORE_FOR_YOU",
+"Plus pour vous"
+],
+[
+"FR_LOCAL_STORAGE",
+"Stockage local"
+],
+[
+"FR_BOOKMARKS",
+"Marque-pages"
+],
+[
+"FR_RANDOM",
+"Aléatoire"
+],
+[
+"FR_DOWNLOADS",
+"Téléchargements"
+],
+[
+"FR_SUGGESTIONS",
+"Suggestions"
+],
+[
+"FR_MORE",
+"Plus"
+],
+[
+"FR_MANGA_SOURCES",
+"Sources des mangas"
+],
+[
+"FR_CATALOG",
+"Catalogue"
+],
+[
+"FR_SOURCES_CATALOG",
+"Sources catalogue"
+],
+[
+"FR_ALL_LANGUAGES",
+"Toutes les langues"
+],
+[
+"FR_NEWEST",
+"Nouveaux"
+],
+[
+"FR_MISC_LANGUAGES",
+"Langues diverses"
+],
+[
+"FR_CONTENT_TYPE_MANGA",
+"Mangas"
+],
+[
+"FR_CONTENT_TYPE_HENTAI",
+"Hentais"
+],
+[
+"FR_CLEAR_SEARCH_HISTORY",
+"Effacer l'historique de recherche"
+],
+[
+"FR_SHOW_UPDATED",
+"Afficher mis à jour"
+],
+[
+"FR_CLEAR_FEED",
+"Effacer le flux"
+],
+[
+"FR_READ",
+"Lire"
+],
+[
+"FR_CHAPTERS",
+"Chapitres"
+],
+[
+"FR_CHAPTERS_EMPTY",
+"Pas de chapitres dans ce manga"
+],
+[
+"FR_DESCRIPTION",
+"Description"
+],
+[
+"FR_EXPAND",
+"Développer"
+],
+[
+"FR_COLLAPSE",
+"Réduire"
+],
+[
+"FR_DOWNLOAD",
+"Télécharger"
+],
+[
+"FR_ADD_TO_FAVOURITES",
+"Ajouter aux favoris"
+],
+[
+"FR_NSFW",
+"18+"
+],
+[
+"FR_PREV_CHAPTER",
+"Chapitre précèdent"
+],
+[
+"FR_NEXT_CHAPTER",
+"Chapitre suivant"
+],
+[
+"FR_PREV_PAGE",
+"Page précédente"
+],
+[
+"FR_NEXT_PAGE",
+"Page suivante"
+],
+[
+"FR_SAVE_PAGE",
+"Sauvegarder la page"
+],
+[
+"FR_READER_SETTINGS",
+"Paramètres du lecteur"
+],
+[
+"FR_TEXT_LOCAL_HOLDER_PRIMARY",
+"Sauvegardez d'abord quelque chose"
+],
+[
+"FR_IMPORT",
+"Importer"
+],
+[
+"FR_CANCEL",
+"Annuler\" // android.R.string.cancel (values-fr)"
+],
+[
+"FR_OK",
+"OK\" // ok"
+],
+[
+"FR_READING",
+"Lecture\" // pref_sections_reading"
+],
+[
+"FR_FIND_MANGA",
+"Trouver des mangas\" // pref_sections_find_manga"
+],
+[
+"FR_YOUR_DATA",
+"Vos données\" // pref_sections_your_data"
+],
+[
+"FR_APPLICATION",
+"Application\" // pref_sections_application"
+],
+[
+"FR_APPEARANCE",
+"Apparence\" // appearance"
+],
+[
+"FR_APPEARANCE_SUMMARY",
+"Thème, Mode liste, Langue\" // capture"
+],
+[
+"FR_NEW_CHAPTERS",
+"Nouveaux chapitres\" // new_chapters"
+],
+[
+"FR_SUGGESTIONS_SUMMARY",
+"Activé\" // capture"
+],
+[
+"FR_DOWNLOADS_STORAGE",
+"Téléchargements et stockage\" // capture"
+],
+[
+"FR_BACKUP_RESTORE",
+"Sauvegarde et restauration\" // capture"
+],
+[
+"FR_BACKUP_RESTORE_SUMMARY",
+"Create or restore a backup, Sauvegardes"
+],
+[
+"FR_NOTIFICATIONS",
+"Notifications\" // notifications"
+],
+[
+"FR_NOTIFICATIONS_SUMMARY",
+"Nouveaux chapitres, Suggestions\" // capture"
+],
+[
+"FR_PRIVACY_CONTENT",
+"Confidentialité et contenu\" // capture"
+],
+[
+"FR_NETWORK",
+"Réseau\" // network"
+],
+[
+"FR_NETWORK_SUMMARY",
+"Données mobiles, Proxy, DNS sur HTTPS\" // capture"
+],
+[
+"FR_ACCOUNTS",
+"Comptes et synchronisation\" // accounts (capture vidéo 3:50)"
+],
+[
+"FR_ACCOUNTS_SUMMARY",
+"Services de suivi, Community, Discord\" // capture"
+],
+[
+"FR_ABOUT",
+"À propos\" // about"
+],
+[
+"FR_ABOUT_VERSION",
+"Version 1.1.1\" // version"
+],
+[
+"FR_COMING_SOON",
+"Cette section sera disponible dans une prochaine phase"
+],
+[
+"FR_IMAGES_MASKED",
+"Images masquées\" // masked_images"
+],
+[
+"FR_LIST_SECTION",
+"Liste des mangas"
+],
+[
+"FR_MANGA_PAGE_SECTION",
+"Page du manga"
+],
+[
+"FR_NAVIGATION_SECTION",
+"Navigation"
+],
+[
+"FR_LIST_MODE",
+"Mode liste"
+],
+[
+"FR_GRID_SIZE",
+"Taille de la grille"
+],
+[
+"FR_QUICK_FILTERS",
+"Afficher les filtres rapides"
+],
+[
+"FR_PROGRESS_INDICATORS",
+"Afficher les indicateurs de progression de lecture"
+],
+[
+"FR_LIST_BADGES",
+"Badges dans les listes"
+],
+[
+"FR_LIST_BADGES_SUMMARY",
+"Mangas sauvegardés, Favoris"
+],
+[
+"FR_COLLAPSE_LONG_DESCRIPTION",
+"Réduire la description longue"
+],
+[
+"FR_PAGES_THUMBNAILS",
+"Afficher les miniatures des pages"
+],
+[
+"FR_PAGES_THUMBNAILS_SUMMARY",
+"Active l'onglet \"Pages\" sur l'écran de détails"
+],
+[
+"FR_DEFAULT_TAB",
+"Onglet par défaut"
+],
+[
+"FR_DEFAULT_TAB_SUMMARY",
+"Dernière utilisation"
+],
+[
+"FR_READING_TIME",
+"Afficher le temps de lecture estimé"
+],
+[
+"FR_READING_TIME_SUMMARY",
+"Le temps estimé peut être inexact"
+],
+[
+"FR_RELATED_MANGA",
+"Mangas connexes"
+],
+[
+"FR_PIN_NAVIGATION",
+"Épingler l'interface de navigation"
+],
+[
+"FR_FLOATING_CONTINUE",
+"Afficher le bouton flottant Continuer"
+],
+[
+"FR_EXIT_CONFIRMATION",
+"Confirmation de sortie"
+],
+[
+"FR_SEARCH_SUGGESTIONS",
+"Suggestions de recherche"
+],
+[
+"FR_RECENT_SHORTCUTS",
+"Afficher les raccourcis des mangas récents"
+],
+[
+"FR_MAIN_SECTIONS",
+"Principales sections de l'écran"
+],
+[
+"FR_ADD",
+"Ajouter"
+],
+[
+"FR_LANGUAGE",
+"Langue"
+],
+[
+"FR_LANGUAGE_SUMMARY",
+"Suivre le système (français seul sur desktop)"
+],
+[
+"FR_ON_DEVICE",
+"Sur l'appareil\" // libellé du dialog sections (Nav LOCAL)"
+],
+[
+"FR_UPDATES",
+"Mis à jour\" // updated (dialog sections, écran P4)"
+],
+[
+"FR_THEME",
+"Thème\" // pref_sections_theme"
+],
+[
+"FR_COLOR_SCHEME",
+"Schéma de couleurs\" // color_scheme (values-fr)"
+],
+[
+"FR_FOLLOW_SYSTEM",
+"Suivre le système\" // follow_system (values-fr)"
+],
+[
+"FR_LIGHT",
+"Clair\" // theme_light (values-fr)"
+],
+[
+"FR_DARK",
+"Sombre\" // theme_dark (values-fr)"
+],
+[
+"FR_AMOLED",
+"Noir\" // dark_amoled (capture)"
+],
+[
+"FR_EXIT_DIALOG_TITLE",
+"Quitter Kotatsu ?"
+],
+[
+"FR_EXIT_DIALOG_CONFIRM",
+"Quitter"
+],
+[
+"FR_AUTHOR",
+"Auteur"
+],
+[
+"FR_STATE",
+"État"
+],
+[
+"FR_STATE_ONGOING",
+"En cours\" // state_ongoing (values-fr)"
+],
+[
+"FR_STATE_FINISHED",
+"Terminé\" // state_finished (values-fr)"
+],
+[
+"FR_STATE_ABANDONED",
+"Abandonné\" // state_abandoned (values-fr)"
+],
+[
+"FR_STATE_PAUSED",
+"En pause\" // state_paused (values-fr)"
+],
+[
+"FR_STATE_UPCOMING",
+"À venir\" // state_upcoming (values-fr)"
+],
+[
+"FR_NO_CHAPTERS",
+"Aucun chapitre"
+],
+[
+"FR_READ_FIRST_CHAPTER",
+"Lire le chapitre 1"
+],
+[
+"FR_CONTINUE",
+"Continuer"
+],
+[
+"FR_PROGRESS",
+"Progression"
+],
+[
+"FR_DONE",
+"Terminé"
+],
+[
+"FR_SORT_ORDER",
+"Ordre de tri\" // dialog « Ordre de tri »"
+],
+[
+"FR_SORT_ORDER_SCORE",
+"Popular & reliable"
+],
+[
+"FR_SORT_ORDER_ALPHABETIC",
+"Alphabétique\" // option alphabetical"
+],
+[
+"FR_SHOW_GRID",
+"Afficher en vue grille\" // pref_sources d'origine"
+],
+[
+"FR_ENABLE_ALL_SOURCES",
+"Activer toutes les sources de mangas"
+],
+[
+"FR_AUTO_MIRROR",
+"Choisir le miroir automatiquement"
+],
+[
+"FR_MANAGE_LINKS",
+"Gérer les liens"
+],
+[
+"FR_SEARCH_SOURCES",
+"Rechercher\" // placeholder du champ (frame 37)"
+],
+[
+"FR_SOURCE_DISABLED",
+"Désactivée\" // menu ⋮ par ligne (case cochée)"
+],
+[
+"FR_DISABLE_EXPLICIT",
+"Désactiver le contenu explicite\" // menu ⋮ global"
+],
+[
+"FR_DISABLE_ALL",
+"Tout désactiver\" // menu ⋮ global"
+],
+[
+"FR_ENABLE_ALL",
+"Activer toutes les sources\" // menu ⋮ global"
+],
+[
+"FR_CATEGORY_COMICS",
+"Comics\" // sous-titre de ligne (catégorie)"
+],
+[
+"FR_CATEGORY_OTHER",
+"Autre\" // sous-titre de ligne (catégorie)"
+],
+[
+"FR_NO_SOURCES_FOUND",
+"Aucune source trouvée\" // état vide de recherche"
+],
+[
+"FR_EMPTY_SOURCES_CATALOG_TITLE",
+"Aucune source de mangas"
+],
+[
+"FR_AVAILABLE_COUNT",
+"Disponible : \" // compteur du catalogue"
+],
+[
+"FR_ACTION_REMOVE",
+"Retirer\" // contentDescription du bouton ✓ (installée)"
+],
+[
+"FR_BACK",
+"Retour\" // contentDescription de la flèche ← (top bars)"
+],
+[
+"FR_NEW_PRESET",
+"Nouveau préréglage\" // action du menu ⋮ + titre du dialog"
+],
+[
+"FR_SAVE",
+"Enregistrer\" // bouton du créateur de préréglages"
+],
+[
+"FR_BOOKMARKS_EMPTY_PRIMARY",
+"Aucun marque-page"
+],
+[
+"FR_MANAGE",
+"Gérer\" // action « Gérer » des catégories"
+],
+[
+"FR_CONTINUE_READING_CD",
+"Continuer la lecture\" // action « lire la suite »"
+],
+[
+"FR_UNKNOWN",
+"Inconnu\" // string unknown (values-fr)"
+],
+[
+"FR_DOWNLOADS_TITLE",
+"Downloads\" // string downloads (non traduit)"
+],
+[
+"FR_STATUS_DOWNLOADING",
+"Downloading…\" // manga_downloading_ (non traduit)"
+],
+[
+"FR_STATUS_QUEUED",
+"Queued\" // queued (non traduit)"
+],
+[
+"FR_STATUS_PAUSED",
+"Paused\" // paused (non traduit)"
+],
+[
+"FR_STATUS_COMPLETE",
+"Downloaded\" // download_complete (non traduit)"
+],
+[
+"FR_STATUS_ERROR",
+"An error occurred\" // error_occurred (non traduit)"
+],
+[
+"FR_STATUS_CANCELED",
+"Canceled\" // canceled (non traduit)"
+],
+[
+"FR_STATUS_STUCK",
+"Stuck\" // stuck (non traduit)"
+],
+[
+"FR_ACTION_PAUSE",
+"Pause\" // pause (non traduit)"
+],
+[
+"FR_ACTION_RESUME",
+"Resume\" // resume (non traduit)"
+],
+[
+"FR_ACTION_RETRY",
+"Retry\" // retry (non traduit)"
+],
+[
+"FR_ACTION_SKIP",
+"Skip\" // skip (non traduit)"
+],
+[
+"FR_ACTION_SKIP_ALL",
+"Skip all\" // skip_all (non traduit)"
+],
+[
+"FR_ACTION_CANCEL",
+"Cancel\" // android.R.string.cancel (non traduit)"
+],
+[
+"FR_ACTION_CANCEL_ALL",
+"Cancel all\" // cancel_all (non traduit)"
+],
+[
+"FR_ACTION_REMOVE_COMPLETED",
+"Remove completed\" // remove_completed (non traduit)"
+],
+[
+"FR_DOWNLOADS_EMPTY_PRIMARY",
+"You don't have any downloads\" // text_downloads_list_holder (non traduit)"
+],
+[
+"FR_STATUS_UNKNOWN",
+"Unknown\" // unknown (non traduit)"
+],
+[
+"FR_CD_BACK",
+"Back\" // contentDescription ← (non traduit)"
+],
+[
+"FR_CD_MORE_OPTIONS",
+"More options\" // contentDescription ⋮ (non traduit)"
+],
+[
+"FR_PROTECT_TITLE",
+"Kotatsu\" // app_name"
+],
+[
+"FR_PROTECT_SUBTITLE",
+"Enter password\" // enter_password (non traduit)"
+],
+[
+"FR_PROTECT_WRONG_PASSWORD",
+"Wrong password\" // wrong_password (non traduit)"
+],
+[
+"FR_PROTECT_NEXT",
+"Next\" // next (non traduit)"
+],
+[
+"FR_PROTECT_CANCEL",
+"Cancel\" // android.R.string.cancel (non traduit)"
+],
+[
+"FR_CLOSE",
+"Fermer\" // contentDescription ← du panneau haut"
+],
+[
+"FR_INCOGNITO",
+"Incognito\" // badge du panneau haut (mode incognito)"
+],
+[
+"FR_ZOOM_OUT",
+"Zoom -\" // contentDescription bouton zoom arrière"
+],
+[
+"FR_ZOOM_IN",
+"Zoom +\" // contentDescription bouton zoom avant"
+],
+[
+"FR_SORT_AND_FILTER",
+"Trier et filtrer\" // titre de la bottom sheet filtres (string sort_and_filter)"
+],
+[
+"FR_GENRES",
+"Genres\" // section « Genres » de la sheet (string genres)"
+],
+[
+"FR_SORT_POPULARITY",
+"Populaires\" // SortOrder.POPULARITY (entry popularity)"
+],
+[
+"FR_SORT_RATING",
+"Mieux notés\" // SortOrder.RATING (entry rating)"
+],
+[
+"FR_RETRY",
+"Réessayer\" // bouton du pied d'erreur catalogue (item_error_footer)"
+],
+[
+"FR_APP_NAME",
+"Kotatsu Desktop\" // nom de l'app desktop (capture)"
+],
+[
+"FR_COPIED",
+"Copié dans le presse-papiers\" // version copiée (comportement desktop)"
+],
+[
+"FR_LICENSE",
+"Licence : GNU GPL v3\" // licence (écran À propos)"
+],
+[
+"FR_ORIGIN_PROJECT",
+"Projet d'origine : Kotatsu / Kotatsu-Redo\" // écran À propos"
+],
+[
+"FR_LINK_KOTATSU_REDO",
+"Kotatsu-Redo (GitHub)\" // lien cliquable (écran À propos)"
+],
+[
+"FR_LINK_KOTATSU",
+"Kotatsu (GitHub)\" // lien cliquable (écran À propos)"
+],
+[
+"FR_SOURCES_PARSERS",
+"Sources : kotatsu-parsers\" // remerciements parsers"
+],
+[
+"FR_BACKUP_BANNER",
+"Create or restore a backup"
+],
+[
+"FR_CREATE_BACKUP",
+"Créer une sauvegarde\" // backup_create"
+],
+[
+"FR_RESTORE_BACKUP",
+"Restaurer une sauvegarde\" // backup_restore"
+],
+[
+"FR_CHOOSE_SAVE_TITLE",
+"Enregistrer la sauvegarde\" // dialog JFileChooser (desktop)"
+],
+[
+"FR_CHOOSE_OPEN_TITLE",
+"Choisir une sauvegarde\" // dialog JFileChooser (desktop)"
+],
+[
+"FR_ZIP_FILTER_DESCRIPTION",
+"Archives ZIP\" // filtre JFileChooser (desktop)"
+],
+[
+"FR_RESTORE_WARNING_TITLE",
+"Restaurer une sauvegarde\" // dialog d'avertissement"
+],
+[
+"FR_RESTORE_CONFIRM",
+"Continuer\" // bouton du dialog d'avertissement"
+],
+[
+"FR_BACKUP_CREATED_TITLE",
+"Sauvegarde créée\" // dialog de succès (desktop)"
+],
+[
+"FR_BACKUP_CREATED",
+"Sauvegarde créée :\\n%s\" // dialog de succès (desktop)"
+],
+[
+"FR_BACKUP_FAILED",
+"Échec de la sauvegarde : %s\" // dialog d'erreur (desktop)"
+],
+[
+"FR_RESTORE_INVALID",
+"Format de sauvegarde invalide\" // zip sans kotatsu.db"
+],
+[
+"FR_RESTORE_FAILED",
+"Échec de la restauration : %s\" // dialog d'erreur (desktop)"
+],
+[
+"FR_DB_REQUIRED",
+"kotatsu.db\" // base Room d'origine"
+],
+[
+"FR_SETTINGS_FILE",
+"settings.json\" // KeyValueStore du portage desktop"
+],
+[
+"FR_DOWNLOADS_DIR",
+"Dossier pour les téléchargements\" // downloads_dir"
+],
+[
+"FR_STORAGE_USAGE",
+"Utilisation du stockage\" // storage_usage (aussi titre"
+],
+[
+"FR_DATA_REMOVAL",
+"Data removal"
+],
+[
+"FR_DATA_REMOVAL_SUMMARY",
+"Effacer les données inutiles\" // libellé vidéo"
+],
+[
+"FR_BACKUPS",
+"Sauvegardes\" // ligne de section sauvegarde (vidéo)"
+],
+[
+"FR_OPEN_DIR",
+"Ouvrir le dossier\" // entrée desktop (équivalent Android)"
+],
+[
+"FR_DIR_CHANGED_TITLE",
+"Dossier modifié\" // dialog desktop (divergence)"
+],
+[
+"FR_OPEN_DIR_FAILED",
+"Impossible d'ouvrir le dossier\" // message de secours desktop"
+],
+[
+"FR_SAME_DIR_MESSAGE",
+"Le dossier sélectionné est déjà le dossier actuel.\" // dialog desktop"
+],
+[
+"FR_ELLIPSIS",
+"…\" // taille en cours de calcul (placeholder)"
+],
+[
+"FR_DATA_REMOVAL_TITLE",
+"Effacement des données\" // data_removal (vidéo)"
+],
+[
+"FR_CLEAR_READ_HISTORY",
+"Effacer l'historique de lecture\" // clear_history (values-fr)"
+],
+[
+"FR_CLEAR_SUGGESTIONS",
+"Effacer les suggestions\" // clear_suggestions"
+],
+[
+"FR_CLEAR_NETWORK_CACHE",
+"Vider le cache réseau\" // clear_network_cache"
+],
+[
+"FR_CLEAR_COOKIES",
+"Effacer les cookies\" // clear_cookies"
+],
+[
+"FR_CONFIRM_TITLE",
+"Êtes-vous sûr ?\" // dialog de confirmation (vidéo)"
+],
+[
+"FR_DONE_HISTORY",
+"Historique de lecture effacé\" // « snackbar » desktop"
+],
+[
+"FR_DONE_SUGGESTIONS",
+"Suggestions effacées\" // « snackbar » desktop"
+],
+[
+"FR_DONE_NETWORK_CACHE",
+"Cache réseau vidé\" // « snackbar » desktop"
+],
+[
+"FR_DONE_COOKIES",
+"Cookies effacés\" // « snackbar » desktop"
+],
+[
+"FR_ERROR",
+"Une erreur est survenue : %s\" // message d'erreur (desktop)"
+],
+[
+"FR_DELETE",
+"Effacer\" // bouton de confirmation (delete, values-fr)"
+],
+[
+"FR_TRACKER_SWITCH",
+"Vérifier les nouveaux chapitres et les notifier\" // tracker_enabled"
+],
+[
+"FR_FREQUENCY",
+"Fréquence de vérification\" // tracker_frequency"
+],
+[
+"FR_CHECK_UPDATES",
+"Rechercher les mises à jour\" // check_for_updates"
+],
+[
+"FR_DOWNLOAD_NEW",
+"Télécharger de nouveaux chapitres\" // tracker_download"
+],
+[
+"FR_SECTION_TROUBLESHOOTING",
+"Dépannage\" // troubleshooting (headers)"
+],
+[
+"FR_FEED_LOG",
+"Vérification du journal des nouveaux chapitres\" // feed_log"
+],
+[
+"FR_BATTERY_OPTIMIZATION",
+"Désactiver l'optimisation de la batterie\" // battery_optimization"
+],
+[
+"FR_FREQUENCY_DEFAULT",
+"Par défaut\" // dialog radio fréquence (choix desktop)"
+],
+[
+"FR_FREQUENCY_HOURLY",
+"Toutes les heures\" // dialog radio fréquence"
+],
+[
+"FR_FREQUENCY_EVERY6H",
+"Toutes les 6 heures\" // dialog radio fréquence"
+],
+[
+"FR_FREQUENCY_DAILY",
+"Quotidienne\" // dialog radio fréquence"
+],
+[
+"FR_DOWNLOAD_DISABLED",
+"Jamais\" // TrackerDownloadStrategy.DISABLED"
+],
+[
+"FR_DOWNLOAD_DOWNLOADED",
+"Manga avec chapitres téléchargés\" // .DOWNLOADED"
+],
+[
+"FR_DOWNLOAD_RECENTLY_READ",
+"Manga lu récemment\" // .RECENTLY_READ"
+],
+[
+"FR_FEED_LOG_EMPTY_TITLE",
+"Aucune vérification enregistrée"
+],
+[
+"FR_AT",
+" à \" // horodatage « Il y a 3 heures à 16:24 »"
+],
+[
+"FR_TIME_PATTERN",
+"HH:mm\" // motif DateTimeFormatter (non affiché tel quel)"
+],
+[
+"FR_AGO_JUST_NOW",
+"À l'instant\" // temps relatif (< 1 min)"
+],
+[
+"FR_AGO_MINUTES",
+"Il y a %d minutes\" // temps relatif (< 1 h)"
+],
+[
+"FR_AGO_HOURS",
+"Il y a %d heures\" // temps relatif (< 24 h)"
+],
+[
+"FR_AGO_DAYS",
+"Il y a %d jours\" // temps relatif (< 7 j)"
+],
+[
+"FR_SECTION_METERED",
+"Données mobiles\" // pref_header_network (metered)"
+],
+[
+"FR_DOWNLOAD_METERED",
+"Télécharger en données mobiles\" // download_metered"
+],
+[
+"FR_SUGGESTIONS_WIFI_ONLY",
+"Suggestions en Wi-Fi seulement\" // suggestions_wifi_only"
+],
+[
+"FR_TRACKER_WIFI_ONLY",
+"Vérification des nouveaux chapitres en Wi-Fi seulement\" // tracker_wifi_only"
+],
+[
+"FR_SECTION_PROXY",
+"Proxy\" // proxy"
+],
+[
+"FR_PROXY_TYPE",
+"Type de proxy\" // proxy_type"
+],
+[
+"FR_PROXY_ADDRESS",
+"Adresse\" // proxy_address"
+],
+[
+"FR_PROXY_PORT",
+"Port\" // proxy_port"
+],
+[
+"FR_PROXY_LOGIN",
+"Identifiant\" // proxy_login"
+],
+[
+"FR_PROXY_PASSWORD",
+"Mot de passe\" // proxy_password"
+],
+[
+"FR_PROXY_EMPTY",
+"—\" // valeur vide affichée (desktop)"
+],
+[
+"FR_PROXY_PASSWORD_MASK",
+"••••••••\" // mot de passe masqué (desktop)"
+],
+[
+"FR_SECTION_DOH",
+"DNS sur HTTPS\" // dns_over_https"
+],
+[
+"FR_DOH",
+"Serveur DNS sur HTTPS\" // dns_over_https (ligne)"
+],
+[
+"FR_DOH_DISABLED",
+"Désactivé\" // DoHProvider.NONE"
+],
+[
+"FR_PROXY_HOST_HINT",
+"Hôte ou adresse IP\" // champ de saisie (desktop)"
+],
+[
+"FR_PROXY_PORT_HINT",
+"0 - 65535\" // champ de saisie (desktop)"
+],
+[
+"FR_PROXY_LOGIN_HINT",
+"Identifiant\" // champ de saisie (desktop)"
+],
+[
+"FR_PROXY_PASSWORD_HINT",
+"Mot de passe\" // champ de saisie (desktop)"
+],
+[
+"FR_TRISTATE_ENABLED",
+"Toujours"
+],
+[
+"FR_TRISTATE_ASK",
+"Demander"
+],
+[
+"FR_TRISTATE_DISABLED",
+"Jamais"
+],
+[
+"FR_PROXY_TYPE_DIRECT",
+"Direct"
+],
+[
+"FR_PROXY_TYPE_HTTP",
+"HTTP"
+],
+[
+"FR_PROXY_TYPE_SOCKS",
+"SOCKS"
+],
+[
+"FR_DOH_GOOGLE",
+"Google"
+],
+[
+"FR_DOH_CLOUDFLARE",
+"Cloudflare"
+],
+[
+"FR_DOH_ADGUARD",
+"AdGuard"
+],
+[
+"FR_DOH_ZERO_MS",
+"0ms"
+],
+[
+"FR_TRACKER_NO_NSFW",
+"Ne pas notifier pour les mangas pour adultes\" // tracker_nsfw"
+],
+[
+"FR_TRACKER_FREQUENCY",
+"Nouveaux chapitres — régler la fréquence\" // libellé vidéo"
+],
+[
+"FR_OPEN_FEED_SETTINGS",
+"Paramètres des nouveaux chapitres\" // renvoi (desktop)"
+],
+[
+"FR_SUGGESTIONS_NOTIFICATIONS",
+"Notifier les nouvelles suggestions\" // suggestions_notifications"
+],
+[
+"FR_DATABASE",
+"Base de données\" // storage_database (vidéo)"
+],
+[
+"FR_NETWORK_CACHE",
+"Cache réseau\" // storage_cache (vidéo)"
+],
+[
+"FR_TOTAL",
+"Total\" // storage_total (vidéo)"
+],
+[
+"FR_COMPUTING",
+"Calcul…\" // calcul en cours (desktop)"
+],
+[
+"FR_SUGGESTIONS_ENABLE",
+"Activer les suggestions\" // suggestions_enable"
+],
+[
+"FR_SUGGESTIONS_INCLUDE_DISABLED",
+"Inclure les sources désactivées\" // suggestions_include_disabled"
+],
+[
+"FR_SUGGESTIONS_EXCLUDE_GENRES",
+"Exclure des genres\" // suggestions_excluded_genres"
+],
+[
+"FR_SUGGESTIONS_GENRE_HINT",
+"Nom du genre\" // champ de saisie (dialog desktop)"
+],
+[
+"FR_READER_SECTION_PAGES",
+"Pages\" // section d'en-tête (captures)"
+],
+[
+"FR_READER_DEFAULT_MODE",
+"Mode par défaut\" // default_mode"
+],
+[
+"FR_READER_MODE_DETECT",
+"Mode de détection automatique du lecteur\" // reader_mode_detect"
+],
+[
+"FR_READER_SCALE",
+"Mode mise à l'échelle\" // scale_mode"
+],
+[
+"FR_READER_ANIMATION",
+"Animation de page\" // animation"
+],
+[
+"FR_READER_CROP_PAGES",
+"Recadrer les pages\" // crop_pages"
+],
+[
+"FR_READER_CROP_DISABLED",
+"Désactivé (non disponible sur desktop)\" // divergence"
+],
+[
+"FR_READER_BACKGROUND",
+"Arrière-plan\" // reader_background"
+],
+[
+"FR_READER_PAGES_NUMBERED",
+"Pages numérotées\" // pages_numbering"
+],
+[
+"FR_READER_SECTION_WEBTOON",
+"Webtoon\" // section d'en-tête (captures)"
+],
+[
+"FR_READER_WEBTOON_SEPARATORS",
+"Séparateurs en mode webtoon\" // webtoon_separators"
+],
+[
+"FR_READER_WEBTOON_ZOOM",
+"Zoom Webtoon\" // adaptation desktop"
+],
+[
+"FR_READER_SECTION_ADVANCED",
+"Avancé\" // section d'en-tête (captures)"
+],
+[
+"FR_READER_PRELOAD",
+"Précharger les pages\" // preload_pages"
+],
+[
+"FR_PRIVACY_SECTION_SECURITY",
+"Sécurité de l'application\" // section d'en-tête (capture Paramètres, frame 74)"
+],
+[
+"FR_PRIVACY_SECTION_ACTIVITY",
+"Votre activité\" // section d'en-tête (capture Paramètres, frame 74)"
+],
+[
+"FR_ADULT_CONTENT",
+"Contenu pour adultes\" // capture Paramètres (frame 74)"
+],
+[
+"FR_ADULT_CONTENT_SUMMARY",
+"Masquer les sources de mangas pour adultes\" // choix desktop"
+],
+[
+"FR_SCREENSHOTS_POLICY",
+"Politique relative aux captures d'écran\" // capture (frame 78)"
+],
+[
+"FR_SCREENSHOTS_ALLOW",
+"Autoriser\" // ScreenshotsPolicy.ALLOW"
+],
+[
+"FR_SCREENSHOTS_BLOCK_NSFW",
+"Masquer le contenu pour adultes\" // .BLOCK_NSFW"
+],
+[
+"FR_SCREENSHOTS_BLOCK_INCOGNITO",
+"Masquer le contenu en mode incognito\" // .BLOCK_INCOGNITO"
+],
+[
+"FR_SCREENSHOTS_BLOCK_ALL",
+"Interdire\" // .BLOCK_ALL"
+],
+[
+"FR_READING_STATS",
+"Statistiques de lecture\" // capture (frame 78)"
+],
+[
+"FR_READING_STATS_SUMMARY",
+"Collecter des statistiques sur ta lecture\" // libellé vidéo (tutoiement d'origine conservé)"
+],
+[
+"FR_INCOGNITO_TABS_HINT",
+"Activer/désactiver depuis le menu ⋮ de chaque onglet\" // choix desktop"
+],
+[
+"FR_INCOGNITO_NSFW",
+"Mode incognito pour le contenu pour adultes\" // incognito_nsfw (TriStateOption)"
+],
+[
+"FR_PROTECT_APP",
+"Protéger l'application\" // protect_app (frame 78)"
+],
+[
+"FR_PROTECT_APP_ENABLED",
+"Activé\" // état réel du mot de passe (desktop)"
+],
+[
+"FR_PROTECT_APP_DISABLED",
+"Désactivé\" // état réel du mot de passe (desktop)"
+],
+[
+"FR_SHARE_SOURCE_RELIABILITY",
+"Partager la fiabilité des sources\" // « Share source reliability » (frame 78)"
+],
+[
+"FR_SHARE_SOURCE_RELIABILITY_UNAVAILABLE",
+"Non disponible dans le portage desktop\" // divergence desktop"
+],
+[
+"FR_SUGGESTIONS_18_PLUS",
+"Suggestions 18+\" // frame 78 (titre tronqué)"
+],
+[
+"FR_DISCORD_HIDE_NSFW",
+"Masquer le contenu NSFW sur Discord\" // frame 78"
+],
+[
+"FR_COLOR_CORRECTION",
+"Correction des couleurs"
+],
+[
+"FR_BEFORE",
+"Avant\" // aperçu gauche"
+],
+[
+"FR_AFTER",
+"Après\" // aperçu droite"
+],
+[
+"FR_INVERT_COLORS",
+"Inverser les couleurs"
+],
+[
+"FR_GRAYSCALE",
+"Niveaux de gris"
+],
+[
+"FR_BRIGHTNESS",
+"Luminosité"
+],
+[
+"FR_CONTRAST",
+"Contraste"
+],
+[
+"FR_YELLOWISH_BACKGROUND",
+"Fond jaunâtre"
+],
+[
+"FR_RESET",
+"Réinitialiser"
+],
+[
+"FR_COLOR_PREVIEW_LABEL",
+"Exemple de page"
+],
+[
+"FR_AUTO_SCROLL",
+"Défilement automatique"
+],
+[
+"FR_ENABLE",
+"Activer"
+],
+[
+"FR_SPEED",
+"Vitesse"
+],
+[
+"FR_AUTO_SCROLL_FAB_NOTE",
+"Défilement via le bouton de commande flottant"
+],
+[
+"FR_AUTO_SCROLL_PLAY",
+"Lancer le défilement automatique"
+],
+[
+"FR_AUTO_SCROLL_PAUSE",
+"Mettre en pause le défilement automatique"
+],
+[
+"FR_ERASER_TUTORIAL_TITLE",
+"Effacez ce que vous ne voulez plus voir"
+],
+[
+"FR_SKIP",
+"Passer"
+],
+[
+"FR_ACCOUNTS_TITLE",
+"Comptes et synchronisation\" // titre de l'écran (vidéo)"
+],
+[
+"FR_TRACKERS_HEADER",
+"Services de suivi\" // header de section (string/trackers)"
+],
+[
+"FR_DISABLED",
+"Désactivé\" // sous-titre de chaque ligne (string/disabled)"
+],
+[
+"FR_SERVICE_ANILIST",
+"AniList"
+],
+[
+"FR_SERVICE_KITSU",
+"Kitsu"
+],
+[
+"FR_SERVICE_MAL",
+"MyAnimeList\" // EN d'origine"
+],
+[
+"FR_SERVICE_SHIKIMORI",
+"Shikimori"
+],
+[
+"FR_COMMUNITY_ROW",
+"Community : Comments, ratings and source reliability"
+],
+[
+"FR_DISCORD_ROW",
+"Discord Rich Presence"
+]
+]

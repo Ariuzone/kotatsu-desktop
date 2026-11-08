@@ -283,6 +283,8 @@ private fun AppearanceSettingsContent(
 							else -> "system"
 						}
 						appSettings?.appLanguage = langValue
+						// 1.1.1 : application immédiate des chaînes (recalcul à la recomposition)
+						org.koitharu.kotatsu.desktop.ui.strings.applyUiLanguagePreference(langValue)
 					},
 				)
 			}
