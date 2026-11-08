@@ -68,6 +68,18 @@ Journal : `docs/P5_JOURNAL.md`. `Main.kt`/`Fr.kt`/`AppSettings.kt` INTERDITS aux
 | **P5-A Vos données** | agent P5-A | nouveaux `ui/screens/settings/DownloadsStorageSettingsScreen.kt`, `StorageUsageScreen.kt`, `DataRemovalScreen.kt`, `BackupRestoreScreen.kt` | Écran « Téléchargements et stockage » : « Dossier pour les téléchargements » (chemin réel + ouvrir), « Utilisation du stockage » (tailles réelles DB/téléchargements/cache), « Data removal » (actions réelles : historique, cache, suggestions) ; « Sauvegarde et restauration » : « Create or restore a backup » (EN conservé, libellé vidéo) + « Sauvegardes » → créer/restaurer un zip (kotatsu.db + settings.json) via JFileChooser ; compile OK |
 | **P5-B Application** | agent P5-B | nouveaux `ui/screens/settings/NotificationsSettingsScreen.kt`, `NetworkSettingsScreen.kt`, `AboutScreen.kt` | « Notifications » : tracker notifications + no NSFW ; « Réseau » : Données mobiles (metered TriState, Wi-Fi only suggestions/tracker), « Proxy » (type/adresse/port/login), « DNS sur HTTPS » (DoHProvider) ; « À propos » : Version 9.8.6, licence, liens ; compile OK |
 
+## Phase P6 — Comptes & synchronisation / Confidentialité (2026-11-08, en cours)
+
+Journal : `docs/P6_JOURNAL.md`. `Main.kt`/`Fr.kt`/`AppSettings.kt` INTERDITS aux agents.
+Chaînes : P6-A crée `ui/strings/FrAccounts.kt` (seul propriétaire), P6-B ajoute dans
+`FrSettings.kt` (seul propriétaire pour cette tâche). Règle : aucune chaîne en brut dans
+les écrans.
+
+| Lot | Agent | Périmètre exclusif | Critères de fin |
+|---|---|---|---|
+| **P6-A Comptes** | agent P6-A | nouveau `ui/screens/settings/AccountsScreen.kt` + `ui/strings/FrAccounts.kt` | Écran « Comptes et synchronisation » : « Services de suivi » (AniList, Kitsu, MyAnimeList, Shikimori — chacun « Désactivé » + dialog de connexion reportée, divergence OAuth/WebView), Community (EN d'origine) + sous-titres exacts, Discord ; compile OK |
+| **P6-B Confidentialité** | agent P6-B | nouveau `ui/screens/settings/PrivacySettingsScreen.kt` (chaînes → FrSettings.kt) | Écran « Confidentialité et contenu » : « Contenu pour adultes » (switch KEY_DISABLE_NSFW), « Politique des captures d'écran » (dialog ScreenshotsPolicy), « Statistiques de lecture » (switch KEY_STATS_ENABLED), « Partager la fiabilité des sources » (état réel ou désactivé+divergence), incognito (état), « Protéger l'application » (état via ProtectManager — lecture) ; compile OK |
+
 ## Notes d'environnement
 
 - **RÈGLE DE TEST (consigne client, 2026-11-08) : avant CHAQUE test/lancement de l'app, effacer

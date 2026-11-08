@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
@@ -49,6 +50,8 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_ABOUT_VERSION
 import org.koitharu.kotatsu.desktop.ui.strings.FR_APPEARANCE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_APPEARANCE_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_APPLICATION
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACCOUNTS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACCOUNTS_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_BACKUP_RESTORE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_BACKUP_RESTORE_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_COMING_SOON
@@ -91,6 +94,7 @@ public enum class SettingsRoute {
 	NOTIFICATIONS, // Notifications (P5)
 	NETWORK, // Réseau (P5)
 	PRIVACY, // Confidentialité et contenu (P6)
+	ACCOUNTS, // Comptes et synchronisation (P6)
 	ABOUT, // À propos (P5)
 	MASKED_IMAGES, // Images masquées (P1)
 	MAIN_SECTIONS, // Principales sections de l'écran (P2)
@@ -222,6 +226,12 @@ public fun SettingsRootScreen(
 					title = FR_NOTIFICATIONS,
 					subtitle = FR_NOTIFICATIONS_SUMMARY,
 					onClick = { onNavigate(SettingsRoute.NOTIFICATIONS) },
+				)
+				PreferenceRow(
+					icon = Icons.Filled.Person,
+					title = FR_ACCOUNTS,
+					subtitle = FR_ACCOUNTS_SUMMARY,
+					onClick = { onNavigate(SettingsRoute.ACCOUNTS) },
 				)
 				PreferenceRow(
 					icon = Icons.Filled.Shield,

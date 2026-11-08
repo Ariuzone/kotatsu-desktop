@@ -212,8 +212,9 @@ class AppSettings(
 		get() = store.getBoolean(KEY_SUGGESTIONS_WIFI_ONLY, false)
 		set(value) = store.edit { putBoolean(KEY_SUGGESTIONS_WIFI_ONLY, value) }
 
-	val isSuggestionsExcludeNsfw: Boolean
+	var isSuggestionsExcludeNsfw: Boolean
 		get() = store.getBoolean(KEY_SUGGESTIONS_EXCLUDE_NSFW, false)
+		set(value) = store.edit { putBoolean(KEY_SUGGESTIONS_EXCLUDE_NSFW, value) }
 
 	/** Inclure les sources désactivées dans les suggestions (P4). */
 	var isSuggestionsIncludeDisabled: Boolean
@@ -312,8 +313,9 @@ class AppSettings(
 	val isReadingTimeEstimationEnabled: Boolean
 		get() = store.getBoolean(KEY_READING_TIME, true)
 
-	val isStatsEnabled: Boolean
+	var isStatsEnabled: Boolean
 		get() = store.getBoolean(KEY_STATS_ENABLED, false)
+		set(value) = store.edit { putBoolean(KEY_STATS_ENABLED, value) }
 
 	val searchSuggestionTypes: Set<SearchSuggestionType>
 		get() = store.getStringSet(KEY_SEARCH_SUGGESTION_TYPES, null)?.let { stringSet ->

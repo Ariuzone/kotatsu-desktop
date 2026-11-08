@@ -147,6 +147,8 @@ public const val FR_PRIVACY_SUMMARY: String =
 	"Contenu pour adultes, Sécurité de l'application, Votre activité" // capture
 public const val FR_NETWORK: String = "Réseau" // network
 public const val FR_NETWORK_SUMMARY: String = "Données mobiles, Proxy, DNS sur HTTPS" // capture
+public const val FR_ACCOUNTS: String = "Comptes et synchronisation" // accounts (capture vidéo 3:50)
+public const val FR_ACCOUNTS_SUMMARY: String = "Services de suivi, Community, Discord" // capture
 public const val FR_ABOUT: String = "À propos" // about
 public const val FR_ABOUT_VERSION: String = "Version 9.8.6" // version (capture)
 public const val FR_COMING_SOON: String = "Cette section sera disponible dans une prochaine phase"

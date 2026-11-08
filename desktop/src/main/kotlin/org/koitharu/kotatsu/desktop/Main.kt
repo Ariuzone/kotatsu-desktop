@@ -479,6 +479,17 @@ private fun MainScreen(container: AppContainer) {
 							appSettings = container.appSettings,
 							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
 						)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.PRIVACY ->
+						// P6 : « Confidentialité et contenu » (remplace le stub)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.PrivacySettingsScreen(
+							appSettings = container.appSettings,
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+						)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ACCOUNTS ->
+						// P6 : « Comptes et synchronisation » (remplace le stub)
+						org.koitharu.kotatsu.desktop.ui.screens.settings.AccountsScreen(
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+						)
 					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ABOUT ->
 						// P5 : « À propos » (remplace le stub)
 						org.koitharu.kotatsu.desktop.ui.screens.settings.AboutScreen(

@@ -2,7 +2,8 @@
  * Fichier créé — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
  * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-08 — source de chaînes
  * des écrans de réglages desktop (phases P1/P4/P5 : lecteur, nouveaux chapitres, notifications,
- * réseau, stockage, suggestions, sauvegarde, données, à propos). Conformité à la règle client :
+ * réseau, stockage, suggestions, sauvegarde, données, à propos ; phase P6 : confidentialité).
+ * Conformité à la règle client :
  * « toute chaîne affichée vient d'une source de chaînes, jamais écrite en brut dans un écran ».
  * Toutes les chaînes privées des écrans de ui/screens/settings/ sont centralisées ici en
  * public const val FR_*, avec leur provenance (libellé d'origine de l'app Android / frame
@@ -222,6 +223,50 @@ public const val FR_READER_WEBTOON_ZOOM_SUMMARY: String =
 	"Ctrl+molette ou double-clic dans le lecteur (desktop)" // divergence desktop
 public const val FR_READER_SECTION_ADVANCED: String = "Avancé" // section d'en-tête (captures)
 public const val FR_READER_PRELOAD: String = "Précharger les pages" // preload_pages
+
+// --- Écran « Confidentialité et contenu » (PrivacySettingsScreen, phase P6, frames t≈4:00-4:05
+//     de la vidéo + pref_privacy de l'app d'origine) ---
+public const val FR_PRIVACY_SECTION_SECURITY: String = "Sécurité de l'application" // section d'en-tête (capture Paramètres, frame 74)
+public const val FR_PRIVACY_SECTION_ACTIVITY: String = "Votre activité" // section d'en-tête (capture Paramètres, frame 74)
+// « Contenu pour adultes » : interrupteur de la clé d'origine « no_nsfw »
+// (« Désactiver le contenu explicite », menu de « Gérer les sources » frame 56).
+// Sous-titre : choix sobre desktop (non visible dans l'inventaire vidéo) — documenté.
+public const val FR_ADULT_CONTENT: String = "Contenu pour adultes" // capture Paramètres (frame 74)
+public const val FR_ADULT_CONTENT_SUMMARY: String = "Masquer les sources de mangas pour adultes" // choix desktop
+// Libellés FR de l'enum ScreenshotsPolicy (4 valeurs — les libellés de la vidéo ne montrent
+// que « Non définie » comme valeur courante, dialog non ouvert) :
+public const val FR_SCREENSHOTS_POLICY: String = "Politique relative aux captures d'écran" // capture (frame 78)
+public const val FR_SCREENSHOTS_ALLOW: String = "Autoriser" // ScreenshotsPolicy.ALLOW
+public const val FR_SCREENSHOTS_BLOCK_NSFW: String = "Masquer le contenu pour adultes" // .BLOCK_NSFW
+public const val FR_SCREENSHOTS_BLOCK_INCOGNITO: String = "Masquer le contenu en mode incognito" // .BLOCK_INCOGNITO
+public const val FR_SCREENSHOTS_BLOCK_ALL: String = "Interdire" // .BLOCK_ALL
+// « Statistiques de lecture » : interrupteur de la clé d'origine « stats_on ». La propriété
+// desktop est en lecture seule (val) — interrupteur reflété mais désactivé (divergence).
+public const val FR_READING_STATS: String = "Statistiques de lecture" // capture (frame 78)
+public const val FR_READING_STATS_SUMMARY: String = "Collecter des statistiques sur ta lecture" // libellé vidéo (tutoiement d'origine conservé)
+// « Mode incognito » : le réglage vit dans le menu ⋮ de chaque onglet (câblé P2) — ligne info.
+public const val FR_INCOGNITO_TABS_HINT: String = "Activer/désactiver depuis le menu ⋮ de chaque onglet" // choix desktop
+public const val FR_INCOGNITO_NSFW: String = "Mode incognito pour le contenu pour adultes" // incognito_nsfw (TriStateOption)
+public const val FR_PROTECT_APP: String = "Protéger l'application" // protect_app (frame 78)
+public const val FR_PROTECT_APP_ENABLED: String = "Activé" // état réel du mot de passe (desktop)
+public const val FR_PROTECT_APP_DISABLED: String = "Désactivé" // état réel du mot de passe (desktop)
+// « Share source reliability » : EN non traduit dans la vidéo (frame 78) — libellé FR du client.
+// Aucune clé dans AppSettings desktop : ligne désactivée (divergence).
+public const val FR_SHARE_SOURCE_RELIABILITY: String = "Partager la fiabilité des sources" // « Share source reliability » (frame 78)
+public const val FR_SHARE_SOURCE_RELIABILITY_UNAVAILABLE: String = "Non disponible dans le portage desktop" // divergence desktop
+
+// Entrées complémentaires de la frame 78 (suite P6) :
+// « Suggestions 18+ » (titre tronqué en vidéo, icône bulbe) : interrupteur de la clé d'origine
+// « suggestions_exclude_nsfw ». Sens conservé : switch ON = exclure les mangas pour adultes
+// des suggestions (sens direct de la clé) ; le sous-titre vidéo décrit l'état activé.
+public const val FR_SUGGESTIONS_18_PLUS: String = "Suggestions 18+" // frame 78 (titre tronqué)
+public const val FR_SUGGESTIONS_18_PLUS_SUMMARY: String =
+	"Les mangas pour adultes ne seront pas affichés dans les suggestions" // frame 78 (coquille « adutes » corrigée)
+// « Masquer le contenu NSFW sur Discord » : ligne grisée — Discord Rich Presence non porté
+// sur desktop (même divergence que l'écran « Comptes et synchronisation », AccountsScreen).
+public const val FR_DISCORD_HIDE_NSFW: String = "Masquer le contenu NSFW sur Discord" // frame 78
+public const val FR_DISCORD_HIDE_NSFW_SUMMARY: String =
+	"Ne pas utiliser la présence enrichie pour du contenu adulte" // frame 78
 
 /** Taille lisible en Ko/Mo/Go (unités affichées de l'original, libellés vidéo). */
 public fun frFileSize(bytes: Long): String = when {
