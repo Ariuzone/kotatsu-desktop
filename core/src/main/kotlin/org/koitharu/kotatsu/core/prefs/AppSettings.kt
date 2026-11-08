@@ -2,7 +2,9 @@
  * Fichier modifié — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
  * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation JVM/desktop ;
  * 2026-11-08 — phase P2 : préférence isHistoryGroupingEnabled (« Groupe » de la bottom sheet
- * Options de liste, clé history_grouping).
+ * Options de liste, clé history_grouping) ;
+ * 2026-11-08 — phase P3 : isSourcesGrid (« Afficher en vue grille », clé sources_grid) et
+ * isAutoMirrorEnabled (« Choisir le miroir automatiquement », clé auto_mirror) de pref_sources.
  * Adaptation : façade desktop sur KeyValueStore (à la place de SharedPreferences) portant les
  * préférences P1. Les mêmes noms de clés KEY_* que l'original sont conservés quand ils existent.
  * Les préférences liées à l'UI Android (navigation, notifications, backups DocumentFile, WebView,
@@ -66,6 +68,20 @@ class AppSettings(
 	var sourcesSortOrder: String
 		get() = store.getString(KEY_SOURCES_ORDER, "SCORE") ?: "SCORE"
 		set(value) = store.edit { putString(KEY_SOURCES_ORDER, value) }
+
+	/** « Afficher en vue grille » de l'écran « Gérer les sources » (pref_sources d'origine). */
+	var isSourcesGrid: Boolean
+		get() = store.getBoolean(KEY_SOURCES_GRID, false)
+		set(value) = store.edit { putBoolean(KEY_SOURCES_GRID, value) }
+
+	/**
+	 * « Choisir le miroir automatiquement » (pref_sources d'origine). Note : le changement
+	 * automatique de domaine (miroirs) n'est pas encore branché côté desktop — la préférence
+	 * est persistée mais sans effet pour l'instant.
+	 */
+	var isAutoMirrorEnabled: Boolean
+		get() = store.getBoolean(KEY_AUTO_MIRROR, false)
+		set(value) = store.edit { putBoolean(KEY_AUTO_MIRROR, value) }
 
 	var readerMode: ReaderMode
 		get() = store.getEnumValue(KEY_READER_MODE, ReaderMode.STANDARD)
@@ -382,6 +398,8 @@ class AppSettings(
 		const val KEY_HISTORY_GROUPING = "history_grouping"
 		const val KEY_FAVORITES_ORDER = "fav_order"
 		const val KEY_SOURCES_ORDER = "sources_sort_order"
+		const val KEY_SOURCES_GRID = "sources_grid"
+		const val KEY_AUTO_MIRROR = "auto_mirror"
 		const val KEY_RELATED_MANGA = "related_manga"
 		const val KEY_UPDATES_UNSTABLE = "updates_unstable"
 		const val KEY_SSL_BYPASS = "ssl_bypass"

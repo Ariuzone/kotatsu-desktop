@@ -155,6 +155,8 @@ private fun MainScreen(container: AppContainer) {
 	var showSearch by remember { mutableStateOf(false) }
 	var showDownloads by remember { mutableStateOf(false) }
 	var showSourcesCatalog by remember { mutableStateOf(false) }
+	var showManageSources by remember { mutableStateOf(false) } // P3 : Gérer les sources
+	var showManageLinks by remember { mutableStateOf(false) } // P3 : Gérer les liens
 	// Options de liste (P2) : bottom sheet ouverte depuis le menu ⋮ Historique/Favoris ;
 	// état partagé pour que les écrans se recomposent dès qu'une valeur change.
 	var showListOptions by remember { mutableStateOf(false) }
@@ -239,17 +241,20 @@ private fun MainScreen(container: AppContainer) {
 		NavigationRail(modifier = Modifier.align(Alignment.CenterStart)) {
 			for (item in railItems) {
 				NavigationRailItem(
-					selected = selected == item && selectedManga == null && selectedSource == null &&
-						!showSettings && !showDownloads && !showSourcesCatalog && !showSearch,
-					onClick = {
-						selected = item
-						selectedSource = null
-						selectedManga = null
-						showSettings = false
-						showDownloads = false
-						showSourcesCatalog = false
-						showSearch = false
-					},
+				selected = selected == item && selectedManga == null && selectedSource == null &&
+						!showSettings && !showDownloads && !showSourcesCatalog && !showSearch &&
+						!showManageSources && !showManageLinks,
+				onClick = {
+					selected = item
+					selectedSource = null
+					selectedManga = null
+					showSettings = false
+					showDownloads = false
+					showSourcesCatalog = false
+					showManageSources = false
+					showManageLinks = false
+					showSearch = false
+				},
 					icon = {
 						Icon(
 							imageVector = if (selected == item) item.filledIcon else item.outlinedIcon,
@@ -289,6 +294,20 @@ private fun MainScreen(container: AppContainer) {
 		) {
 			Box {
 			when {
+				showManageSources ->
+					// P3 : « Gérer les sources » — toggle → hiddenSources (AppSettings)
+					org.koitharu.kotatsu.desktop.ui.screens.sources.ManageSourcesScreen(
+						appSettings = container.appSettings,
+						onBackClick = { showManageSources = false },
+						domainOf = container::domainOf,
+					)
+
+				showManageLinks ->
+					// P3 : « Gérer les liens » (adaptation desktop, lecture seule)
+					org.koitharu.kotatsu.desktop.ui.screens.sources.ManageLinksScreen(
+						onBackClick = { showManageLinks = false },
+					)
+
 				showSourcesCatalog ->
 					org.koitharu.kotatsu.desktop.ui.screens.sources.SourcesCatalogScreen(
 						domainOf = { container.domainOf(it) },
@@ -296,8 +315,9 @@ private fun MainScreen(container: AppContainer) {
 							showSourcesCatalog = false
 							selectedSource = it
 						},
-						onSourceToggle = { /* activation/désactivation : P3 */ },
+						onSourceToggle = { /* P3 : ignoré quand appSettings est fourni (toggle direct) */ },
 						isAdded = { true },
+						appSettings = container.appSettings,
 						onBackClick = { showSourcesCatalog = false },
 						onSearchClick = { showSearch = true },
 					)
@@ -376,6 +396,18 @@ private fun MainScreen(container: AppContainer) {
 							org.koitharu.kotatsu.desktop.ui.screens.settings.MaskedImagesScreen(
 								onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.READING },
 							)
+					org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.SOURCES ->
+						// P3 : écran racine « Sources des mangas » (remplace le stub)
+						org.koitharu.kotatsu.desktop.ui.screens.sources.SourcesSettingsScreen(
+							appSettings = container.appSettings,
+							enabledCount = sourcesList.size,
+							totalCount = MangaParserSource.entries.size,
+							availableCount = MangaParserSource.entries.filterNot { it.isBroken }.size,
+							onBackClick = { settingsRoute = org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.ROOT },
+							onOpenManageSources = { showManageSources = true },
+							onOpenCatalog = { showSourcesCatalog = true },
+							onOpenLinks = { showManageLinks = true },
+						)
 						else -> {
 							val title = when (route) {
 								org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute.READING -> FR_READER_SETTINGS
@@ -631,6 +663,7 @@ private fun MainScreen(container: AppContainer) {
 								sources = sourcesList,
 								domainOf = { container.domainOf(it) },
 								hasNewChapters = { false },
+								presetsDao = container.database.getSourcePresetsDao(),
 								onSuggestionClick = { selectedManga = it },
 								onSourceClick = { selectedSource = it },
 								onCatalogClick = { showSourcesCatalog = true },
@@ -651,7 +684,7 @@ private fun MainScreen(container: AppContainer) {
 								onSearchClick = { showSearch = true },
 								onIncognitoToggle = { incognito = it },
 								onSettingsClick = { showSettings = true },
-								onManageSourcesClick = { showSourcesCatalog = true },
+								onManageSourcesClick = { showManageSources = true },
 							)
 
 						NavItem.LOCAL -> {

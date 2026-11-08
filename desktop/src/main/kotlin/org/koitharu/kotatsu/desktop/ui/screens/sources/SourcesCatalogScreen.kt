@@ -4,11 +4,17 @@
  * (SourcesCatalogFragment d'origine), fidèle aux captures de référence : barre du haut (←, titre,
  * loupe), chips « Toutes les langues ▾ / Nouveaux / Marque-pages », liste favicon + titre +
  * « Mangas, <langue> » + bouton + (séparateur vertical), état vide Totoro (ic_empty_feed).
+ * 2026-11-08 — phase P3 : parité vidéo — chips de filtres par catégorie (« Nouveaux », « Mangas »,
+ * « Hentais », « Comics », « Autre », « Manhwa » déduites du ContentType du parser), compteur
+ * « Disponible : N », menu de langues PLEIN ÉCRAN (liste natives + « Langues diverses »), état
+ * vide FR exact de la vidéo, et bouton + fonctionnel : quand [appSettings] est fourni, le bouton
+ * écrit directement dans appSettings.hiddenSources (source installée = coche ✓, sinon +).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.sources
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +34,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.outlined.History
@@ -54,6 +61,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import java.util.Locale
+import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.desktop.ui.components.EmptyStateScreen
 import org.koitharu.kotatsu.desktop.ui.components.TotoroIllustration
 import org.koitharu.kotatsu.desktop.ui.strings.FR_ALL_LANGUAGES
@@ -62,17 +70,33 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_CONTENT_TYPE_MANGA
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MISC_LANGUAGES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_NEWEST
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCES_CATALOG
-import org.koitharu.kotatsu.desktop.ui.strings.FR_TEXT_EMPTY_HOLDER_PRIMARY
 import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
+
+// Chaînes FR locales (phase P3) — ne pas déplacer dans Fr.kt (réservé à l'agent UI FR)
+private const val FR_EMPTY_SOURCES_CATALOG_TITLE = "Aucune source de mangas"
+private const val FR_EMPTY_SOURCES_CATALOG_TEXT =
+	"Il n'y a pas de sources disponibles dans cette section, ou tout cela aurait pu être ajouté. " +
+		"Restez à l'écoute"
+private const val FR_CONTENT_COMICS = "Comics"
+private const val FR_CONTENT_OTHER = "Autre"
+private const val FR_CONTENT_MANHWA = "Manhwa"
+private const val FR_AVAILABLE_COUNT = "Disponible : "
+private const val FR_ACTION_ADD = "Ajouter"
+private const val FR_ACTION_REMOVE = "Retirer"
 
 private val FAVICON_SIZE = 48.dp
 private val FAVICON_CORNER = 12.dp // coins arrondis du favicon (capture)
 private val CATALOG_ROW_HEIGHT = 88.dp // hauteur d'une ligne du catalogue (capture)
 
+/** Filtres de contenu du catalogue (chips vidéo) ; AUTRE = tout le reste du ContentType parser. */
+private enum class CatalogContentFilter { MANGAS, HENTAIS, COMICS, AUTRE, MANHWA }
+
 /**
  * Catalogue des sources. @param isAdded indique si la source est déjà ajoutée à l'utilisateur ;
- * @param onSourceToggle bascule l'ajout/retrait (bouton + à droite).
+ * @param onSourceToggle bascule l'ajout/retrait (bouton + à droite) — utilisé uniquement quand
+ * [appSettings] est null ; @param appSettings si non null, le bouton + écrit directement dans
+ * appSettings.hiddenSources (source installée = coche ✓, sinon +), comme sur Android.
  */
 @Composable
 public fun SourcesCatalogScreen(
@@ -83,19 +107,30 @@ public fun SourcesCatalogScreen(
 	onBackClick: () -> Unit,
 	onSearchClick: () -> Unit,
 	modifier: Modifier = Modifier,
+	appSettings: AppSettings? = null,
 ) {
 	val allSources = remember { MangaParserSource.entries.filterNot { it.isBroken } }
 	var selectedLocale by remember { mutableStateOf<String?>(null) } // null = toutes les langues
 	var newestOnly by remember { mutableStateOf(false) }
+	var contentFilter by remember { mutableStateOf<CatalogContentFilter?>(null) }
 	var languageMenuOpen by remember { mutableStateOf(false) }
+	// Révision du cache des sources masquées : incrémenté après chaque écriture dans appSettings
+	var hiddenRevision by remember { mutableStateOf(0) }
+	val hiddenSources = remember(hiddenRevision) { appSettings?.hiddenSources ?: emptySet() }
 
 	// Tri comme côté Android : par titre, langues affichées dans leur langue
 	val availableLocales = remember(allSources) {
-		allSources.map { it.locale }.filter { it.isNotBlank() }.distinct().sorted()
+		allSources.map { it.locale }.filter { it.isNotBlank() }.distinct()
+			.sortedBy { localeLabel(it).lowercase(Locale.ROOT) }
 	}
-	val filtered = remember(allSources, selectedLocale, newestOnly) {
+	val currentContentFilter = contentFilter
+	val filtered = remember(allSources, selectedLocale, newestOnly, currentContentFilter) {
 		allSources
 			.filter { selectedLocale == null || it.locale == selectedLocale }
+			.filter {
+				newestOnly || currentContentFilter == null ||
+					matchesContentFilter(it, currentContentFilter)
+			}
 			.sortedBy { it.title.lowercase() }
 	}
 
@@ -123,116 +158,184 @@ public fun SourcesCatalogScreen(
 				Icon(Icons.Filled.Search, contentDescription = FR_SOURCES_CATALOG)
 			}
 		}
-		// Chips « Toutes les langues ▾ / Nouveaux / Marque-pages »
-		Box(modifier = Modifier.fillMaxWidth()) {
-			LazyRow(
-				contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-				horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
-			) {
-				item {
-					FilterChip(
-						selected = false,
-						onClick = { languageMenuOpen = true },
-						label = { Text(selectedLocale?.let { localeLabel(it) } ?: FR_ALL_LANGUAGES) },
-						leadingIcon = {
-							Icon(
-								imageVector = Icons.Filled.Translate,
-								contentDescription = null,
-								tint = MaterialTheme.colorScheme.onSurfaceVariant,
-							)
-						},
-						trailingIcon = {
-							Icon(
-								imageVector = Icons.Filled.ArrowDropDown,
-								contentDescription = null,
-								modifier = Modifier.size(18.dp),
-							)
-						},
-						colors = FilterChipDefaults.filterChipColors(
-							containerColor = MaterialTheme.colorScheme.surfaceContainer,
-						),
-					)
-				}
-				item {
-					FilterChip(
-						selected = newestOnly,
-						onClick = { newestOnly = !newestOnly },
-						label = { Text(FR_NEWEST) },
-						leadingIcon = {
-							// icône horloge comme la capture (chip « Nouveaux »)
-							Icon(
-								imageVector = Icons.Outlined.History,
-								contentDescription = null,
-								modifier = Modifier.size(18.dp),
-							)
-						},
-						colors = FilterChipDefaults.filterChipColors(
-							containerColor = MaterialTheme.colorScheme.surfaceContainer,
-						),
-					)
-				}
+		// Chips : langue ▾ + « Nouveaux » + catégories (« Mangas », « Hentais », « Comics »…)
+		LazyRow(
+			contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+			horizontalArrangement = Arrangement.spacedBy(8.dp),
+		) {
+			item {
+				FilterChip(
+					selected = false,
+					onClick = { languageMenuOpen = true },
+					label = { Text(selectedLocale?.let { localeLabel(it) } ?: FR_ALL_LANGUAGES) },
+					leadingIcon = {
+						Icon(
+							imageVector = Icons.Filled.Translate,
+							contentDescription = null,
+							tint = MaterialTheme.colorScheme.onSurfaceVariant,
+						)
+					},
+					trailingIcon = {
+						Icon(
+							imageVector = Icons.Filled.ArrowDropDown,
+							contentDescription = null,
+							modifier = Modifier.size(18.dp),
+						)
+					},
+					colors = FilterChipDefaults.filterChipColors(
+						containerColor = MaterialTheme.colorScheme.surfaceContainer,
+					),
+				)
 			}
-			// Menu des langues (capture : Toutes les langues, Langues diverses, Français, …)
-			if (languageMenuOpen) {
-				Box(
-					modifier = Modifier
-						.fillMaxWidth()
-						.background(MaterialTheme.colorScheme.surfaceContainerHigh),
-				) {
-					Column(
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(vertical = 8.dp),
-					) {
-						LanguageMenuItem(FR_ALL_LANGUAGES) {
-							selectedLocale = null
-							languageMenuOpen = false
-						}
-						LanguageMenuItem(FR_MISC_LANGUAGES) {
-							selectedLocale = ""
-							languageMenuOpen = false
-						}
-						for (locale in availableLocales) {
-							LanguageMenuItem(localeLabel(locale)) {
-								selectedLocale = locale
-								languageMenuOpen = false
-							}
-						}
-					}
-				}
+			item {
+				FilterChip(
+					selected = newestOnly,
+					onClick = { newestOnly = !newestOnly },
+					label = { Text(FR_NEWEST) },
+					leadingIcon = {
+						// icône horloge comme la capture (chip « Nouveaux »)
+						Icon(
+							imageVector = Icons.Outlined.History,
+							contentDescription = null,
+							modifier = Modifier.size(18.dp),
+						)
+					},
+					colors = FilterChipDefaults.filterChipColors(
+						containerColor = MaterialTheme.colorScheme.surfaceContainer,
+					),
+				)
+			}
+			items(CatalogContentFilter.entries.toList(), key = { it.name }) { filter ->
+				FilterChip(
+					selected = contentFilter == filter,
+					onClick = { contentFilter = if (contentFilter == filter) null else filter },
+					label = { Text(contentFilterLabel(filter)) },
+					colors = FilterChipDefaults.filterChipColors(
+						containerColor = MaterialTheme.colorScheme.surfaceContainer,
+					),
+				)
 			}
 		}
-		if (filtered.isEmpty()) {
-			EmptyStateScreen(
-				illustration = TotoroIllustration.FEED, // ic_empty_feed comme SourcesCatalogViewModel
-				textPrimary = FR_TEXT_EMPTY_HOLDER_PRIMARY,
+		if (languageMenuOpen) {
+			// Menu de langues PLEIN ÉCRAN (vidéo t≈2:30) : liste natives + « Langues diverses »
+			LanguageMenuOverlay(
+				locales = availableLocales,
+				selectedLocale = selectedLocale,
+				onSelect = { locale ->
+					selectedLocale = locale
+					languageMenuOpen = false
+				},
 			)
 		} else {
-			LazyColumn(modifier = Modifier.fillMaxSize()) {
-				items(filtered, key = { it.name }) { source ->
-					SourceCatalogRow(
-						source = source,
-						domain = domainOf(source),
-						added = isAdded(source),
-						onClick = { onSourceClick(source) },
-						onToggle = { onSourceToggle(source) },
-					)
-					HorizontalDivider(
-						color = MaterialTheme.colorScheme.outlineVariant,
-						thickness = 0.5.dp,
-					)
+			// Compteur de sources disponibles du catalogue (vidéo : « Disponible : 596 »)
+			Text(
+				text = FR_AVAILABLE_COUNT + allSources.size,
+				style = MaterialTheme.typography.labelMedium,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+				modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+			)
+			if (filtered.isEmpty()) {
+				EmptyStateScreen(
+					illustration = TotoroIllustration.FEED, // ic_empty_feed comme SourcesCatalogViewModel
+					textPrimary = FR_EMPTY_SOURCES_CATALOG_TITLE,
+					textSecondary = FR_EMPTY_SOURCES_CATALOG_TEXT,
+				)
+			} else {
+				LazyColumn(modifier = Modifier.fillMaxSize()) {
+					items(filtered, key = { it.name }) { source ->
+						SourceCatalogRow(
+							source = source,
+							domain = domainOf(source),
+							added = isSourceAdded(source, appSettings, hiddenSources, isAdded),
+							onClick = { onSourceClick(source) },
+							onToggle = { toggleSource(source, appSettings) { onSourceToggle(source) }; hiddenRevision++ },
+						)
+						HorizontalDivider(
+							color = MaterialTheme.colorScheme.outlineVariant,
+							thickness = 0.5.dp,
+						)
+					}
 				}
 			}
 		}
 	}
 }
 
+/** Décide de l'état « installée » : appSettings.hiddenSources si fourni, sinon [isAdded]. */
+private fun isSourceAdded(
+	source: MangaParserSource,
+	appSettings: AppSettings?,
+	hiddenSources: Set<String>,
+	isAdded: (MangaParserSource) -> Boolean,
+): Boolean = if (appSettings != null) {
+	source.name !in hiddenSources
+} else {
+	isAdded(source)
+}
+
+/** Toggle du bouton + : écrit directement dans appSettings.hiddenSources si [appSettings] != null. */
+private inline fun toggleSource(
+	source: MangaParserSource,
+	appSettings: AppSettings?,
+	fallback: () -> Unit,
+) {
+	if (appSettings != null) {
+		val hidden = appSettings.hiddenSources
+		appSettings.hiddenSources = if (source.name in hidden) {
+			hidden - source.name
+		} else {
+			hidden + source.name
+		}
+	} else {
+		fallback()
+	}
+}
+
+/** Menu de langues plein écran : « Toutes les langues », langues natives triées, « Langues diverses ». */
 @Composable
-private fun LanguageMenuItem(label: String, onClick: () -> Unit) {
+private fun LanguageMenuOverlay(
+	locales: List<String>,
+	selectedLocale: String?,
+	onSelect: (String?) -> Unit,
+) {
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.background(MaterialTheme.colorScheme.surfaceContainerHigh),
+	) {
+		LazyColumn(modifier = Modifier.fillMaxSize()) {
+			item(key = "__all") {
+				LanguageMenuItem(
+					label = FR_ALL_LANGUAGES,
+					selected = selectedLocale == null,
+				) { onSelect(null) }
+			}
+			items(locales, key = { it }) { locale ->
+				LanguageMenuItem(
+					label = localeLabel(locale),
+					selected = selectedLocale == locale,
+				) { onSelect(locale) }
+			}
+			item(key = "__misc") {
+				LanguageMenuItem(
+					label = FR_MISC_LANGUAGES,
+					selected = selectedLocale == "",
+				) { onSelect("") }
+			}
+		}
+	}
+}
+
+@Composable
+private fun LanguageMenuItem(label: String, selected: Boolean, onClick: () -> Unit) {
 	Text(
 		text = label,
 		style = MaterialTheme.typography.bodyLarge,
-		color = MaterialTheme.colorScheme.onSurface,
+		color = if (selected) {
+			MaterialTheme.colorScheme.primary
+		} else {
+			MaterialTheme.colorScheme.onSurface
+		},
 		modifier = Modifier
 			.fillMaxWidth()
 			.clickable(onClick = onClick)
@@ -305,8 +408,8 @@ private fun SourceCatalogRow(
 		)
 		IconButton(onClick = onToggle) {
 			Icon(
-				imageVector = Icons.Filled.Add,
-				contentDescription = if (added) "Retirer" else "Ajouter",
+				imageVector = if (added) Icons.Filled.Check else Icons.Filled.Add,
+				contentDescription = if (added) FR_ACTION_REMOVE else FR_ACTION_ADD,
 				tint = MaterialTheme.colorScheme.onSurface,
 			)
 		}
@@ -318,6 +421,30 @@ private fun contentTypeLabel(source: MangaParserSource): String = when (source.c
 	ContentType.HENTAI -> FR_CONTENT_TYPE_HENTAI
 	else -> FR_CONTENT_TYPE_MANGA
 }
+
+/** Libellé des chips de catégorie (vidéo t≈9:35). */
+private fun contentFilterLabel(filter: CatalogContentFilter): String = when (filter) {
+	CatalogContentFilter.MANGAS -> FR_CONTENT_TYPE_MANGA
+	CatalogContentFilter.HENTAIS -> FR_CONTENT_TYPE_HENTAI
+	CatalogContentFilter.COMICS -> FR_CONTENT_COMICS
+	CatalogContentFilter.AUTRE -> FR_CONTENT_OTHER
+	CatalogContentFilter.MANHWA -> FR_CONTENT_MANHWA
+}
+
+/** Filtre par catégorie, déduit des métadonnées du parser (ContentType de la source). */
+private fun matchesContentFilter(source: MangaParserSource, filter: CatalogContentFilter): Boolean =
+	when (filter) {
+		CatalogContentFilter.MANGAS -> source.contentType == ContentType.MANGA
+		CatalogContentFilter.HENTAIS -> source.contentType == ContentType.HENTAI
+		CatalogContentFilter.COMICS -> source.contentType == ContentType.COMICS
+		CatalogContentFilter.MANHWA -> source.contentType == ContentType.MANHWA
+		CatalogContentFilter.AUTRE -> source.contentType !in setOf(
+			ContentType.MANGA,
+			ContentType.MANHWA,
+			ContentType.HENTAI,
+			ContentType.COMICS,
+		)
+	}
 
 /** Libellé de langue dans sa propre langue (« Русский », « Français »…). */
 private fun localeLabel(locale: String): String {

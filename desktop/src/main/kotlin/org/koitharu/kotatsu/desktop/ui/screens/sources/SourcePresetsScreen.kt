@@ -9,6 +9,11 @@
  *
  * Les données sont injectées : [suggestions] (List<Manga>), [sources] (List<MangaParserSource>),
  * [domainOf] (favicon URL, déjà disponible via AppContainer.domainOf).
+ *
+ * 2026-11-08 — phase P3 : créateur de préréglages (vidéo t≈5:30) — action « Nouveau préréglage »
+ * dans le menu ⋮ ouvrant PresetCreatorDialog ; l'enregistrement persiste via [presetsDao]
+ * (SourcePresetsDao Room, même backend que côté Android — passer container.database.
+ * getSourcePresetsDao() depuis Main.kt).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.sources
 
@@ -48,6 +53,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +68,8 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import coil3.request.crossfade
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koitharu.kotatsu.desktop.ui.components.TopSearchBar
 import org.koitharu.kotatsu.desktop.ui.components.TopSearchMenuAction
 import org.koitharu.kotatsu.desktop.ui.strings.FR_BOOKMARKS
@@ -77,12 +85,17 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_SETTINGS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCE_PRESETS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_TEXT_EMPTY_HOLDER_PRIMARY
+import org.koitharu.kotatsu.explore.data.SourcePresetsDao
+import org.koitharu.kotatsu.explore.data.SourcePresetEntity
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 
 private val QUICK_BUTTON_HEIGHT = 64.dp
 private val QUICK_BUTTON_CORNER = 32.dp
 private val SOURCE_FAVICON_SIZE = 64.dp
+
+// Chaîne FR locale (phase P3) — ne pas déplacer dans Fr.kt (réservé à l'agent UI FR)
+private const val FR_NEW_PRESET = "Nouveau préréglage"
 
 /** Boutons rapides de l'onglet Source (captures de référence). */
 public enum class SourceQuickAction {
@@ -96,7 +109,8 @@ public enum class SourceQuickAction {
 /**
  * Onglet « Source ». @param suggestions mangas suggérés (pager) ; @param sources sources à
  * afficher dans « Sources des mangas » ; @param hasNewChapters ajoute le marqueur 🔥 (nouveaux
- * chapitres) devant le nom de la source.
+ * chapitres) devant le nom de la source ; @param presetsDao si non null, le créateur de
+ * préréglages (« Nouveau préréglage » du menu ⋮) persiste dans la table source_presets.
  */
 @Composable
 public fun SourcePresetsScreen(
@@ -114,13 +128,44 @@ public fun SourcePresetsScreen(
 	onSettingsClick: () -> Unit,
 	onManageSourcesClick: () -> Unit,
 	modifier: Modifier = Modifier,
+	presetsDao: SourcePresetsDao? = null,
 ) {
 	var incognito by remember { mutableStateOf(false) }
+	var showPresetCreator by remember { mutableStateOf(false) }
+	val scope = rememberCoroutineScope()
+
+	if (showPresetCreator) {
+		PresetCreatorDialog(
+			onDismiss = { showPresetCreator = false },
+			onSave = { title, languages ->
+				showPresetCreator = false
+				val dao = presetsDao
+				if (dao != null) {
+					scope.launch(Dispatchers.IO) {
+						runCatching {
+							dao.insert(
+								SourcePresetEntity(
+									presetId = 0L, // autoGenerate
+									title = title,
+									languages = languages.joinToString(","),
+									sources = "",
+									createdAt = System.currentTimeMillis(),
+									sortKey = dao.getNextSortKey(),
+									deletedAt = 0L,
+								),
+							)
+						}
+					}
+				}
+			},
+		)
+	}
 
 	Column(modifier = modifier.fillMaxSize()) {
 		TopSearchBar(
 			onSearchClick = onSearchClick,
 			menuActions = listOf(
+				TopSearchMenuAction(FR_NEW_PRESET, { showPresetCreator = true }),
 				TopSearchMenuAction(FR_SOURCE_PRESETS, { onQuickAction(SourceQuickAction.SOURCE_PRESETS) }),
 				TopSearchMenuAction(FR_MANAGE_SOURCES, onManageSourcesClick),
 				TopSearchMenuAction(

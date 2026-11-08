@@ -34,6 +34,17 @@ Vérifications finales : `:desktop:build :core:build` EXIT=0 · checklist P2 à 
 E2E « Ajouter Marque-pages au rail » validé. Restes hors périmètre documentés (tri favoris P8,
 miniatures/temps/connexes P8).
 
+## Phase P3 — Sources (2026-11-08, en cours)
+
+Journal détaillé : `docs/P3_JOURNAL.md`. Spécification : `../video-analysis/half1-inventory.md`
+(lignes 46-64 + moitié 2 t≈9:35-9:45). Main.kt **réservé au principal** (routage en intégration) ;
+chaînes en constantes privées dans les fichiers de chaque agent (Fr.kt interdit aux deux).
+
+| Lot | Agent | Périmètre exclusif | Critères de fin |
+|---|---|---|---|
+| **P3-A racine Sources + Gérer les sources** | agent P3-A | nouveaux `ui/screens/sources/SourcesSettingsScreen.kt` + `ManageSourcesScreen.kt`, `core/prefs/AppSettings.kt` (si nouvelle clé) | Écran racine « Sources des mangas » avec menu ⋮ exact (Ordre de tri, Afficher en vue grille, Gérer les sources, Sources catalogue — Disponible : N, Activer toutes les sources de mangas, Choisir le miroir automatiquement, Gérer les liens) ; « Gérer les sources » : liste icône+nom+« Catégorie, Langue »+menu ⋮ par ligne+œil barré, recherche, menu global (« Désactiver le contenu explicite », « Tout désactiver »), toggle → `hiddenSources`, tri `sourcesOrder` ; compile OK |
+| **P3-B catalogue + installables + préréglages + liens** | agent P3-B | `SourcesCatalogScreen.kt`, `SourcePresetsScreen.kt`, nouveau `ManageLinksScreen.kt` (+ dialog créateur de préréglages) | Catalogue : chips conformes vidéo (« Toutes les langues ▾ / Nouveaux / Mangas / Hentais / Comics / Autre / Manhwa »), menu langues plein écran, état vide FR exact, « Disponible : N », bouton **+** fonctionnel (toggle `hiddenSources`) ; créateur de préréglages (« Nouveau préréglage », chips de langues, « Enregistrer » désactivé tant que vide) ; « Gérer les liens » (adaptation desktop documentée) ; compile OK |
+
 ## Notes d'environnement
 
 - **RÈGLE DE TEST (consigne client, 2026-11-08) : avant CHAQUE test/lancement de l'app, effacer
