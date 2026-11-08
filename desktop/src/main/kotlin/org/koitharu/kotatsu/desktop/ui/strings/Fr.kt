@@ -3,6 +3,8 @@
  * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-06 — chaînes de l'UI
  * desktop en français, reprises mot pour mot de app/src/main/res/values-fr/strings.xml de
  * l'app d'origine et des captures de référence. Chaque constante cite sa clé d'origine.
+ * Modification : 2026-11-08 — phase P2 : chaînes de la section « Thème » de l'écran
+ * Apparence (libellés exacts des captures frames 9-25 de la vidéo).
  */
 package org.koitharu.kotatsu.desktop.ui.strings
 
@@ -215,7 +217,7 @@ public const val FR_LIST_BADGES: String = "Badges dans les listes"
 public const val FR_LIST_BADGES_SUMMARY: String = "Mangas sauvegardés, Favoris"
 public const val FR_COLLAPSE_LONG_DESCRIPTION: String = "Réduire la description longue"
 public const val FR_PAGES_THUMBNAILS: String = "Afficher les miniatures des pages"
-public const val FR_PAGES_THUMBNAILS_SUMMARY: String = "Active l'onglet « Pages » sur l'écran de détails"
+public const val FR_PAGES_THUMBNAILS_SUMMARY: String = "Active l'onglet \"Pages\" sur l'écran de détails"
 public const val FR_DEFAULT_TAB: String = "Onglet par défaut"
 public const val FR_DEFAULT_TAB_SUMMARY: String = "Dernière utilisation"
 public const val FR_READING_TIME: String = "Afficher le temps de lecture estimé"
@@ -238,6 +240,24 @@ public const val FR_MAIN_SECTIONS: String = "Principales sections de l'écran"
 public const val FR_ADD: String = "Ajouter"
 public const val FR_LANGUAGE: String = "Langue"
 public const val FR_LANGUAGE_SUMMARY: String = "Suivre le système (français seul sur desktop)"
+// Dialog « Ajouter » de « Principales sections de l'écran » (capture ~2:07) :
+// « Sur l'appareil, Suggestions, Mis à jour, Marque-pages »
+public const val FR_ON_DEVICE: String = "Sur l'appareil" // libellé du dialog sections (Nav LOCAL)
+public const val FR_UPDATES: String = "Mis à jour" // updated (dialog sections, écran P4)
+// Adaptations desktop — libellés divergents, documentés dans docs/UI_DIVERGENCES.md
+public const val FR_EXIT_CONFIRMATION_SUMMARY: String =
+	"Demander confirmation avant de fermer la fenêtre (desktop)" // origine : « Appuyez deux fois sur la touche Retour pour quitter l'appli »
+public const val FR_RECENT_SHORTCUTS_SUMMARY: String =
+	"Geste long-press de l'icône Android, sans équivalent sur desktop" // origine : « Rendre les mangas récents disponibles en appuyant longuement sur l'icône de l'application »
+// Section « Thème » de l'écran Apparence (captures frames 9-25)
+public const val FR_THEME: String = "Thème" // pref_sections_theme
+public const val FR_COLOR_SCHEME: String = "Schéma de couleurs" // color_scheme (values-fr)
+public const val FR_FOLLOW_SYSTEM: String = "Suivre le système" // follow_system (values-fr)
+public const val FR_LIGHT: String = "Clair" // theme_light (values-fr)
+public const val FR_DARK: String = "Sombre" // theme_dark (values-fr)
+public const val FR_AMOLED: String = "Noir" // dark_amoled (capture)
+public const val FR_AMOLED_SUMMARY: String =
+	"Utilise moins d'énergie pour les écrans AMOLED" // dark_amoled_summary (values-fr)
 // Confirmation de sortie (dialog desktop, adaptation de « Appuyez deux fois sur la touche Retour »)
 public const val FR_EXIT_DIALOG_TITLE: String = "Quitter Kotatsu ?"
 public const val FR_EXIT_DIALOG_CONFIRM: String = "Quitter"

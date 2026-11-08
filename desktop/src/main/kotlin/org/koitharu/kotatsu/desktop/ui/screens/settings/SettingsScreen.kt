@@ -8,6 +8,10 @@
  * désactivées), Navigation (bouton flottant Continuer et Confirmation de sortie câblés ;
  * Principales sections de l'écran → écran dédié). Les réglages de liste s'appliquent à
  * l'historique/favoris via les préférences core (mêmes clés KEY_* que l'original).
+ * Modification : 2026-11-08 — phase P2 : section « Thème » traduite en français, rangée
+ * horizontale de cartes de palette pour « Schéma de couleurs » (ColorSchemeCardsRow,
+ * frames 1:40-2:25) à la place des rangées radio, libellés FR pour le mode de thème et
+ * l'option AMOLED (« Noir »). Logique setThemeMode/setColorScheme/setAmoled inchangée.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -51,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.core.prefs.ListMode
 import org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode
+import org.koitharu.kotatsu.desktop.ui.components.preferences.ColorSchemeCardsRow
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceCategoryHeader
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceDivider
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceRow
@@ -58,17 +63,24 @@ import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceSwitchRo
 import org.koitharu.kotatsu.desktop.ui.components.preferences.RadioDialog
 import org.koitharu.kotatsu.desktop.ui.settings.DesktopSettings
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute
+import org.koitharu.kotatsu.desktop.ui.strings.FR_AMOLED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_AMOLED_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_APPEARANCE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_APPEARANCE_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_COLLAPSE_LONG_DESCRIPTION
+import org.koitharu.kotatsu.desktop.ui.strings.FR_COLOR_SCHEME
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DARK
 import org.koitharu.kotatsu.desktop.ui.strings.FR_DEFAULT_TAB
 import org.koitharu.kotatsu.desktop.ui.strings.FR_DEFAULT_TAB_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_EXIT_CONFIRMATION
+import org.koitharu.kotatsu.desktop.ui.strings.FR_EXIT_CONFIRMATION_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_FLOATING_CONTINUE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_FLOATING_CONTINUE_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FOLLOW_SYSTEM
 import org.koitharu.kotatsu.desktop.ui.strings.FR_GRID_SIZE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_LANGUAGE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_LANGUAGE_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_LIGHT
 import org.koitharu.kotatsu.desktop.ui.strings.FR_LIST_BADGES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_LIST_BADGES_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_LIST_MODE
@@ -86,25 +98,16 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_QUICK_FILTERS_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_READING_TIME
 import org.koitharu.kotatsu.desktop.ui.strings.FR_READING_TIME_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_RECENT_SHORTCUTS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_RECENT_SHORTCUTS_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_RELATED_MANGA
 import org.koitharu.kotatsu.desktop.ui.strings.FR_RELATED_MANGA_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SEARCH_SUGGESTIONS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SEARCH_SUGGESTIONS_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_THEME
 import org.koitharu.kotatsu.desktop.ui.strings.frListModeLabel
 import org.koitharu.kotatsu.desktop.ui.strings.frProgressModeLabel
 import org.koitharu.kotatsu.desktop.ui.theme.ThemeMode
-
-private val SCHEME_TITLES = mapOf(
-	"DEFAULT" to "Totoro",
-	"ASUKA" to "Asuka",
-	"MION" to "Mion",
-	"RIKKA" to "Rikka",
-	"SAKURA" to "Sakura",
-	"MAMIMI" to "Mamimi",
-	"KANADE" to "Kanade",
-	"ITSUKA" to "Itsuka",
-	"MIKU" to "Miku",
-)
+import org.koitharu.kotatsu.desktop.ui.theme.isDarkTheme
 
 @Composable
 public fun AppearanceSettingsScreen(
@@ -173,27 +176,43 @@ private fun AppearanceSettingsContent(
 		// --- Thème ---
 		item {
 			Text(
-				text = "Theme",
+				text = FR_THEME,
 				style = MaterialTheme.typography.titleSmall,
 				color = MaterialTheme.colorScheme.primary,
 				modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
 			)
 		}
-		items(listOf("SYSTEM", "LIGHT", "DARK")) { mode ->
-			val selected = settings.themeMode.value == ThemeMode.valueOf(mode)
+		item {
+			// Schéma de couleurs : rangée horizontale scrollable de cartes de palette
+			Text(
+				text = FR_COLOR_SCHEME,
+				style = MaterialTheme.typography.bodyLarge,
+				color = MaterialTheme.colorScheme.onSurface,
+				modifier = Modifier.padding(horizontal = 16.dp),
+			)
+			ColorSchemeCardsRow(
+				selected = settings.colorScheme.value,
+				dark = isDarkTheme(settings.themeMode.value),
+				onSelect = { settings.setColorScheme(it) },
+				modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+			)
+			PreferenceDivider()
+		}
+		items(ThemeMode.entries) { mode ->
+			val selected = settings.themeMode.value == mode
 			Row(
 				modifier = Modifier
 					.fillMaxWidth()
-					.clickable { settings.setThemeMode(ThemeMode.valueOf(mode)) }
+					.clickable { settings.setThemeMode(mode) }
 					.padding(horizontal = 16.dp, vertical = 4.dp),
 				verticalAlignment = Alignment.CenterVertically,
 			) {
-				RadioButton(selected = selected, onClick = { settings.setThemeMode(ThemeMode.valueOf(mode)) })
+				RadioButton(selected = selected, onClick = { settings.setThemeMode(mode) })
 				Text(
 					text = when (mode) {
-						"SYSTEM" -> "Follow system"
-						"LIGHT" -> "Light"
-						else -> "Dark"
+						ThemeMode.SYSTEM -> FR_FOLLOW_SYSTEM
+						ThemeMode.LIGHT -> FR_LIGHT
+						ThemeMode.DARK -> FR_DARK
 					},
 					style = MaterialTheme.typography.bodyLarge,
 					color = MaterialTheme.colorScheme.onSurface,
@@ -207,43 +226,24 @@ private fun AppearanceSettingsContent(
 					.padding(horizontal = 16.dp, vertical = 8.dp),
 				verticalAlignment = Alignment.CenterVertically,
 			) {
-				Text(
-					text = "AMOLED theme",
-					style = MaterialTheme.typography.bodyLarge,
-					color = MaterialTheme.colorScheme.onSurface,
-					modifier = Modifier.weight(1f),
-				)
+				Column(modifier = Modifier.weight(1f)) {
+					Text(
+						text = FR_AMOLED,
+						style = MaterialTheme.typography.bodyLarge,
+						color = MaterialTheme.colorScheme.onSurface,
+					)
+					Text(
+						text = FR_AMOLED_SUMMARY,
+						style = MaterialTheme.typography.bodyMedium,
+						color = MaterialTheme.colorScheme.onSurfaceVariant,
+					)
+				}
 				Switch(
 					checked = settings.isAmoled.value,
 					onCheckedChange = { settings.setAmoled(it) },
 				)
 			}
 			PreferenceDivider()
-		}
-		item {
-			Text(
-				text = "Color scheme",
-				style = MaterialTheme.typography.titleSmall,
-				color = MaterialTheme.colorScheme.primary,
-				modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-			)
-		}
-		items(listOf("DEFAULT", "ASUKA", "MION", "RIKKA", "SAKURA", "MAMIMI", "KANADE", "ITSUKA", "MIKU")) { scheme ->
-			val selected = settings.colorScheme.value == scheme
-			Row(
-				modifier = Modifier
-					.fillMaxWidth()
-					.clickable { settings.setColorScheme(scheme) }
-					.padding(horizontal = 16.dp, vertical = 4.dp),
-				verticalAlignment = Alignment.CenterVertically,
-			) {
-				RadioButton(selected = selected, onClick = { settings.setColorScheme(scheme) })
-				Text(
-					text = SCHEME_TITLES[scheme] ?: scheme,
-					style = MaterialTheme.typography.bodyLarge,
-					color = MaterialTheme.colorScheme.onSurface,
-				)
-			}
 		}
 		item {
 			// Langue : l'app desktop est FR seule (divergence documentée)
@@ -379,7 +379,7 @@ private fun AppearanceSettingsContent(
 			PreferenceSwitchRow(
 				icon = Icons.Outlined.ExitToApp,
 				title = FR_EXIT_CONFIRMATION,
-				subtitle = "Demander confirmation avant de fermer la fenêtre (desktop)",
+				subtitle = FR_EXIT_CONFIRMATION_SUMMARY,
 				checked = exitConfirmation,
 				onCheckedChange = {
 					exitConfirmation = it
@@ -395,7 +395,7 @@ private fun AppearanceSettingsContent(
 			PreferenceRow(
 				icon = Icons.Outlined.Info,
 				title = FR_RECENT_SHORTCUTS,
-				subtitle = "Geste long-press de l'icône Android, sans équivalent sur desktop",
+				subtitle = FR_RECENT_SHORTCUTS_SUMMARY,
 				enabled = false,
 			)
 			PreferenceRow(

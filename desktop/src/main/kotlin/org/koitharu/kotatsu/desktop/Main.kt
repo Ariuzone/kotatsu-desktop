@@ -1,6 +1,9 @@
 /*
  * Fichier modifié — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
- * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation Compose Desktop.
+ * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation Compose
+ * Desktop ; 2026-11-08 — phase P2 : entrées « Options de liste » des menus ⋮ Historique/Favoris
+ * ouvrant la ListOptionsSheet (état partagé ListOptionsState, appliqué en direct à AppSettings),
+ * tri de l'historique (« Dernier lu » / « Par nom ») et réglages liste/grille appliqués aux Favoris.
  *
  * Fenêtre principale — reproduit la mise en page « tablette/desktop » de l'app Android
  * (rail de navigation latéral + volet de contenu), cf. activity_main.xml + navigation_rail_fab.xml.
@@ -50,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import org.koitharu.kotatsu.core.APP_VERSION_NAME
+import org.koitharu.kotatsu.desktop.ui.components.ListOptionsSheet
+import org.koitharu.kotatsu.desktop.ui.components.ListOptionsState
 import org.koitharu.kotatsu.desktop.ui.nav.NavItem
 import org.koitharu.kotatsu.desktop.ui.screens.history.HistoryItem
 import org.koitharu.kotatsu.desktop.ui.strings.FR_HISTORY
@@ -150,6 +155,10 @@ private fun MainScreen(container: AppContainer) {
 	var showSearch by remember { mutableStateOf(false) }
 	var showDownloads by remember { mutableStateOf(false) }
 	var showSourcesCatalog by remember { mutableStateOf(false) }
+	// Options de liste (P2) : bottom sheet ouverte depuis le menu ⋮ Historique/Favoris ;
+	// état partagé pour que les écrans se recomposent dès qu'une valeur change.
+	var showListOptions by remember { mutableStateOf(false) }
+	val listOptions = remember { ListOptionsState(container.appSettings) }
 	var incognito by remember {
 		mutableStateOf(container.appSettings.isIncognitoModeEnabled)
 	}
@@ -474,13 +483,28 @@ private fun MainScreen(container: AppContainer) {
 									)
 								}
 							}
+							// « Ordre de tri » de la bottom sheet Options de liste (P2) :
+							// « Dernier lu » = ordre du DAO (date de dernière lecture décroissante),
+							// « Par nom » = tri alphabétique insensible à la casse.
+							val sortedHistory = remember(historyItems, listOptions.sortOrder) {
+								if (listOptions.sortOrder == org.koitharu.kotatsu.parsers.model.SortOrder.ALPHABETICAL) {
+									historyItems.sortedBy { it.manga.title.lowercase() }
+								} else {
+									historyItems
+								}
+							}
 							org.koitharu.kotatsu.desktop.ui.screens.history.HistoryScreen(
-								historyItems = historyItems,
-								listMode = container.appSettings.listMode,
-								gridSize = container.appSettings.gridSize,
+								historyItems = sortedHistory,
+								listMode = listOptions.listMode,
+								gridSize = listOptions.gridSize,
 								progressMode = container.appSettings.progressIndicators,
 								isBadgesEnabled = container.appSettings.isListBadgesEnabled,
+								// « Groupe » : les en-têtes de dates n'ont de sens qu'en tri « Dernier lu »
+								// (tri alphabétique ⇒ liste plate, comme le comportement d'origine).
+								isGroupingEnabled = listOptions.isGroupingEnabled &&
+									listOptions.sortOrder != org.koitharu.kotatsu.parsers.model.SortOrder.ALPHABETICAL,
 								favouriteUrls = favouriteUrls,
+								onListOptionsClick = { showListOptions = true },
 								onMangaClick = { selectedManga = it },
 								onContinueClick = { item ->
 									// « Continue reading » : retrouve le chapitre courant via la source
@@ -528,7 +552,10 @@ private fun MainScreen(container: AppContainer) {
 										.filter { category.id == -1L || it.favourite.categoryId.toLong() == category.id }
 										.map { it.manga.toManga(emptySet(), chapters = null) }
 								},
+								listMode = listOptions.listMode,
+								gridSize = listOptions.gridSize,
 								onMangaClick = { selectedManga = it },
+								onListOptionsClick = { showListOptions = true },
 							)
 						}
 
@@ -687,6 +714,13 @@ private fun MainScreen(container: AppContainer) {
 			}
 			}
 		}
+	}
+	// Bottom sheet « Options de liste » (P2) : ouverte depuis le menu ⋮ Historique/Favoris
+	if (showListOptions) {
+		ListOptionsSheet(
+			state = listOptions,
+			onDismiss = { showListOptions = false },
+		)
 	}
 	// Fenêtre lecteur (comme ReaderActivity d'origine : une fenêtre dédiée)
 	val request = readerRequest

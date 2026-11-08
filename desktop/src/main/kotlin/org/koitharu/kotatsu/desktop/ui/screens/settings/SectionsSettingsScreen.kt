@@ -6,6 +6,9 @@
  * du même nom. Adaptation desktop : boutons flèche ↑/↓ à la place du geste de glissement
  * (divergence documentée dans docs/UI_DIVERGENCES.md). Ordre persisté via
  * AppSettings.mainSections (clé main_sections_order) et appliqué au rail immédiatement.
+ * Modification : 2026-11-08 — phase P2 : dialog « Ajouter » aligné sur la capture (~2:07) :
+ * options exactes « Sur l'appareil, Suggestions, Mis à jour, Marque-pages » + « Annuler » ;
+ * « Suggestions » et « Mis à jour » affichées mais désactivées (écrans portés en P4).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -23,6 +26,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -43,8 +47,12 @@ import org.koitharu.kotatsu.desktop.ui.nav.NavItem
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceDivider
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
 import org.koitharu.kotatsu.desktop.ui.strings.FR_ADD
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BOOKMARKS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CANCEL
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MAIN_SECTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ON_DEVICE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_UPDATES
 import org.koitharu.kotatsu.desktop.ui.strings.frNavItemLabel
 
 @Composable
@@ -152,41 +160,53 @@ public fun SectionsSettingsScreen(
 	}
 
 	if (showAddDialog) {
-		// Sections disponibles non affichées (l'app d'origine propose aussi « Suggestions »
-		// et « Mis à jour », écrans portés en P4)
-		val missing = NavItem.entries.filter { it.name !in sections }
+		// Options exactes du dialog Android (capture ~2:07) : « Sur l'appareil, Suggestions,
+		// Mis à jour, Marque-pages ». « Suggestions » et « Mis à jour » (écrans P4) sont
+		// affichées mais désactivées, faute d'écran associé sur desktop (divergence documentée).
+		val addOptions: List<Pair<String, NavItem?>> = listOf(
+			FR_ON_DEVICE to NavItem.LOCAL,
+			FR_SUGGESTIONS to null,
+			FR_UPDATES to null,
+			FR_BOOKMARKS to NavItem.BOOKMARKS,
+		)
 		AlertDialog(
 			onDismissRequest = { showAddDialog = false },
 			title = { Text(text = FR_ADD) },
 			text = {
 				Column {
-					if (missing.isEmpty()) {
+					if (addOptions.none { (_, item) -> item != null && item.name !in sections }) {
 						Text(
 							text = "Toutes les sections disponibles sont déjà affichées",
 							style = MaterialTheme.typography.bodyMedium,
 							color = MaterialTheme.colorScheme.onSurfaceVariant,
 						)
 					}
-					missing.forEach { item ->
+					addOptions.forEach { (label, item) ->
+						val alreadyShown = item != null && item.name in sections
+						val enabled = item != null && !alreadyShown
 						Row(
 							modifier = Modifier
 								.fillMaxWidth()
-								.clickable {
-									persist(sections + item.name)
+								.clickable(enabled = enabled) {
+									item?.let {
+										persist(sections + it.name)
+									}
 									showAddDialog = false
 								}
 								.padding(vertical = 10.dp),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
 							Icon(
-								imageVector = item.filledIcon,
+								imageVector = item?.filledIcon ?: Icons.Outlined.Info,
 								contentDescription = null,
-								tint = MaterialTheme.colorScheme.onSurfaceVariant,
+								tint = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant
+								else MaterialTheme.colorScheme.outline,
 							)
 							Text(
-								text = frNavItemLabel(item),
+								text = label,
 								style = MaterialTheme.typography.bodyLarge,
-								color = MaterialTheme.colorScheme.onSurface,
+								color = if (enabled) MaterialTheme.colorScheme.onSurface
+								else MaterialTheme.colorScheme.outline,
 								modifier = Modifier.padding(start = 16.dp),
 							)
 						}

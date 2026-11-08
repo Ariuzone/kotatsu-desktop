@@ -1,6 +1,8 @@
 /*
  * Fichier modifié — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
- * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation Compose Desktop.
+ * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation Compose
+ * Desktop ; 2026-11-08 — phase P2 : l'entrée « Options de liste » du menu ⋮ ouvre la
+ * ListOptionsSheet (callback onListOptionsClick, feuille hébergée par Main).
  *
  * Écran « Historique » — reproduit HistoryListFragment (fragment_list_simple.xml) :
  * barre de recherche pill + menu ⋮ (fidèle aux captures de référence ; menu = opt_history :
@@ -137,6 +139,7 @@ public fun HistoryScreen(
 	progressMode: ProgressIndicatorMode = ProgressIndicatorMode.PERCENT_READ,
 	isBadgesEnabled: Boolean = false,
 	favouriteUrls: Set<String> = emptySet(),
+	onListOptionsClick: (() -> Unit)? = null,
 	onClearHistory: (() -> Unit)? = null,
 	onSearchClick: () -> Unit = {},
 	onSettingsClick: () -> Unit = {},
@@ -151,7 +154,7 @@ public fun HistoryScreen(
 				if (onClearHistory != null) {
 					add(TopSearchMenuAction(FR_CLEAR_HISTORY, onClearHistory))
 				}
-				add(TopSearchMenuAction(label = FR_LIST_OPTIONS, onClick = { }))
+				add(TopSearchMenuAction(label = FR_LIST_OPTIONS, onClick = { onListOptionsClick?.invoke() }))
 				add(
 					TopSearchMenuAction(
 						label = FR_INCOGNITO_MODE,

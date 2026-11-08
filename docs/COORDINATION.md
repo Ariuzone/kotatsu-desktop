@@ -19,8 +19,27 @@
 
 *(vide)*
 
+## Phase P2 — Apparence complète (2026-11-08, **TERMINÉE**)
+
+Journal détaillé : `docs/P2_JOURNAL.md` (état hérité, itérations des agents, captures, bilan).
+Spécification : `../video-analysis/half1-inventory.md` (frames 1:40 → 2:25). Baseline `bfec3c2`.
+
+| Lot | Agent | Périmètre exclusif | Résultat |
+|---|---|---|---|
+| **P2-A parité Apparence** | agent P2-A | `SettingsScreen.kt`, `Fr.kt`, `ColorSchemeCards.kt` (nouveau), `SectionsSettingsScreen.kt`, `UI_DIVERGENCES.md` | ✅ Cartes de palette (vraies couleurs), Thème 100 % FR, dialog « Ajouter » aux 4 options exactes, revue libellé par libellé, 5 divergences documentées (#10-#14) |
+| **P2-B options de liste** | agent P2-B | `ListOptionsSheet.kt` (nouveau), `Main.kt`, `HistoryScreen.kt`, `FavouritesScreen.kt`, `BookmarksScreen.kt`, `AppSettings.kt` | ✅ Bottom sheet complète (segments/slider/tri/groupe) branchée Historique **et** Favoris, tri appliqué, groupement persisté (clé `history_grouping`), marque-pages FR |
+| **Captures** | agent (échec filtre) puis principal | — | ✅ 6 captures sur **app vierge** (règle client), vérifiées visuellement |
+
+Vérifications finales : `:desktop:build :core:build` EXIT=0 · checklist P2 à jour ·
+E2E « Ajouter Marque-pages au rail » validé. Restes hors périmètre documentés (tri favoris P8,
+miniatures/temps/connexes P8).
+
 ## Notes d'environnement
 
+- **RÈGLE DE TEST (consigne client, 2026-11-08) : avant CHAQUE test/lancement de l'app, effacer
+  les données utilisateur** — fermer l'app puis supprimer `%APPDATA%\Kotatsu` (kotatsu.db*,
+  settings.json, cookies.json, local/, okhttp-cache/) — et relancer : on teste TOUJOURS une app
+  vierge, comme une première ouverture. S'applique à tous les agents (captures, E2E, manuel).
 - Limite : **2 sous-agents simultanés** (passée de 1 à 2 en cours de projet) (« user concurrency limit exceeded » au-delà) → lots L2/L3/L4b/L5 séquencés.
 - JDK : Android Studio JBR 25 (`C:/Program Files/Android/Android Studio/jbr`), `JAVA_HOME` à exporter pour chaque commande Gradle.
 - Versions épinglées : Kotlin 2.2.10, CMP 1.9.0, Room 2.8.4 JVM, OkHttp 5.3.2, Coil 3.4.0, parsers JitPack 68f3fed395.

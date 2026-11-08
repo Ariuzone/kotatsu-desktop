@@ -1,6 +1,8 @@
 /*
  * Fichier modifié — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
- * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation JVM/desktop.
+ * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation JVM/desktop ;
+ * 2026-11-08 — phase P2 : préférence isHistoryGroupingEnabled (« Groupe » de la bottom sheet
+ * Options de liste, clé history_grouping).
  * Adaptation : façade desktop sur KeyValueStore (à la place de SharedPreferences) portant les
  * préférences P1. Les mêmes noms de clés KEY_* que l'original sont conservés quand ils existent.
  * Les préférences liées à l'UI Android (navigation, notifications, backups DocumentFile, WebView,
@@ -249,6 +251,15 @@ class AppSettings(
 		get() = store.getEnumValue(KEY_FAVORITES_ORDER, SortOrder.NEWEST)
 		set(value) = store.edit { putString(KEY_FAVORITES_ORDER, value.name) }
 
+	/**
+	 * « Groupe » (bottom sheet « Options de liste », P2) : regrouper l'historique par date de
+	 * dernière lecture. Aucune clé d'origine retrouvée côté Android (géré par le module list
+	 * non porté) — clé desktop dédiée, même style que les autres.
+	 */
+	var isHistoryGroupingEnabled: Boolean
+		get() = store.getBoolean(KEY_HISTORY_GROUPING, true)
+		set(value) = store.edit { putBoolean(KEY_HISTORY_GROUPING, value) }
+
 	val isRelatedMangaEnabled: Boolean
 		get() = store.getBoolean(KEY_RELATED_MANGA, true)
 
@@ -368,6 +379,7 @@ class AppSettings(
 		const val KEY_IMAGES_PROXY = "images_proxy_2"
 		const val KEY_LOCAL_LIST_ORDER = "local_order"
 		const val KEY_HISTORY_ORDER = "history_order"
+		const val KEY_HISTORY_GROUPING = "history_grouping"
 		const val KEY_FAVORITES_ORDER = "fav_order"
 		const val KEY_SOURCES_ORDER = "sources_sort_order"
 		const val KEY_RELATED_MANGA = "related_manga"
