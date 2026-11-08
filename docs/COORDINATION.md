@@ -92,12 +92,27 @@ crée ses chaînes dans `FrReader.kt` **après** la vague 2 (ou les demande au r
 | **P7-A cœur lecteur** | agent P7-A | `ui/screens/reader/ReaderScreen.kt`, `Main.kt` ReaderHost (autorisé pour ce lot), `core/prefs/AppSettings.kt` (méthodes par manga), `core/prefs/ReaderMode.kt` | Menu lecteur complet : Sauvegarder la page (export PNG), Ajouter un marque-page (BookmarksDao), Mode lecture segmenté 4 modes **mémorisé par manga**, Pages doubles paysage (bêta), Faire pivoter, chapitres préc./suiv. câblés, toast « Images masquées » ; itération 2 : intégration des composants P7-B ; compile OK |
 | **P7-B composants purs** | agent P7-B | nouveaux `ui/screens/reader/components/ColorCorrectionDialog.kt`, `AutoScrollDialog.kt`, `EraserTutorialDialog.kt` + `ui/strings/FrReader.kt` | Correction des couleurs (aperçu avant/après, Inverser/Niveaux de gris/Luminosité/Contraste/Fond jaunâtre/Réinitialiser + `Modifier.colorCorrection(state)`) ; Défilement automatique (dialog Activer + Vitesse xN slider + FAB flottant + état) ; Didacticiel gomme (« Passer ») + overlay gomme générique (callbacks) ; signatures documentées pour P7-A ; compile OK |
 
+## Phase P8 — Découverte & écriture (2026-11-08, en cours)
+
+Journal : `docs/P8_JOURNAL.md`. `Main.kt`/`AppSettings.kt` interdits aux agents (aucune clé
+requise). Chaînes : P8-A = ajouts dans `Fr.kt` (seul propriétaire), P8-B = ajouts dans
+`FrSources.kt` (seul propriétaire). Règle : aucune chaîne en brut.
+
+| Lot | Agent | Périmètre exclusif | Critères de fin |
+|---|---|---|---|
+| **P8-A fiche enrichie** | agent P8-A | `ui/screens/details/DetailsScreen.kt`, nouveau `ui/screens/details/FavoritesCategoriesDialog.kt`, `Main.kt` UNIQUEMENT bloc détails (autorisé), `ui/strings/Fr.kt` (ajouts) | Méta Source/Auteur/État/Chapitres+temps estimé ; badge 18+ ; « Mangas connexes / Tout afficher » (recherche source par genre, masquée si échec) ; « Lire ▾ » dropdown (Continuer · n si historique) ; « Ajouter aux favoris ▾ » → dialog catégories (cases, 🔔, « Gérer »/« Terminé », persistance DAO) ; compile OK |
+| **P8-B filtres + favoris** | agent P8-B | `ui/screens/catalog/CatalogScreen.kt`, `ui/screens/favourites/FavouritesScreen.kt`, `ui/strings/FrSources.kt` (ajouts) | Catalogue : icône entonnoir → bottom sheet Tri (SortOrder) + chips genres du source + sheet genres avec recherche, appliqués à la liste ; Favoris : puce ★ violette sur les couvertures favorites, onglets catégories fonctionnels ; compile OK |
+
 ## Notes d'environnement
 
 - **RÈGLE DE TEST (consigne client, 2026-11-08) : avant CHAQUE test/lancement de l'app, effacer
   les données utilisateur** — fermer l'app puis supprimer `%APPDATA%\Kotatsu` (kotatsu.db*,
   settings.json, cookies.json, local/, okhttp-cache/) — et relancer : on teste TOUJOURS une app
   vierge, comme une première ouverture. S'applique à tous les agents (captures, E2E, manuel).
+- **RÈGLE DE CONTENU (consigne client, 2026-11-08) : INTERDIT d'ouvrir des contenus à caractère
+  explicite (sources NSFW/Hentai) pendant les tests/captures** — le filtre de sécurité du
+  fournisseur de l'agent bloque la session. Toujours utiliser des sources sûres (MangaDex…) ;
+  ne pas lire de captures pouvant contenir des couvertures explicites.
 - **RÈGLE DE CHAÎNES (consigne client, 2026-11-08) : toute description/chaîne affichée vient de
   la source de chaînes (`desktop/ui/strings/`), jamais écrite en brut dans un écran.** Les
   `private const val` locaux des phases P3-P5 sont bannis : ils migrent vers des fichiers

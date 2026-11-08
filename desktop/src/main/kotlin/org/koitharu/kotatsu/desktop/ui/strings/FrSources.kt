@@ -6,8 +6,13 @@
  * Téléchargements, Protection, Lecteur, Détails), conformité règle client : toute chaîne affichée
  * vient d'une source de chaînes, jamais écrite en brut dans un écran. Chaque constante cite sa
  * provenance (écran d'origine, capture/vidéo de référence ou clé strings.xml).
+ * Modification : 2026-11-08 — phase P8 : chaînes du catalogue d'une source (bottom sheet
+ * « Trier et filtrer » : ordre de tri + genres, vidéo t≈6:50-7:10 Weeb Central), libellés FR des
+ * SortOrder des parsers, et centralisation de « Réessayer » (pied d'erreur du catalogue).
  */
 package org.koitharu.kotatsu.desktop.ui.strings
+
+import org.koitharu.kotatsu.parsers.model.SortOrder
 
 // --- Écran « Sources des mangas » (SourcesSettingsScreen, pref_sources, frames 29-30/39/45) ---
 public const val FR_SORT_ORDER: String = "Ordre de tri" // dialog « Ordre de tri »
@@ -116,3 +121,46 @@ public const val FR_CLOSE: String = "Fermer" // contentDescription ← du pannea
 public const val FR_INCOGNITO: String = "Incognito" // badge du panneau haut (mode incognito)
 public const val FR_ZOOM_OUT: String = "Zoom -" // contentDescription bouton zoom arrière
 public const val FR_ZOOM_IN: String = "Zoom +" // contentDescription bouton zoom avant
+
+// --- Écran « Catalogue d'une source » (CatalogScreen, vidéo t≈6:50-7:10 Source Weeb Central) ---
+public const val FR_SORT_AND_FILTER: String = "Trier et filtrer" // titre de la bottom sheet filtres (string sort_and_filter)
+public const val FR_GENRES: String = "Genres" // section « Genres » de la sheet (string genres)
+public const val FR_SORT_POPULARITY: String = "Populaires" // SortOrder.POPULARITY (entry popularity)
+public const val FR_SORT_RATING: String = "Mieux notés" // SortOrder.RATING (entry rating)
+public const val FR_RETRY: String = "Réessayer" // bouton du pied d'erreur catalogue (item_error_footer)
+
+/**
+ * Libellé FR d'un ordre de tri des parsers (radios « Ordre de tri » de la bottom sheet du
+ * catalogue). Provenance : libellés values-fr de l'app d'origine (« Mis à jour », « Nouveaux »,
+ * « Alphabétique ») ; les variantes croissantes/inverses et fenêtres de popularité sont des
+ * adaptations desktop (non montrées dans la vidéo).
+ */
+public fun frSortOrderLabel(order: SortOrder): String = when (order) {
+	SortOrder.UPDATED -> FR_UPDATES // string updated (« Mis à jour », Fr.kt)
+	SortOrder.UPDATED_ASC -> "Mis à jour (croissant)"
+	SortOrder.POPULARITY -> FR_SORT_POPULARITY
+	SortOrder.POPULARITY_ASC -> "Populaires (croissant)"
+	SortOrder.POPULARITY_HOUR -> "Populaires (dernière heure)"
+	SortOrder.POPULARITY_TODAY -> "Populaires (aujourd'hui)"
+	SortOrder.POPULARITY_WEEK -> "Populaires (semaine)"
+	SortOrder.POPULARITY_MONTH -> "Populaires (mois)"
+	SortOrder.POPULARITY_YEAR -> "Populaires (année)"
+	SortOrder.RATING -> FR_SORT_RATING
+	SortOrder.RATING_ASC -> "Mieux notés (croissant)"
+	SortOrder.NEWEST -> FR_NEWEST // string sources_catalog « Nouveaux » (Fr.kt)
+	SortOrder.NEWEST_ASC -> "Nouveaux (croissant)"
+	SortOrder.ALPHABETICAL -> FR_SORT_ORDER_ALPHABETIC // « Alphabétique » (constante ci-dessus)
+	SortOrder.ALPHABETICAL_DESC -> "Alphabétique (inverse)"
+	SortOrder.ADDED -> "Ajoutés"
+	SortOrder.ADDED_ASC -> "Ajoutés (croissant)"
+	SortOrder.RELEVANCE -> "Pertinence"
+}
+
+/** Ordres de tri proposés par défaut dans la sheet du catalogue (comme la vidéo : popularité d'abord). */
+public val DEFAULT_CATALOG_SORT_ORDERS: List<SortOrder> = listOf(
+	SortOrder.POPULARITY,
+	SortOrder.UPDATED,
+	SortOrder.NEWEST,
+	SortOrder.RATING,
+	SortOrder.ALPHABETICAL,
+)

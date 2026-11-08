@@ -19,6 +19,12 @@
  * page_scans de HiddenImagesDatabase, champs x1,y1,x2,y2 séparés par « ; » ; matcherVersion 0),
  * chargés à l'ouverture du chapitre et remontés à ReaderContent (masque = rect couleur fond
  * dessiné par-dessus la page).
+ * Modification : 2026-11-08 — phase P8-A (bloc écran détails uniquement) : câblage du bloc
+ * détails — catégories de favoris (FavouritesDao.observeCategories + écriture via
+ * LibraryRepository.addFavourite/removeFavourite → dialog FavoritesCategoriesDialog),
+ * position d'historique (HistoryDao.find → « Continuer · n », « Chapitre n sur N »,
+ * « Progression ») et mangas connexes (recherche par 1er genre, « Tout afficher » ouvrant
+ * le catalogue filtré).
  */
 package org.koitharu.kotatsu.desktop
 
@@ -572,21 +578,122 @@ private fun MainScreen(container: AppContainer) {
 							error = e.message ?: e.javaClass.simpleName
 						}
 					}
-					org.koitharu.kotatsu.desktop.ui.screens.details.DetailsScreen(
-						manga = details ?: seed,
-						chapters = chapters.map { it.name },
-						isFavourite = false,
-						collapseLongDescription = container.appSettings.isLongDescriptionCollapsed,
-						onBackClick = { selectedManga = null },
-						onChapterClick = { index ->
-							openReader(details ?: seed, chapters, chapters.getOrNull(index))
-						},
-						onFavouriteClick = {},
-						onDownloadClick = {
-							container.downloadManager.enqueue(manga = details ?: seed)
-						},
-						onReadClick = { openReader(details ?: seed, chapters, chapters.firstOrNull()) },
-					)
+
+					// --- Phase P8-A : favoris, historique (position de lecture) et connexes ---
+					// DAO favoris : lecture des catégories du manga (observeCategories) ; écriture
+					// via LibraryRepository.addFavourite/removeFavourite (qui passent par les
+					// méthodes DAO FavouritesDao.upsert/delete et garantissent le stockage du
+					// manga avant insertion — contrainte FK).
+					val favouritesDao = remember { container.database.getFavouritesDao() }
+					val historyDao = remember { container.database.getHistoryDao() }
+					val allCategories by container.library.observeFavouriteCategories()
+						.collectAsState(initial = emptyList())
+					val mangaCategories by remember(seed.id) {
+						favouritesDao.observeCategories(seed.id)
+					}.collectAsState(initial = emptyList())
+					val isFavourite = mangaCategories.isNotEmpty()
+					var showFavouritesDialog by remember(seed.url) { mutableStateOf(false) }
+
+					// Position d'historique du manga (chapterId → index dans la liste chargée).
+					// Réévaluée à la fermeture du lecteur (readerRequest repasse à null) pour
+					// afficher « Continuer · n » / « Chapitre n sur N » / « Progression » (vidéo 9:25).
+					var historyEntry by remember(seed.url) {
+						mutableStateOf<org.koitharu.kotatsu.history.data.HistoryEntity?>(null)
+					}
+					LaunchedEffect(seed.url, readerRequest) {
+						historyEntry = runCatching { historyDao.find(seed.id) }.getOrNull()
+					}
+					val continueChapterIndex = historyEntry?.let { h ->
+						chapters.indexOfFirst { it.id == h.chapterId }.takeIf { it >= 0 }
+					}
+
+					// Mangas connexes (P8-A) : recherche dans la source par le premier genre du
+					// manga (container.getList(query = genre)). runCatching : en cas d'échec
+					// réseau ou de liste vide, la section « Mangas connexes » est masquée.
+					val base = details ?: seed
+					var relatedManga by remember(seed.url) { mutableStateOf<List<Manga>>(emptyList()) }
+					var relatedTag by remember(seed.url) { mutableStateOf<String?>(null) }
+					LaunchedEffect(base.id, base.tags) {
+						val tag = base.tags.firstOrNull()?.title ?: return@LaunchedEffect
+						relatedTag = tag
+						relatedManga = runCatching {
+							container.getList(base.source, 0, query = tag)
+								.filterNot { it.url == base.url }
+								.take(12)
+						}.getOrDefault(emptyList())
+					}
+					// « Tout afficher » (P8-A) : ouvre le catalogue de la source filtré par le
+					// genre (CatalogScreen réutilisé avec un fetchList à requête) — rendu plus bas.
+					var showRelatedCatalog by remember(seed.url) { mutableStateOf(false) }
+
+					val relatedSource = base.source as? MangaParserSource
+					if (showRelatedCatalog && relatedTag != null && relatedSource != null) {
+						org.koitharu.kotatsu.desktop.ui.screens.catalog.CatalogScreen(
+							source = relatedSource,
+							fetchList = { s, offset ->
+								container.getList(s, offset, query = relatedTag)
+							},
+							onMangaClick = { selectedManga = it },
+							onBackClick = { showRelatedCatalog = false },
+						)
+					} else {
+						org.koitharu.kotatsu.desktop.ui.screens.details.DetailsScreen(
+							manga = details ?: seed,
+							chapters = chapters.map { it.name },
+							isFavourite = isFavourite,
+							collapseLongDescription = container.appSettings.isLongDescriptionCollapsed,
+							continueChapterIndex = continueChapterIndex,
+							historyPercent = historyEntry?.percent,
+							relatedManga = relatedManga,
+							onSeeRelated = if (relatedManga.isNotEmpty()) {
+								{ showRelatedCatalog = true }
+							} else {
+								null
+							},
+							onRelatedClick = { selectedManga = it },
+							onBackClick = { selectedManga = null },
+							onChapterClick = { index ->
+								openReader(details ?: seed, chapters, chapters.getOrNull(index))
+							},
+							onFavouriteClick = { showFavouritesDialog = true },
+							onDownloadClick = {
+								container.downloadManager.enqueue(manga = details ?: seed)
+							},
+							onReadClick = {
+								// CTA principal : « Continuer · n » si position d'historique,
+								// sinon chapitre 1 (vidéo t≈9:25)
+								val target = continueChapterIndex?.let { chapters.getOrNull(it) }
+									?: chapters.firstOrNull()
+								openReader(details ?: seed, chapters, target)
+							},
+							onReadFirstChapter = {
+								openReader(details ?: seed, chapters, chapters.firstOrNull())
+							},
+						)
+						if (showFavouritesDialog) {
+							// Dialog « Ajouter aux favoris » (P8-A) : cases des catégories,
+							// cloche si la catégorie est notifiée, « Gérer » désactivé (aucun
+							// écran de gestion des catégories — périmètre P8-B).
+							org.koitharu.kotatsu.desktop.ui.screens.details.FavoritesCategoriesDialog(
+								manga = details ?: seed,
+								categories = allCategories,
+								checkedIds = mangaCategories.map { it.categoryId.toLong() }.toSet(),
+								onCheckedChange = { categoryId, checked ->
+									scope.launch {
+										runCatching {
+											if (checked) {
+												container.library.addFavourite(details ?: seed, categoryId)
+											} else {
+												container.library.removeFavourite(details ?: seed, categoryId)
+											}
+										}
+									}
+								},
+								onConfirm = { showFavouritesDialog = false },
+								onDismiss = { showFavouritesDialog = false },
+							)
+						}
+					}
 					if (error != null) {
 						LaunchedEffect(error) {
 							// L'erreur est visible via l'écran détails (liste chapitres vide) ;
@@ -601,6 +708,12 @@ private fun MainScreen(container: AppContainer) {
 					org.koitharu.kotatsu.desktop.ui.screens.catalog.CatalogScreen(
 						source = source,
 						fetchList = { s, offset -> container.getList(s, offset) },
+						// P8-B : genres officiels du source pour les chips de filtres
+						fetchFilterOptions = { s ->
+							runCatching {
+								container.repositoryFactory.create(s) as? org.koitharu.kotatsu.core.parser.ParserMangaRepository
+							}.getOrNull()?.getFilterOptions()
+						},
 						onMangaClick = { selectedManga = it },
 						onBackClick = { selectedSource = null },
 					)

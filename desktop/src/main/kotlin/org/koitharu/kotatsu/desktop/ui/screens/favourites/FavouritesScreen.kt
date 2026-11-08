@@ -6,6 +6,11 @@
  * désormais listMode + gridSize (3 modes de liste, comme l'historique — bottom sheet frame ~0:30).
  * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
  * dans les écrans).
+ * Modification : 2026-11-08 — phase P8 : puce ★ violette sur les couvertures de la grille
+ * (overlay coin supérieur droit, vidéo t≈7:20 favoris — tous les mangas de cet écran sont des
+ * favoris, la puce est donc affichée sur chaque couverture de la grille, comme le badge favori
+ * de HistoryGridCard). Vérification : les onglets catégories filtrent déjà réellement — la page
+ * active recharge `fetchManga(selectedCategory)` et Main filtre par categoryId côté données.
  *
  * Écran « Favoris » — reproduit FavouritesContainerFragment (fragment_favourites_container.xml) :
  * barre de recherche pill + menu ⋮ (fidèle aux captures ; menu = Options de liste, Catégories
@@ -32,13 +37,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Surface
@@ -54,6 +63,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -61,7 +71,6 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import org.koitharu.kotatsu.core.prefs.ListMode
 import org.koitharu.kotatsu.desktop.ui.components.EmptyStateScreen
-import org.koitharu.kotatsu.desktop.ui.components.MangaGridCard
 import org.koitharu.kotatsu.desktop.ui.components.MangaListCard
 import org.koitharu.kotatsu.desktop.ui.components.TotoroIllustration
 import org.koitharu.kotatsu.desktop.ui.components.TopSearchBar
@@ -200,21 +209,22 @@ public fun FavouritesScreen(
 				)
 			} else {
 				when (listMode) {
-					ListMode.GRID -> {
-						// « Taille de la grille » : 100 % = 110dp, même base que l'historique
-						val cellWidth = (GRID_BASE_CELL_WIDTH * gridSize.coerceIn(50, 200) / 100f)
-						LazyVerticalGrid(
-							columns = GridCells.Adaptive(cellWidth),
-							modifier = Modifier.fillMaxSize(),
-							contentPadding = PaddingValues(GRID_CONTENT_PADDING),
-							horizontalArrangement = Arrangement.spacedBy(GRID_SPACING),
-							verticalArrangement = Arrangement.spacedBy(GRID_SPACING),
-						) {
-							itemsIndexed(mangas) { _, manga ->
-								MangaGridCard(manga = manga, onClick = { onMangaClick(manga) })
+						ListMode.GRID -> {
+							// « Taille de la grille » : 100 % = 110dp, même base que l'historique
+							val cellWidth = (GRID_BASE_CELL_WIDTH * gridSize.coerceIn(50, 200) / 100f)
+							LazyVerticalGrid(
+								columns = GridCells.Adaptive(cellWidth),
+								modifier = Modifier.fillMaxSize(),
+								contentPadding = PaddingValues(GRID_CONTENT_PADDING),
+								horizontalArrangement = Arrangement.spacedBy(GRID_SPACING),
+								verticalArrangement = Arrangement.spacedBy(GRID_SPACING),
+							) {
+								itemsIndexed(mangas) { _, manga ->
+									// P8 : puce ★ violette (tous les mangas de l'écran sont des favoris)
+									FavouritesGridCard(manga = manga, onClick = { onMangaClick(manga) })
+								}
 							}
 						}
-					}
 					ListMode.LIST -> {
 						// « Compact » : lignes item_manga_list.xml (couverture 40dp, titre + auteur)
 						LazyColumn(
@@ -254,6 +264,76 @@ public fun FavouritesScreen(
 				}
 			}
 		}
+	}
+}
+
+/** Métriques de la carte grille (identiques à MangaGridCard, cf. item_manga_grid.xml). */
+private val GRID_CARD_MARGIN = 2.dp
+private val GRID_CARD_PADDING = 6.dp
+private val GRID_COVER_CORNER = 12.dp
+private val GRID_TITLE_PADDING_VERTICAL = 4.dp
+private val STAR_BADGE_OFFSET = 6.dp
+private val STAR_BADGE_SIZE = 18.dp
+
+/**
+ * Carte grille des favoris (P8) : identique à MangaGridCard (marges 2/6dp, couverture coins
+ * 12dp, titre TitleSmall 2 lignes) + puce ★ violette en overlay du coin supérieur droit de la
+ * couverture (vidéo t≈7:20) — tous les mangas de cet écran sont des favoris. Dupliquée localement
+ * car MangaGridCard (composant partagé) n'expose pas d'overlay et n'est pas dans le périmètre.
+ */
+@Composable
+private fun FavouritesGridCard(
+	manga: Manga,
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier,
+) {
+	Column(
+		modifier = modifier
+			.padding(GRID_CARD_MARGIN)
+			.clickable(onClick = onClick)
+			.padding(GRID_CARD_PADDING),
+	) {
+		Box {
+			Box(
+				modifier = Modifier
+					.fillMaxWidth()
+					.aspectRatio(2f / 3f)
+					.clip(RoundedCornerShape(GRID_COVER_CORNER))
+					.background(MaterialTheme.colorScheme.surfaceContainer),
+				contentAlignment = Alignment.Center,
+			) {
+				AsyncImage(
+					model = ImageRequest.Builder(coil3.PlatformContext.INSTANCE)
+						.data(manga.coverUrl)
+						.crossfade(true)
+						.build(),
+					contentDescription = manga.title,
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.fillMaxSize(),
+				)
+			}
+			// Puce ★ violette (couleur primaire du thème, comme le badge favori de l'historique)
+			Icon(
+				imageVector = Icons.Filled.Star,
+				contentDescription = null,
+				tint = MaterialTheme.colorScheme.primary,
+				modifier = Modifier
+					.align(Alignment.TopEnd)
+					.padding(STAR_BADGE_OFFSET)
+					.size(STAR_BADGE_SIZE),
+			)
+		}
+		Text(
+			text = manga.title,
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(vertical = GRID_TITLE_PADDING_VERTICAL),
+			style = MaterialTheme.typography.titleSmall,
+			color = MaterialTheme.colorScheme.onSurface,
+			maxLines = 2,
+			overflow = TextOverflow.Ellipsis,
+			textAlign = TextAlign.Start,
+		)
 	}
 }
 

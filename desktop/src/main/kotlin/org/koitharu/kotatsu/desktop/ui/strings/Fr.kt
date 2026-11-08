@@ -5,6 +5,10 @@
  * l'app d'origine et des captures de référence. Chaque constante cite sa clé d'origine.
  * Modification : 2026-11-08 — phase P2 : chaînes de la section « Thème » de l'écran
  * Apparence (libellés exacts des captures frames 9-25 de la vidéo).
+ * Modification : 2026-11-08 — phase P8-A : écran détails — méta enrichie (« Source », « État »,
+ * « Chapitres », temps de lecture estimé, « Progression »), bouton « Lire ▾ » (menu
+ * « Lire le chapitre 1 » / « Continuer · n »), dialog « Ajouter aux favoris »
+ * (« Gérer » / « Terminé ») ; libellés des captures vidéo t≈6:07-6:45, 7:10-7:20, 9:25.
  */
 package org.koitharu.kotatsu.desktop.ui.strings
 
@@ -291,3 +295,78 @@ public fun frNavItemLabel(item: org.koitharu.kotatsu.desktop.ui.nav.NavItem): St
 	org.koitharu.kotatsu.desktop.ui.nav.NavItem.LOCAL -> FR_LOCAL_STORAGE
 	org.koitharu.kotatsu.desktop.ui.nav.NavItem.BOOKMARKS -> FR_BOOKMARKS
 }
+
+// --- Phase P8-A : écran détails (vidéo t≈6:07-6:45 fiche, t≈7:10-7:20 dialog favoris, t≈9:25 fiche après lecture) ---
+
+/** « Auteur : » (string/author, values-fr). */
+public const val FR_AUTHOR: String = "Auteur"
+
+/** « État : » (string/state, values-fr ; vidéo t≈6:07 « État : En cours »). */
+public const val FR_STATE: String = "État"
+
+/** « État : » — libellés des états du manga (manga.state ; state_* de values-fr). */
+public const val FR_STATE_ONGOING: String = "En cours" // state_ongoing (values-fr)
+public const val FR_STATE_FINISHED: String = "Terminé" // state_finished (values-fr)
+public const val FR_STATE_ABANDONED: String = "Abandonné" // state_abandoned (values-fr)
+public const val FR_STATE_PAUSED: String = "En pause" // state_paused (values-fr)
+public const val FR_STATE_UPCOMING: String = "À venir" // state_upcoming (values-fr)
+
+/** Libellé FR d'un état de manga ; null (ligne masquée) si état inconnu/non traduit. */
+public fun frStateLabel(state: org.koitharu.kotatsu.parsers.model.MangaState?): String? =
+	when (state) {
+		org.koitharu.kotatsu.parsers.model.MangaState.ONGOING -> FR_STATE_ONGOING
+		org.koitharu.kotatsu.parsers.model.MangaState.FINISHED -> FR_STATE_FINISHED
+		org.koitharu.kotatsu.parsers.model.MangaState.ABANDONED -> FR_STATE_ABANDONED
+		org.koitharu.kotatsu.parsers.model.MangaState.PAUSED -> FR_STATE_PAUSED
+		org.koitharu.kotatsu.parsers.model.MangaState.UPCOMING -> FR_STATE_UPCOMING
+		null -> null
+		// RESTRICTED : pas de libellé values-fr relevé → ligne « État » masquée (parité prudente)
+		else -> null
+	}
+
+/** « Aucun chapitre » (string/no_chapters, values-fr ; vidéo t≈6:07 « Chapitres : Aucun chapitre »). */
+public const val FR_NO_CHAPTERS: String = "Aucun chapitre"
+
+/** « 26 chapitres » (vidéo t≈7:10 « Chapitres : 26 chapitres (1 h 26 m) ») ; singulier « 1 chapitre ». */
+public fun frChaptersCount(count: Int): String = when (count) {
+	1 -> "1 chapitre"
+	else -> "$count chapitres"
+}
+
+/**
+ * Durée au format vidéo « (1 h 26 m) » / « (26 m) » (captures t≈7:10, 9:25).
+ * Formule d'estimation P8-A : 4 minutes par chapitre (constante ESTIMATED_MINUTES_PER_CHAPTER
+ * de DetailsScreen), ou temps restant = chapitres restants × 4 min quand une position
+ * d'historique existe. Divergence documentée : la vidéo affiche ~3,3 min/chapitre.
+ */
+public fun frDuration(minutes: Int): String {
+	val m = minutes.coerceAtLeast(0)
+	return if (m >= 60) {
+		val h = m / 60
+		val rem = m % 60
+		if (rem == 0) "$h h" else "$h h $rem m"
+	} else {
+		"$m m"
+	}
+}
+
+/** « Lire le chapitre 1 » (menu ▾ du bouton Lire, vidéo t≈7:15 ; pas de clé values-fr relevée). */
+public const val FR_READ_FIRST_CHAPTER: String = "Lire le chapitre 1"
+
+/** « Continuer » (string/_continue, values-fr) — CTA du bouton Lire après lecture. */
+public const val FR_CONTINUE: String = "Continuer"
+
+/** « Continuer · 2 » (vidéo t≈9:25 « Continuer · 2 ▾ »). */
+public fun frContinueChapter(chapterNumber: Int): String = "$FR_CONTINUE · $chapterNumber"
+
+/** « Chapitre 2 sur 26 » (string/chapter_d_of_d, values-fr ; vidéo t≈9:25). */
+public fun frChapterXofY(current: Int, total: Int): String = "Chapitre $current sur $total"
+
+/** « Progression : » (string/progress, values-fr ; vidéo t≈9:25 ligne « Progression : 4 % »). */
+public const val FR_PROGRESS: String = "Progression"
+
+/** « Terminé » (string/done, values-fr ; bouton de validation du dialog favoris t≈7:15). */
+public const val FR_DONE: String = "Terminé"
+
+// « Gérer » : déjà déclaré dans FrSources.kt (string/manage, values-fr) — réutilisé par
+// le dialog « Ajouter aux favoris » (P8-A) sans nouvelle déclaration.
