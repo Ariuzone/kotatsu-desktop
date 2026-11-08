@@ -254,6 +254,11 @@ class AppSettings(
 		get() = store.getString(KEY_TRACKER_FREQUENCY, "DEFAULT") ?: "DEFAULT"
 		set(value) = store.edit { putString(KEY_TRACKER_FREQUENCY, value) }
 
+	/** Langue de l'interface de maintenance (system/en/fr) — P6/1.1.1, défaut = langue du système. */
+	var appLanguage: String
+		get() = store.getString(KEY_APP_LANGUAGE, "system") ?: "system"
+		set(value) = store.edit { putString(KEY_APP_LANGUAGE, value) }
+
 	/** Catégories favorites suivies pour les nouveaux chapitres (P4) — vide = toutes. */
 	var trackerFavouriteCategories: Set<String>
 		get() = store.getStringSet(KEY_TRACKER_FAV_CATEGORIES, emptySet()).orEmpty()
@@ -427,6 +432,7 @@ class AppSettings(
 	const val KEY_SUGGESTIONS_EXCLUDED_GENRES = "suggestions_excluded_genres"
 	const val KEY_TRACKER_FREQUENCY = "tracker_frequency"
 	const val KEY_TRACKER_FAV_CATEGORIES = "tracker_fav_categories"
+		const val KEY_APP_LANGUAGE = "app_language"
 	const val KEY_SUGGESTIONS_INCLUDE_DISABLED = "suggestions_include_disabled"
 		const val KEY_SUGGESTIONS_EXCLUDE_NSFW = "suggestions_exclude_nsfw"
 		const val KEY_DOWNLOADS_METERED_NETWORK = "downloads_metered_network"

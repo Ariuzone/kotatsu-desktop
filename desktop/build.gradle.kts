@@ -53,7 +53,7 @@ compose.desktop {
 
 		// Métadonnées propres au portage desktop
 		group = "org.koitharu.kotatsu"
-		version = "1.1"
+		version = "1.1.1"
 
 		nativeDistributions {
 			targetFormats(TargetFormat.Exe, TargetFormat.Msi)
@@ -61,7 +61,7 @@ compose.desktop {
 			// Les scripts personnalisés (installateur / désinstallateur) sont injectés dans
 			// <installation>\app\resources par les tâches Gradle injectHelpers* (bas de fichier)
 			// — mécanisme appResourcesRootDir écarté (copie non fiable selon les variantes).
-			packageVersion = "1.1.0"
+			packageVersion = "1.1.1"
 			description = "Lecteur de manga — portage Windows de Kotatsu-Redo"
 			vendor = "Portage non officiel de Kotatsu-Redo (GPLv3)"
 			// UUID de la ligne produit « Kotatsu Desktop 1.x » (nouveau en 1.1 : l'ancien UUID servait
@@ -69,40 +69,20 @@ compose.desktop {
 			// déjà installée, bloquant toute mise à jour). Conserver ce UUID pour toutes les
 			// futures versions 1.x ; les mises à jour = major-upgrade MSI (augmenter packageVersion).
 			windows {
-				exePackageVersion = "1.1.0"
-				msiPackageVersion = "1.1.0"
+				exePackageVersion = "1.1.1"
+				msiPackageVersion = "1.1.1"
 				iconFile.set(project.file("src/main/resources/kotatsu.ico"))
 				menu = true
 				shortcut = true
 				dirChooser = true
+				// Installation PAR UTILISATEUR : pas d UAC a l installation/desinstallation,
+				// cle de desinstallation dans HKCU (modifiable par l app sans elevation).
+				perUserInstall = true
 				upgradeUuid = "e17ceb03-287c-4d25-ab56-748855fef9d3"
 			}
 
 			// JDK embarqué : l'utilisateur n'a pas besoin d'installer Java
 			includeAllModules = true
 		}
-	}
-}
-
-// Injection des scripts personnalisés (installateur/désinstallateur, cf. resources/main/)
-// dans <installation>\app\resources\ des images jpackage (variantes main et release),
-// après création de l'image par Compose et AVANT l'appel de jpackage.
-val helperImageDirs = listOf(
-	layout.buildDirectory.dir("compose/binaries/main/app/Kotatsu Desktop/app/resources"),
-	layout.buildDirectory.dir("compose/binaries/main-release/app/Kotatsu Desktop/app/resources"),
-)
-helperImageDirs.forEachIndexed { index, dir ->
-	val inject = tasks.register<Copy>(if (index == 0) "injectHelpersMain" else "injectHelpersRelease") {
-		from(project.file("resources/main"))
-		into(dir)
-	}
-	// L'injection DOIT suivre la création de l'image (dépendance forte) et précéder
-	// l'appel de jpackage (les packages en dépendent).
-	val createTask = if (index == 0) "createDistributable" else "createReleaseDistributable"
-	inject.configure { dependsOn(createTask) }
-	tasks.matching {
-		it.name in setOf("packageExe", "packageMsi", "packageReleaseExe", "packageReleaseMsi", "packageDistributionForCurrentOS")
-	}.configureEach {
-		dependsOn(inject)
 	}
 }

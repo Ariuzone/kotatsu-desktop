@@ -246,13 +246,46 @@ private fun AppearanceSettingsContent(
 			PreferenceDivider()
 		}
 		item {
-			// Langue : l'app desktop est FR seule (divergence documentée)
+			// Langue (1.1.1) : « Suivre le système » (repli anglais), English, Français —
+			// appliquée aux interfaces de maintenance (installateur/désinstallateur) ;
+			// infrastructure prête pour la traduction de l'interface principale.
+			var langMenu by remember { mutableStateOf(false) }
+			var langValue by remember { mutableStateOf(appSettings?.appLanguage ?: "system") }
 			PreferenceRow(
 				icon = Icons.Outlined.Info,
 				title = FR_LANGUAGE,
-				subtitle = FR_LANGUAGE_SUMMARY,
-				enabled = false,
+				subtitle = when (langValue) {
+					"en" -> "English"
+					"fr" -> "Français"
+					else -> FR_LANGUAGE_SUMMARY
+				},
+				onClick = { if (appSettings != null) langMenu = true },
+				enabled = appSettings != null,
 			)
+			if (langMenu) {
+				RadioDialog(
+					title = FR_LANGUAGE,
+					options = listOf(
+						FR_LANGUAGE_SUMMARY, // « Suivre le système »
+						"English",
+						"Français",
+					),
+					selectedIndex = when (langValue) {
+						"en" -> 1
+						"fr" -> 2
+						else -> 0
+					},
+					onDismiss = { langMenu = false },
+					onSelect = { index ->
+						langValue = when (index) {
+							1 -> "en"
+							2 -> "fr"
+							else -> "system"
+						}
+						appSettings?.appLanguage = langValue
+					},
+				)
+			}
 		}
 
 		// --- Liste des mangas ---

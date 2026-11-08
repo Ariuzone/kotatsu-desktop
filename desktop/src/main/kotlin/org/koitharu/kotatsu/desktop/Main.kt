@@ -111,15 +111,36 @@ import org.koitharu.kotatsu.reader.data.erase.PageScanEntity
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import org.koitharu.kotatsu.parsers.model.MangaPage
+import java.io.File
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 
-fun main() = application {
+fun main(args: Array<String>) {
+	// Mode maintenance : désinstallateur GUI (-Dkotatsu.mode=uninstaller, lanceur « Uninstall
+	// Kotatsu Desktop » créé au premier lancement, cf. setupMaintenanceLauncher).
+	val mode = System.getProperty("kotatsu.mode")
+	if (mode == "uninstaller" || "--mode uninstaller" in args) {
+		org.koitharu.kotatsu.desktop.ui.maintenance.mainUninstaller()
+		return
+	}
+	if (mode == "installer" || "--mode installer" in args) {
+		org.koitharu.kotatsu.desktop.ui.maintenance.mainInstaller()
+		return
+	}
+	// App principale ; au premier lancement d'une installation jpackage, crée le lanceur
+	// « Uninstall » et oriente la clé de désinstallation HKCU vers son GUI.
+	application {
 	val container = remember { AppContainer.getInstance() }
 	val settings = remember { DesktopSettings.getInstance() }
 
 	// Notifications nouveaux chapitres (icône tray + bulles Windows), cf. TrackWorker d'origine
 	TrackerTray(notifier = container.trackerNotifier)
 	LaunchedEffect(Unit) { container.trackerScheduler.start() }
+
+	// 1.1.1 : lanceur « Uninstall » + clé de désinstallation HKCU orientée vers le GUI
+	// (installation par utilisateur, sans UAC — fil d'arrière-plan, premier lancement)
+	LaunchedEffect(Unit) {
+		Thread { setupMaintenanceLauncher() }.start()
+	}
 
 	// « Confirmation de sortie » (P2) : dialog avant fermeture si activé
 	var pendingExit by remember { mutableStateOf(false) }
@@ -158,6 +179,57 @@ fun main() = application {
 			)
 		}
 		}
+	}
+	}
+}
+
+/**
+ * 1.1.1 : pour une installation jpackage PAR UTILISATEUR, crée le lanceur dédié
+ * « Uninstall Kotatsu Desktop.exe » (copie de l'exécutable principal avec
+ * -Dkotatsu.mode=uninstaller dans son .cfg) et oriente la clé de désinstallation
+ * HKCU vers ce lanceur — ainsi Paramètres Windows > Applications > Kotatsu Desktop >
+ * Désinstaller ouvre l'interface graphique de désinstallation (choix de conserver
+ * ou non les données utilisateur). Sans effet en développement.
+ */
+private fun setupMaintenanceLauncher() {
+	val appDir = System.getProperty("jpackage.app-dir") ?: return
+	try {
+		val mainExe = File(appDir, "Kotatsu Desktop.exe")
+		val mainCfg = File(appDir, "Kotatsu Desktop.cfg")
+		if (!mainExe.isFile || !mainCfg.isFile) return
+		val uninstallExe = File(appDir, "Uninstall Kotatsu Desktop.exe")
+		val uninstallCfg = File(appDir, "Uninstall Kotatsu Desktop.cfg")
+		if (!uninstallExe.isFile) {
+			mainExe.copyTo(uninstallExe, overwrite = false)
+		}
+		if (!uninstallCfg.isFile) {
+			val cfg = mainCfg.readText(Charsets.UTF_8)
+			val patched = if (cfg.contains("kotatsu.mode")) {
+				cfg
+			} else if (cfg.contains("[JavaOptions]")) {
+				cfg.replace("[JavaOptions]", "[JavaOptions]\njava-options=-Dkotatsu.mode=uninstaller")
+			} else {
+				cfg + "\n[JavaOptions]\njava-options=-Dkotatsu.mode=uninstaller\n"
+			}
+			uninstallCfg.writeText(patched, Charsets.UTF_8)
+		}
+		// Orienter UninstallString (HKCU — installation par utilisateur, pas d'élévation)
+		val query = ProcessBuilder(
+			"reg", "query", "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
+			"/s", "/f", "Kotatsu Desktop", "/d",
+		).start()
+		val output = query.inputStream.readBytes().toString(Charsets.UTF_8)
+		query.waitFor()
+		val key = output.lineSequence()
+			.map { it.trim() }
+			.firstOrNull { it.startsWith("HKEY_") } ?: return
+		if (output.contains(uninstallExe.path)) return // déjà orienté
+		ProcessBuilder(
+			"reg", "add", key, "/v", "UninstallString", "/t", "REG_SZ",
+			"/d", "\"" + uninstallExe.path + "\"", "/f",
+		).start().waitFor()
+	} catch (t: Throwable) {
+		// jamais bloquant : l'entrée Windows standard reste fonctionnelle
 	}
 }
 
