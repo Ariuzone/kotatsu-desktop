@@ -7,6 +7,8 @@
  * direct sur bureau. Ici : top bar retour + texte explicatif FR de la vidéo + liste des domaines
  * miroir connus en lecture seule (vide à ce jour : aucun registre de miroirs n'est encore câblé
  * sur desktop — voir rapport P3-B / UI_DIVERGENCES.md).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.sources
 
@@ -28,17 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-
-// Chaînes FR locales (phase P3) — ne pas déplacer dans Fr.kt (réservé à l'agent UI FR)
-private const val FR_MANAGE_LINKS_TITLE = "Gérer les liens"
-private const val FR_MANAGE_LINKS_EXPLANATION =
-	"Gérer les liens vers des mangas à partir d'applications externes (par exemple, un navigateur " +
-		"web). Il se peut que vous deviez également l'activer manuellement dans les paramètres " +
-		"système de l'application."
-private const val FR_MANAGE_LINKS_DESKTOP_NOTE =
-	"Sur la version de bureau, les liens profonds (deep links) d'applications externes ne sont " +
-		"pas pris en charge : ouvrez directement un lien de manga dans Kotatsu-Redo. Les domaines " +
-		"miroir, s'il en existe, seront listés ici en lecture seule."
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_MANAGE_LINKS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_MANAGE_LINKS_DESKTOP_NOTE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_MANAGE_LINKS_EXPLANATION
 
 /**
  * « Gérer les liens » — adaptation desktop minimale (lecture seule). Sur Android cet écran gère
@@ -60,10 +55,10 @@ public fun ManageLinksScreen(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			IconButton(onClick = onBackClick) {
-				Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+				Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = FR_BACK)
 			}
 			Text(
-				text = FR_MANAGE_LINKS_TITLE,
+				text = FR_MANAGE_LINKS,
 				style = MaterialTheme.typography.titleLarge,
 				color = MaterialTheme.colorScheme.onSurface,
 				modifier = Modifier.weight(1f),

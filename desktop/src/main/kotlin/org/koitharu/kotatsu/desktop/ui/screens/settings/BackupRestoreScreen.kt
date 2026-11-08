@@ -13,6 +13,8 @@
  *    des fichiers vers appDir (écrasement, protection zip-slip) et fermeture immédiate de l'app
  *    (exitProcess(0)) — l'utilisateur relance l'application ensuite (divergence desktop) ;
  *    si le zip ne contient pas kotatsu.db → « Format de sauvegarde invalide ».
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -49,8 +51,28 @@ import kotlinx.coroutines.withContext
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceDivider
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceRow
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACKUP_BANNER
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACKUP_CREATED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACKUP_CREATED_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACKUP_FAILED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACKUP_RESTORE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CANCEL
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CHOOSE_OPEN_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CHOOSE_SAVE_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CLOSE_APP_NOTE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CREATE_BACKUP
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CREATE_BACKUP_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DB_REQUIRED
 import org.koitharu.kotatsu.desktop.ui.strings.FR_OK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_RESTORE_BACKUP
+import org.koitharu.kotatsu.desktop.ui.strings.FR_RESTORE_BACKUP_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_RESTORE_CONFIRM
+import org.koitharu.kotatsu.desktop.ui.strings.FR_RESTORE_FAILED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_RESTORE_INVALID
+import org.koitharu.kotatsu.desktop.ui.strings.FR_RESTORE_WARNING
+import org.koitharu.kotatsu.desktop.ui.strings.FR_RESTORE_WARNING_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SETTINGS_FILE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ZIP_FILTER_DESCRIPTION
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
@@ -60,31 +82,7 @@ import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 import kotlin.system.exitProcess
 
-// Chaînes FR de l'écran
-private const val FR_TITLE = "Sauvegarde et restauration"
-private const val FR_BACKUP_BANNER = "Create or restore a backup" // libellé EN non traduit (vidéo)
-private const val FR_CREATE_BACKUP = "Créer une sauvegarde"
-private const val FR_CREATE_BACKUP_SUMMARY = "Enregistrer la base de données et les paramètres dans un fichier ZIP"
-private const val FR_RESTORE_BACKUP = "Restaurer une sauvegarde"
-private const val FR_RESTORE_BACKUP_SUMMARY = "Restaurer la base de données et les paramètres depuis un fichier ZIP"
-private const val FR_CHOOSE_SAVE_TITLE = "Enregistrer la sauvegarde"
-private const val FR_CHOOSE_OPEN_TITLE = "Choisir une sauvegarde"
-private const val FR_ZIP_FILTER_DESCRIPTION = "Archives ZIP"
-private const val FR_RESTORE_WARNING_TITLE = "Restaurer une sauvegarde"
-private const val FR_RESTORE_WARNING =
-	"L'application sera fermée pour restaurer la sauvegarde. Continuer ?"
-private const val FR_RESTORE_CONFIRM = "Continuer"
-private const val FR_BACKUP_CREATED_TITLE = "Sauvegarde créée"
-private const val FR_BACKUP_CREATED = "Sauvegarde créée :\n%s"
-private const val FR_BACKUP_FAILED = "Échec de la sauvegarde : %s"
-private const val FR_RESTORE_INVALID = "Format de sauvegarde invalide"
-private const val FR_RESTORE_FAILED = "Échec de la restauration : %s"
-private const val FR_DB_REQUIRED = "kotatsu.db"
-private const val FR_SETTINGS_FILE = "settings.json"
-private const val FR_CLOSE_APP_NOTE =
-	"Il est recommandé de fermer l'application avant de créer ou de restaurer une sauvegarde " +
-		"pour garantir la cohérence de la base de données. La restauration ferme l'application " +
-		"automatiquement : relancez-la ensuite."
+// Chaînes FR de l'écran : voir ui/strings/FrSettings.kt et Fr.kt (FR_BACKUP_RESTORE, FR_OK, FR_CANCEL).
 
 private val BANNER_HORIZONTAL_PADDING = 16.dp
 private val BANNER_VERTICAL_PADDING = 12.dp
@@ -105,13 +103,13 @@ public fun BackupRestoreScreen(
 
 	// État local miroir : message informatif (dialog) et sauvegarde en attente de confirmation
 	var infoMessage by remember { mutableStateOf<String?>(null) }
-	var infoTitle by remember { mutableStateOf(FR_TITLE) }
+	var infoTitle by remember { mutableStateOf(FR_BACKUP_RESTORE) }
 	var pendingRestoreFile by remember { mutableStateOf<File?>(null) }
 	var busy by remember { mutableStateOf(false) }
 
 	Column(modifier = Modifier.fillMaxSize()) {
 		SettingsTopBar(
-			title = FR_TITLE,
+			title = FR_BACKUP_RESTORE,
 			onBackClick = onBackClick,
 			onSearchClick = null,
 		)

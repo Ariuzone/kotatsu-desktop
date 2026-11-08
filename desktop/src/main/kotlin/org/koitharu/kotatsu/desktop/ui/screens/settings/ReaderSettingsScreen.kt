@@ -7,6 +7,8 @@
  * appliqués à l'ouverture suivante du lecteur. Les entrées sans effet sur desktop (boutons de
  * volume, plein écran Android…) sont omises ou désactivées — divergences documentées dans
  * docs/UI_DIVERGENCES.md.
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -42,7 +44,27 @@ import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceSwitchRo
 import org.koitharu.kotatsu.desktop.ui.components.preferences.RadioDialog
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsRoute
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
+import org.koitharu.kotatsu.desktop.ui.strings.FR_IMAGES_MASKED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_IMAGES_MASKED_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_ANIMATION
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_BACKGROUND
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_CROP_DISABLED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_CROP_PAGES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_DEFAULT_MODE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_MODE_DETECT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_MODE_DETECT_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_PAGES_NUMBERED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_PAGES_NUMBERED_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_PRELOAD
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_SCALE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_SECTION_ADVANCED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_SECTION_PAGES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_SECTION_WEBTOON
 import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_SETTINGS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_WEBTOON_SEPARATORS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_WEBTOON_SEPARATORS_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_WEBTOON_ZOOM
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_WEBTOON_ZOOM_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.frReaderModeLabel
 import org.koitharu.kotatsu.desktop.ui.strings.frReaderAnimationLabel
 import org.koitharu.kotatsu.desktop.ui.strings.frReaderBackgroundLabel
@@ -80,17 +102,17 @@ public fun ReaderSettingsScreen(
 		LazyColumn(modifier = Modifier.fillMaxSize()) {
 			// --- Pages ---
 			item {
-				PreferenceCategoryHeader(title = "Pages")
+				PreferenceCategoryHeader(title = FR_READER_SECTION_PAGES)
 				PreferenceRow(
 					icon = Icons.Outlined.Tune,
-					title = "Mode par défaut",
+					title = FR_READER_DEFAULT_MODE,
 					subtitle = frReaderModeLabel(readerMode),
 					onClick = { openDialog = ReaderDialog.MODE },
 				)
 				PreferenceSwitchRow(
 					icon = Icons.Outlined.Shield,
-					title = "Mode de détection automatique du lecteur",
-					subtitle = "Détecter automatiquement si un manga est un webtoon",
+					title = FR_READER_MODE_DETECT,
+					subtitle = FR_READER_MODE_DETECT_SUMMARY,
 					checked = autoDetect,
 					onCheckedChange = {
 						autoDetect = it
@@ -99,34 +121,34 @@ public fun ReaderSettingsScreen(
 				)
 				PreferenceRow(
 					icon = Icons.Filled.OpenWith,
-					title = "Mode mise à l'échelle",
+					title = FR_READER_SCALE,
 					subtitle = frReaderScaleLabel(scaleMode),
 					onClick = { openDialog = ReaderDialog.SCALE },
 				)
 				PreferenceRow(
 					icon = Icons.Outlined.SwapVert,
-					title = "Animation de page",
+					title = FR_READER_ANIMATION,
 					subtitle = frReaderAnimationLabel(animation),
 					onClick = { openDialog = ReaderDialog.ANIMATION },
 				)
 				// « Recadrer les pages » : sans effet sur desktop (divergence documentée)
 				PreferenceRow(
 					icon = Icons.Filled.Texture,
-					title = "Recadrer les pages",
-					subtitle = "Désactivé (non disponible sur desktop)",
+					title = FR_READER_CROP_PAGES,
+					subtitle = FR_READER_CROP_DISABLED,
 					enabled = false,
 					onClick = {},
 				)
 				PreferenceRow(
 					icon = Icons.Filled.FormatPaint,
-					title = "Arrière-plan",
+					title = FR_READER_BACKGROUND,
 					subtitle = frReaderBackgroundLabel(background),
 					onClick = { openDialog = ReaderDialog.BACKGROUND },
 				)
 				PreferenceSwitchRow(
 					icon = Icons.Outlined.Numbers,
-					title = "Pages numérotées",
-					subtitle = "Afficher les numéros de page dans le coin inférieur",
+					title = FR_READER_PAGES_NUMBERED,
+					subtitle = FR_READER_PAGES_NUMBERED_SUMMARY,
 					checked = pagesNumbered,
 					onCheckedChange = {
 						pagesNumbered = it
@@ -136,11 +158,11 @@ public fun ReaderSettingsScreen(
 			}
 			// --- Webtoon ---
 			item {
-				PreferenceCategoryHeader(title = "Webtoon")
+				PreferenceCategoryHeader(title = FR_READER_SECTION_WEBTOON)
 				PreferenceSwitchRow(
 					icon = Icons.Outlined.Tune,
-					title = "Séparateurs en mode webtoon",
-					subtitle = "Afficher des espaces verticaux entre les pages en mode webtoon",
+					title = FR_READER_WEBTOON_SEPARATORS,
+					subtitle = FR_READER_WEBTOON_SEPARATORS_SUMMARY,
 					checked = webtoonSeparators,
 					onCheckedChange = {
 						webtoonSeparators = it
@@ -150,24 +172,24 @@ public fun ReaderSettingsScreen(
 				// Zoom Webtoon : zoom autorisé par Ctrl+molette / double-clic sur desktop
 				PreferenceRow(
 					icon = Icons.Outlined.Info,
-					title = "Zoom Webtoon",
-					subtitle = "Ctrl+molette ou double-clic dans le lecteur (desktop)",
+					title = FR_READER_WEBTOON_ZOOM,
+					subtitle = FR_READER_WEBTOON_ZOOM_SUMMARY,
 					enabled = false,
 					onClick = {},
 				)
 				PreferenceRow(
 					icon = Icons.Outlined.Shield,
-					title = "Images masquées",
-					subtitle = "Tout ce que vous avez effacé. Retirez une image pour la revoir",
+					title = FR_IMAGES_MASKED,
+					subtitle = FR_IMAGES_MASKED_SUMMARY,
 					onClick = { onNavigate(SettingsRoute.MASKED_IMAGES) },
 				)
 			}
 			// --- Avancé ---
 			item {
-				PreferenceCategoryHeader(title = "Avancé")
+				PreferenceCategoryHeader(title = FR_READER_SECTION_ADVANCED)
 				PreferenceRow(
 					icon = Icons.Outlined.WbSunny,
-					title = "Précharger les pages",
+					title = FR_READER_PRELOAD,
 					subtitle = frNetworkPolicyLabel(preloadPolicy),
 					onClick = { openDialog = ReaderDialog.PRELOAD },
 				)
@@ -178,7 +200,7 @@ public fun ReaderSettingsScreen(
 
 	when (openDialog) {
 		ReaderDialog.MODE -> RadioDialog(
-			title = "Mode par défaut",
+			title = FR_READER_DEFAULT_MODE,
 			options = ReaderMode.entries.map { frReaderModeLabel(it) },
 			selectedIndex = ReaderMode.entries.indexOf(readerMode),
 			onDismiss = { openDialog = null },
@@ -188,7 +210,7 @@ public fun ReaderSettingsScreen(
 			},
 		)
 		ReaderDialog.SCALE -> RadioDialog(
-			title = "Mode mise à l'échelle",
+			title = FR_READER_SCALE,
 			options = ScaleMode.entries.map { frReaderScaleLabel(it) },
 			selectedIndex = ScaleMode.entries.indexOf(scaleMode),
 			onDismiss = { openDialog = null },
@@ -198,7 +220,7 @@ public fun ReaderSettingsScreen(
 			},
 		)
 		ReaderDialog.ANIMATION -> RadioDialog(
-			title = "Animation de page",
+			title = FR_READER_ANIMATION,
 			options = ReaderAnimation.entries.map { frReaderAnimationLabel(it) },
 			selectedIndex = ReaderAnimation.entries.indexOf(animation),
 			onDismiss = { openDialog = null },
@@ -208,7 +230,7 @@ public fun ReaderSettingsScreen(
 			},
 		)
 		ReaderDialog.BACKGROUND -> RadioDialog(
-			title = "Arrière-plan",
+			title = FR_READER_BACKGROUND,
 			options = ReaderBackground.entries.map { frReaderBackgroundLabel(it) },
 			selectedIndex = ReaderBackground.entries.indexOf(background),
 			onDismiss = { openDialog = null },
@@ -218,7 +240,7 @@ public fun ReaderSettingsScreen(
 			},
 		)
 		ReaderDialog.PRELOAD -> RadioDialog(
-			title = "Précharger les pages",
+			title = FR_READER_PRELOAD,
 			options = listOf(NetworkPolicy.ALWAYS, NetworkPolicy.NON_METERED, NetworkPolicy.NEVER)
 				.map { frNetworkPolicyLabel(it) },
 			selectedIndex = when (preloadPolicy) {

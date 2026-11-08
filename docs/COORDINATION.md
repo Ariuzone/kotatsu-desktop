@@ -74,6 +74,12 @@ Journal : `docs/P5_JOURNAL.md`. `Main.kt`/`Fr.kt`/`AppSettings.kt` INTERDITS aux
   les données utilisateur** — fermer l'app puis supprimer `%APPDATA%\Kotatsu` (kotatsu.db*,
   settings.json, cookies.json, local/, okhttp-cache/) — et relancer : on teste TOUJOURS une app
   vierge, comme une première ouverture. S'applique à tous les agents (captures, E2E, manuel).
+- **RÈGLE DE CHAÎNES (consigne client, 2026-11-08) : toute description/chaîne affichée vient de
+  la source de chaînes (`desktop/ui/strings/`), jamais écrite en brut dans un écran.** Les
+  `private const val` locaux des phases P3-P5 sont bannis : ils migrent vers des fichiers
+  `public const val FR_*` dans `ui/strings/` (Fr.kt existant, FrSources.kt pour les écrans
+  sources, FrSettings.kt pour les écrans de réglages). Même convention pour les
+  `contentDescription` non nuls.
 - Limite : **2 sous-agents simultanés** (passée de 1 à 2 en cours de projet) (« user concurrency limit exceeded » au-delà) → lots L2/L3/L4b/L5 séquencés.
 - JDK : Android Studio JBR 25 (`C:/Program Files/Android/Android Studio/jbr`), `JAVA_HOME` à exporter pour chaque commande Gradle.
 - Versions épinglées : Kotlin 2.2.10, CMP 1.9.0, Room 2.8.4 JVM, OkHttp 5.3.2, Coil 3.4.0, parsers JitPack 68f3fed395.

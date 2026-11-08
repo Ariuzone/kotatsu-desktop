@@ -5,6 +5,8 @@
  * strings.xml : app_name « Kotatsu », enter_password, wrong_password, next ; bouton cancel
  * d'Android = « Cancel »). La biométrie et FLAG_SECURE sont absents (API Android) ;
  * le délai anti-bruteforce est dans ProtectManager.tryUnlock.
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  */
 
 package org.koitharu.kotatsu.desktop.ui.screens.protect
@@ -45,13 +47,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
 import kotlinx.coroutines.launch
-
-// Textes exacts de l'app d'origine (res/values/strings.xml)
-private const val TEXT_TITLE = "Kotatsu" // app_name
-private const val TEXT_SUBTITLE = "Enter password" // enter_password
-private const val TEXT_ERROR_WRONG_PASSWORD = "Wrong password" // wrong_password
-private const val TEXT_BUTTON_NEXT = "Next" // next
-private const val TEXT_BUTTON_CANCEL = "Cancel" // android.R.string.cancel
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROTECT_CANCEL
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROTECT_NEXT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROTECT_SUBTITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROTECT_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROTECT_WRONG_PASSWORD
 
 /**
  * Écran de déverrouillage (ProtectActivity / activity_protect.xml) : titre, sous-titre,
@@ -83,10 +83,10 @@ fun ProtectScreen(
 		verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
 	) {
 		// textView_title (app_name)
-		Text(text = TEXT_TITLE, style = MaterialTheme.typography.headlineMedium)
+		Text(text = FR_PROTECT_TITLE, style = MaterialTheme.typography.headlineMedium)
 		// textView_subtitle (enter_password)
 		Text(
-			text = TEXT_SUBTITLE,
+			text = FR_PROTECT_SUBTITLE,
 			style = MaterialTheme.typography.bodyMedium,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 		)
@@ -101,7 +101,7 @@ fun ProtectScreen(
 			modifier = Modifier
 				.fillMaxWidth(0.5f)
 				.focusRequester(focusRequester),
-			label = { Text(TEXT_SUBTITLE) },
+			label = { Text(FR_PROTECT_SUBTITLE) },
 			singleLine = true,
 			enabled = !isLoading, // onLoadingStateChanged : layout désactivé pendant la vérification
 			isError = isError,
@@ -122,7 +122,7 @@ fun ProtectScreen(
 				}
 			},
 			supportingText = if (isError) {
-				{ Text(TEXT_ERROR_WRONG_PASSWORD, color = MaterialTheme.colorScheme.error) }
+				{ Text(FR_PROTECT_WRONG_PASSWORD, color = MaterialTheme.colorScheme.error) }
 			} else {
 				null
 			},
@@ -131,7 +131,7 @@ fun ProtectScreen(
 		Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
 			// button_cancel (android:string/cancel)
 			OutlinedButton(onClick = onCancel) {
-				Text(TEXT_BUTTON_CANCEL)
+				Text(FR_PROTECT_CANCEL)
 			}
 			// button_next (next) — actif seulement si le champ n'est pas vide (comme l'original)
 			Spacer(modifier = Modifier.width(8.dp))
@@ -146,7 +146,7 @@ fun ProtectScreen(
 				},
 				enabled = password.isNotEmpty() && !isLoading,
 			) {
-				Text(TEXT_BUTTON_NEXT)
+				Text(FR_PROTECT_NEXT)
 			}
 		}
 	}

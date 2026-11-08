@@ -10,6 +10,8 @@
  *  - « Effacer les cookies » : suppression de cookies.json (fichier KeyValueStore du réseau).
  * Chaque exécution est protégée par runCatching dans un rememberCoroutineScope (Dispatchers.IO)
  * et le résultat est affiché comme un message temporaire (équivalent snackbar desktop).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -50,29 +52,25 @@ import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceDivider
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceRow
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CANCEL
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CLEAR_COOKIES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CLEAR_NETWORK_CACHE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CLEAR_READ_HISTORY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CLEAR_SUGGESTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CONFIRM_COOKIES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CONFIRM_HISTORY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CONFIRM_NETWORK_CACHE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CONFIRM_SUGGESTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CONFIRM_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DATA_REMOVAL_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DELETE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DONE_COOKIES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DONE_HISTORY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DONE_NETWORK_CACHE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DONE_SUGGESTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ERROR
 import java.io.File
 
-// Chaînes FR de l'écran
-private const val FR_TITLE = "Effacement des données"
-private const val FR_CLEAR_HISTORY = "Effacer l'historique de lecture"
-private const val FR_CLEAR_SUGGESTIONS = "Effacer les suggestions"
-private const val FR_CLEAR_NETWORK_CACHE = "Vider le cache réseau"
-private const val FR_CLEAR_COOKIES = "Effacer les cookies"
-private const val FR_CONFIRM_TITLE = "Êtes-vous sûr ?"
-private const val FR_CONFIRM_HISTORY =
-	"Êtes-vous sûr de vouloir effacer tout l'historique de lecture ? Cette action est irréversible."
-private const val FR_CONFIRM_SUGGESTIONS =
-	"Êtes-vous sûr de vouloir effacer toutes les suggestions ? Cette action est irréversible."
-private const val FR_CONFIRM_NETWORK_CACHE =
-	"Êtes-vous sûr de vouloir vider le cache réseau ? Les pages déjà chargées seront retéléchargées."
-private const val FR_CONFIRM_COOKIES =
-	"Êtes-vous sûr de vouloir effacer les cookies ? Vous serez déconnecté des sources."
-private const val FR_DONE_HISTORY = "Historique de lecture effacé"
-private const val FR_DONE_SUGGESTIONS = "Suggestions effacées"
-private const val FR_DONE_NETWORK_CACHE = "Cache réseau vidé"
-private const val FR_DONE_COOKIES = "Cookies effacés"
-private const val FR_ERROR = "Une erreur est survenue : %s"
-private const val FR_DELETE = "Effacer"
+// Chaînes FR de l'écran : voir ui/strings/FrSettings.kt (FR_CANCEL vient de Fr.kt).
 
 private const val FEEDBACK_DURATION_MS = 4000L
 private val SCREEN_HORIZONTAL_PADDING = 16.dp
@@ -105,7 +103,7 @@ public fun DataRemovalScreen(
 
 	Column(modifier = Modifier.fillMaxSize()) {
 		SettingsTopBar(
-			title = FR_TITLE,
+			title = FR_DATA_REMOVAL_TITLE,
 			onBackClick = onBackClick,
 			onSearchClick = null,
 		)
@@ -117,7 +115,7 @@ public fun DataRemovalScreen(
 			) {
 				PreferenceRow(
 					icon = Icons.Outlined.History,
-					title = FR_CLEAR_HISTORY,
+					title = FR_CLEAR_READ_HISTORY,
 					subtitle = null,
 					enabled = !busy,
 					onClick = { pendingAction = RemovalAction.HISTORY },

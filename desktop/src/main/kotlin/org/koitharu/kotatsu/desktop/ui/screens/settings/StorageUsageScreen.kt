@@ -5,6 +5,8 @@
  * catégorie — « Base de données » (kotatsu.db + -wal/-shm), « Téléchargements » (dossier local/),
  * « Cache réseau » (okhttp-cache/) et « Total » — calculées en tâche de fond (Dispatchers.IO)
  * et affichées en Mo/Go avec une barre de progression proportionnelle sobre M3.
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -28,15 +30,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
+import org.koitharu.kotatsu.desktop.ui.strings.FR_COMPUTING
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DATABASE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOADS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NETWORK_CACHE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_STORAGE_USAGE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TOTAL
+import org.koitharu.kotatsu.desktop.ui.strings.frFileSize
 import java.io.File
 
-// Chaînes FR de l'écran
-private const val FR_TITLE = "Utilisation du stockage"
-private const val FR_DATABASE = "Base de données"
-private const val FR_DOWNLOADS = "Téléchargements"
-private const val FR_NETWORK_CACHE = "Cache réseau"
-private const val FR_TOTAL = "Total"
-private const val FR_COMPUTING = "Calcul…"
+// Chaînes FR de l'écran : voir ui/strings/FrSettings.kt (FR_DOWNLOADS vient de Fr.kt,
+// FR_STORAGE_USAGE est partagé avec l'écran « Téléchargements et stockage »).
 
 private val ROW_HORIZONTAL_PADDING = 24.dp
 private val ROW_VERTICAL_PADDING = 12.dp
@@ -73,7 +77,7 @@ public fun StorageUsageScreen(
 
 	Column(modifier = Modifier.fillMaxSize()) {
 		SettingsTopBar(
-			title = FR_TITLE,
+			title = FR_STORAGE_USAGE,
 			onBackClick = onBackClick,
 			onSearchClick = null,
 		)
@@ -135,8 +139,8 @@ private fun UsageRow(
 				color = MaterialTheme.colorScheme.onSurface,
 				modifier = Modifier.weight(1f),
 			)
-			Text(
-				text = formatFileSize(bytes),
+				Text(
+					text = frFileSize(bytes),
 				style = MaterialTheme.typography.bodyMedium,
 				color = MaterialTheme.colorScheme.onSurfaceVariant,
 			)
@@ -166,14 +170,4 @@ private fun databaseFilesSize(appDir: File): Long {
 		if (file.exists()) total += file.length()
 	}
 	return total
-}
-
-/** Taille lisible en Ko/Mo/Go (chaînes FR locales à l'écran). */
-private fun formatFileSize(bytes: Long): String {
-	return when {
-		bytes >= 1_000_000_000L -> String.format("%.1f Go", bytes / 1_000_000_000.0)
-		bytes >= 1_000_000L -> String.format("%.1f Mo", bytes / 1_000_000.0)
-		bytes >= 1_000L -> String.format("%.0f Ko", bytes / 1_000.0)
-		else -> String.format("%d o", bytes)
-	}
 }

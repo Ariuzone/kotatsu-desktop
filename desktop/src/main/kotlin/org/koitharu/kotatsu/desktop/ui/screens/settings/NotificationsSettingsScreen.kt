@@ -6,6 +6,8 @@
  * vers les réglages des nouveaux chapitres) et section « Suggestions » (notification des
  * suggestions). Préférences via AppSettings.isTrackerNotificationsEnabled /
  * isTrackerNoNsfw (clés KEY_TRACKER_NOTIFICATIONS / KEY_TRACKER_NO_NSFW d'origine), mutables.
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -31,21 +33,19 @@ import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceRow
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceSwitchRow
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceCategoryHeader
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NEW_CHAPTERS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NOTIFICATIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_OPEN_FEED_SETTINGS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS_NOTIFICATIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS_NOTIFICATIONS_UNAVAILABLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TRACKER_FREQUENCY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TRACKER_FREQUENCY_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TRACKER_NO_NSFW
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TRACKER_NOTIFICATIONS
 
-// Chaînes FR de l'écran « Notifications »
-private const val FR_TITLE = "Notifications"
-private const val FR_SECTION_NEW_CHAPTERS = "Nouveaux chapitres"
-private const val FR_TRACKER_NOTIFICATIONS =
-	"Afficher une notification quand de nouveaux chapitres sont détectés"
-private const val FR_TRACKER_NO_NSFW = "Ne pas notifier pour les mangas pour adultes"
-private const val FR_TRACKER_FREQUENCY = "Nouveaux chapitres — régler la fréquence"
-private const val FR_TRACKER_FREQUENCY_SUMMARY =
-	"Choisir la fréquence de vérification des nouveaux chapitres"
-private const val FR_OPEN_FEED_SETTINGS = "Paramètres des nouveaux chapitres"
-private const val FR_SECTION_SUGGESTIONS = "Suggestions"
-private const val FR_SUGGESTIONS_NOTIFICATIONS = "Notifier les nouvelles suggestions"
-private const val FR_SUGGESTIONS_NOTIFICATIONS_UNAVAILABLE =
-	"Aucun réglage de notification des suggestions n'existe dans le portage desktop actuel"
+// Chaînes FR de l'écran « Notifications » : voir ui/strings/FrSettings.kt (FR_NOTIFICATIONS,
+// FR_NEW_CHAPTERS et FR_SUGGESTIONS viennent de Fr.kt).
 
 /**
  * Écran « Notifications » (Paramètres > Notifications) : notifications des nouveaux chapitres
@@ -64,7 +64,7 @@ public fun NotificationsSettingsScreen(
 
 	Column(modifier = Modifier.fillMaxSize()) {
 		SettingsTopBar(
-			title = FR_TITLE,
+			title = FR_NOTIFICATIONS,
 			onBackClick = onBackClick,
 			onSearchClick = null,
 		)
@@ -74,7 +74,7 @@ public fun NotificationsSettingsScreen(
 				.verticalScroll(rememberScrollState()),
 		) {
 			// 1. Section « Nouveaux chapitres »
-			PreferenceCategoryHeader(title = FR_SECTION_NEW_CHAPTERS)
+			PreferenceCategoryHeader(title = FR_NEW_CHAPTERS)
 
 			// Notification des nouveaux chapitres (KEY_TRACKER_NOTIFICATIONS)
 			PreferenceSwitchRow(
@@ -122,7 +122,7 @@ public fun NotificationsSettingsScreen(
 			}
 
 			// 2. Section « Suggestions »
-			PreferenceCategoryHeader(title = FR_SECTION_SUGGESTIONS)
+			PreferenceCategoryHeader(title = FR_SUGGESTIONS)
 
 			// Notification des suggestions : aucune clé AppSettings correspondante n'existe
 			// côté desktop — entrée d'information désactivée.

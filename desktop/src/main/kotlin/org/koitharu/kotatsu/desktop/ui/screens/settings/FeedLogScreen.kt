@@ -8,7 +8,9 @@
  * NOTE : le backend du journal n'existe pas encore côté desktop (aucune persistance des
  * passages de TrackerScheduler) — les [FeedLogEntry] sont injectés par le appelant ;
  * l'intégrateur principal branchera les vraies données (capture des événements de
- * TrackerScheduler.runOnce) plus tard. Les chaînes FR sont des private const val locales.
+ * TrackerScheduler.runOnce) plus tard.
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -38,17 +40,19 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import org.koitharu.kotatsu.desktop.ui.components.EmptyStateView
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
+import org.koitharu.kotatsu.desktop.ui.strings.FR_AGO_DAYS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_AGO_HOURS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_AGO_JUST_NOW
+import org.koitharu.kotatsu.desktop.ui.strings.FR_AGO_MINUTES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_AT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FEED_LOG
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FEED_LOG_EMPTY_TEXT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FEED_LOG_EMPTY_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TIME_PATTERN
+import org.koitharu.kotatsu.desktop.ui.strings.frNewChapters
 
-// --- Chaînes FR (parité app Android en français, libellés vidéo) ---
-private const val FR_SCREEN_TITLE = "Vérification du journal des nouveaux chapitres"
-private const val FR_EMPTY_TITLE = "Aucune vérification enregistrée"
-private const val FR_EMPTY_TEXT =
-	"Le journal de la vérification en arrière-plan des nouveaux chapitres est vide. " +
-		"Les vérifications effectuées apparaîtront ici."
-private const val FR_NEW_CHAPTERS_ONE = "1 nouveau chapitre"
-private const val FR_NEW_CHAPTERS_MANY = "%d nouveaux chapitres"
-private const val FR_AT = " à "
-private const val FR_TIME_PATTERN = "HH:mm"
+// Chaînes FR de l'écran : voir ui/strings/FrSettings.kt (le pluriel « N nouveaux chapitres »
+// vient de Fr.kt : frNewChapters).
 
 /** Vignette de couverture de remplacement (l'original affiche la couverture du manga). */
 private val LOG_THUMBNAIL_SIZE = 48.dp
@@ -87,7 +91,7 @@ public fun FeedLogScreen(
 ) {
 	Column(modifier = Modifier.fillMaxSize()) {
 		SettingsTopBar(
-			title = FR_SCREEN_TITLE,
+			title = FR_FEED_LOG,
 			onBackClick = onBackClick,
 			onSearchClick = null,
 		)
@@ -95,8 +99,8 @@ public fun FeedLogScreen(
 			Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 				EmptyStateView(
 					icon = Icons.Outlined.History,
-					textPrimary = FR_EMPTY_TITLE,
-					textSecondary = FR_EMPTY_TEXT,
+					textPrimary = FR_FEED_LOG_EMPTY_TITLE,
+					textSecondary = FR_FEED_LOG_EMPTY_TEXT,
 				)
 			}
 		} else {
@@ -156,7 +160,7 @@ private fun FeedLogRow(entry: FeedLogEntry) {
 				modifier = Modifier.padding(top = LOG_TEXT_SPACING),
 			)
 			Text(
-				text = entry.error ?: frNewChaptersCount(entry.foundChapters),
+				text = entry.error ?: frNewChapters(entry.foundChapters),
 				style = MaterialTheme.typography.bodyMedium,
 				color = if (entry.error != null) {
 					MaterialTheme.colorScheme.error
@@ -169,12 +173,6 @@ private fun FeedLogRow(entry: FeedLogEntry) {
 			)
 		}
 	}
-}
-
-/** « N nouveau(x) chapitre(s) » (pluriel d'origine). */
-private fun frNewChaptersCount(count: Int): String = when (count) {
-	1 -> FR_NEW_CHAPTERS_ONE
-	else -> FR_NEW_CHAPTERS_MANY.format(count)
 }
 
 /** Horodatage relatif « Il y a 3 heures à 16:24 » (format de la vidéo). */
@@ -204,8 +202,3 @@ private fun frRelativeTime(dateTime: java.time.ZonedDateTime): String {
 			.format(dateTime.toLocalDate())
 	}
 }
-
-private const val FR_AGO_JUST_NOW = "À l'instant"
-private const val FR_AGO_MINUTES = "Il y a %d minutes"
-private const val FR_AGO_HOURS = "Il y a %d heures"
-private const val FR_AGO_DAYS = "Il y a %d jours"

@@ -15,7 +15,8 @@
  *   - section « Dépannage » : « Vérification du journal des nouveaux chapitres » (onOpenLog)
  *     et « Désactiver l'optimisation de la batterie » (entrée grisée : concept Android sans
  *     équivalent desktop — divergence documentée).
- * Les chaînes FR sont des private const val locales (parité avec l'app Android en français).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -49,35 +50,31 @@ import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceRow
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceSwitchRow
 import org.koitharu.kotatsu.desktop.ui.components.preferences.RadioDialog
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BATTERY_OPTIMIZATION
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BATTERY_OPTIMIZATION_SUBTITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CATEGORIES_EMPTY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CHECK_UPDATES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOAD_DISABLED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOAD_DOWNLOADED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOAD_NEW
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOAD_RECENTLY_READ
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FEED_LOG
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FEED_LOG_SUBTITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FREQUENCY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FREQUENCY_DEFAULT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FREQUENCY_DAILY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FREQUENCY_EVERY6H
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FREQUENCY_HOURLY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FAVOURITES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_FAVOURITES_CATEGORIES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NEW_CHAPTERS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_OK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SECTION_TROUBLESHOOTING
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TRACKER_SWITCH
+import org.koitharu.kotatsu.desktop.ui.strings.frSourcesEnabled
 
-// --- Chaînes FR (strings.xml values-fr de l'app d'origine, libellés vidéo exacts) ---
-private const val FR_SCREEN_TITLE = "Nouveaux chapitres"
-private const val FR_TRACKER_SWITCH = "Vérifier les nouveaux chapitres et les notifier"
-private const val FR_FREQUENCY = "Fréquence de vérification"
-private const val FR_CHECK_UPDATES = "Rechercher les mises à jour"
-private const val FR_SECTION_FAVOURITES = "Favoris"
-private const val FR_FAVOURITE_CATEGORIES = "Catégories favorites"
-private const val FR_DOWNLOAD_NEW = "Télécharger de nouveaux chapitres"
-private const val FR_SECTION_TROUBLESHOOTING = "Dépannage"
-private const val FR_FEED_LOG = "Vérification du journal des nouveaux chapitres"
-private const val FR_FEED_LOG_SUBTITLE =
-	"Informations de débogage sur la vérification en arrière-plan des nouveaux chapitres"
-private const val FR_BATTERY_OPTIMIZATION = "Désactiver l'optimisation de la batterie"
-private const val FR_BATTERY_OPTIMIZATION_SUBTITLE =
-	"Aide à la vérification des mises à jour des arrière-plans…"
-
-// --- Dialogues ---
-private const val FR_FREQUENCY_DEFAULT = "Par défaut"
-private const val FR_FREQUENCY_HOURLY = "Toutes les heures"
-private const val FR_FREQUENCY_EVERY6H = "Toutes les 6 heures"
-private const val FR_FREQUENCY_DAILY = "Quotidienne"
-private const val FR_DOWNLOAD_DISABLED = "Jamais"
-private const val FR_DOWNLOAD_DOWNLOADED = "Manga avec chapitres téléchargés"
-private const val FR_DOWNLOAD_RECENTLY_READ = "Manga lu récemment"
-private const val FR_CATEGORIES_EMPTY =
-	"Aucune catégorie favorite. Ajoutez des mangas à vos favoris pour " +
-		"organiser la vérification des nouveaux chapitres par catégorie."
-private const val FR_CATEGORIES_ENABLED_FMT = "%d de %d activé(s)"
+// Chaînes FR de l'écran : voir ui/strings/FrSettings.kt ; FR_NEW_CHAPTERS, FR_FAVOURITES,
+// FR_FAVOURITES_CATEGORIES, FR_OK et frSourcesEnabled viennent de Fr.kt.
 
 /**
  * Valeurs de fréquence stockées dans [AppSettings.trackerFrequency] (P4, clé
@@ -147,11 +144,11 @@ public fun FeedSettingsScreen(
 	} else {
 		favouriteCategories.count { it in favouriteSelection }
 	}
-	val categoriesSubtitle = FR_CATEGORIES_ENABLED_FMT.format(enabledCount, favouriteCategories.size)
+	val categoriesSubtitle = frSourcesEnabled(enabledCount, favouriteCategories.size)
 
 	Column(modifier = Modifier.fillMaxSize()) {
 		SettingsTopBar(
-			title = FR_SCREEN_TITLE,
+			title = FR_NEW_CHAPTERS,
 			onBackClick = onBackClick,
 			onSearchClick = null,
 		)
@@ -179,10 +176,10 @@ public fun FeedSettingsScreen(
 					title = FR_CHECK_UPDATES,
 					onClick = onUpdateNow,
 				)
-				PreferenceCategoryHeader(title = FR_SECTION_FAVOURITES)
+				PreferenceCategoryHeader(title = FR_FAVOURITES)
 				PreferenceRow(
 					icon = Icons.Outlined.FavoriteBorder,
-					title = FR_FAVOURITE_CATEGORIES,
+					title = FR_FAVOURITES_CATEGORIES,
 					subtitle = categoriesSubtitle,
 					onClick = {
 						// Initialisation du dialog : ensemble vide = toutes cochées
@@ -258,7 +255,7 @@ public fun FeedSettingsScreen(
 			// État vide explicatif : aucune catégorie favorite à proposer
 			AlertDialog(
 				onDismissRequest = { openDialog = null },
-				title = { Text(text = FR_FAVOURITE_CATEGORIES) },
+				title = { Text(text = FR_FAVOURITES_CATEGORIES) },
 				text = {
 					Text(
 						text = FR_CATEGORIES_EMPTY,
@@ -266,15 +263,15 @@ public fun FeedSettingsScreen(
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
 					)
 				},
-				confirmButton = {
-					TextButton(onClick = { openDialog = null }) {
-						Text(text = "OK")
-					}
-				},
-			)
-		} else {
-			MultiChoiceDialog(
-				title = FR_FAVOURITE_CATEGORIES,
+					confirmButton = {
+						TextButton(onClick = { openDialog = null }) {
+							Text(text = FR_OK)
+						}
+					},
+				)
+			} else {
+				MultiChoiceDialog(
+					title = FR_FAVOURITES_CATEGORIES,
 				options = favouriteCategories,
 				checked = favouriteCategories.map { it in pendingCategories },
 				onDismiss = { openDialog = null },

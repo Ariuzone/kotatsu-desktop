@@ -6,6 +6,8 @@
  * de saisie + chips des genres déjà exclus, croix de suppression) et note d'information
  * « Toutes les données sont analysées localement... ». Préférences persistées via
  * AppSettings.isSuggestionsEnabled / isSuggestionsIncludeDisabled / excludedSuggestionGenres.
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -52,18 +54,16 @@ import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CANCEL
 import org.koitharu.kotatsu.desktop.ui.strings.FR_OK
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS_ENABLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS_EXCLUDE_GENRES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS_EXCLUDE_GENRES_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS_GENRE_HINT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS_INCLUDE_DISABLED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS_INCLUDE_DISABLED_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS_LOCAL_NOTE
 
-// Chaînes FR de l'écran (vidéo t≈2:40-3:05)
-private const val FR_SUGGESTIONS_ENABLE = "Activer les suggestions"
-private const val FR_SUGGESTIONS_INCLUDE_DISABLED = "Inclure les sources désactivées"
-private const val FR_SUGGESTIONS_INCLUDE_DISABLED_SUMMARY =
-	"Afficher les suggestions de toutes les sources de mangas, y compris celles désactivées"
-private const val FR_SUGGESTIONS_EXCLUDE_GENRES = "Exclure des genres"
-private const val FR_SUGGESTIONS_EXCLUDE_GENRES_SUMMARY =
-	"Spécifiez les genres que vous ne voulez pas voir apparaître dans les suggestions"
-private const val FR_SUGGESTIONS_LOCAL_NOTE =
-	"Toutes les données sont analysées localement sur cet appareil et ne sont jamais envoyées ailleurs."
-private const val FR_SUGGESTIONS_GENRE_HINT = "Nom du genre"
+// Chaînes FR de l'écran (vidéo t≈2:40-3:05) : voir ui/strings/FrSettings.kt
+// (FR_SUGGESTIONS, FR_OK et FR_CANCEL viennent de Fr.kt).
 
 // Bannière interrupteur : carte arrondie pleine largeur (bannière bleue de la vidéo)
 private val BANNER_HORIZONTAL_PADDING = 16.dp

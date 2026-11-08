@@ -6,7 +6,8 @@
  * d'origine : couverture avec fond flouté, badge 18+ (textView_nsfw_18), titre TitleLarge,
  * sous-titre (auteur), chips de tags, description (tronquée + « Plus »/« Réduire »), liste des
  * chapitres (chaîne « Chapitres »), barre d'actions Lire / Favoris / Télécharger (chaînes
- * exactes de values-fr/strings.xml).
+ * exactes de values-fr/strings.xml). Modification : 2026-11-08 — centralisation des chaînes
+ * (règle client : aucune chaîne en brut dans les écrans).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.details
 
@@ -64,6 +65,7 @@ import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.desktop.ui.strings.FR_ADD_TO_FAVOURITES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACK
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CHAPTERS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CHAPTERS_EMPTY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_COLLAPSE
@@ -186,7 +188,7 @@ private fun DetailsHeader(manga: Manga, onBackClick: () -> Unit) {
 			IconButton(onClick = onBackClick) {
 				Icon(
 					imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-					contentDescription = "Retour",
+					contentDescription = FR_BACK,
 					tint = MaterialTheme.colorScheme.onSurface,
 				)
 			}

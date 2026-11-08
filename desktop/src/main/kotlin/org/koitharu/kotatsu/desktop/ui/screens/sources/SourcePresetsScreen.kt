@@ -14,6 +14,8 @@
  * dans le menu ⋮ ouvrant PresetCreatorDialog ; l'enregistrement persiste via [presetsDao]
  * (SourcePresetsDao Room, même backend que côté Android — passer container.database.
  * getSourcePresetsDao() depuis Main.kt).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.sources
 
@@ -80,6 +82,7 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_LOCAL_STORAGE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MANAGE_SOURCES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MANGA_SOURCES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MORE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NEW_PRESET
 import org.koitharu.kotatsu.desktop.ui.strings.FR_RANDOM
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SETTINGS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCE_PRESETS
@@ -93,9 +96,6 @@ import org.koitharu.kotatsu.parsers.model.MangaParserSource
 private val QUICK_BUTTON_HEIGHT = 64.dp
 private val QUICK_BUTTON_CORNER = 32.dp
 private val SOURCE_FAVICON_SIZE = 64.dp
-
-// Chaîne FR locale (phase P3) — ne pas déplacer dans Fr.kt (réservé à l'agent UI FR)
-private const val FR_NEW_PRESET = "Nouveau préréglage"
 
 /** Boutons rapides de l'onglet Source (captures de référence). */
 public enum class SourceQuickAction {

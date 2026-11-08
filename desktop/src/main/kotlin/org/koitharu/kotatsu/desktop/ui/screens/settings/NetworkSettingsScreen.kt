@@ -9,6 +9,8 @@
  * isSuggestionsWiFiOnly, isTrackerWiFiOnly, proxyType/Address/Port/Login/Password, dnsOverHttps),
  * toutes mutables. Le réseau est reconstruit au démarrage : note indiquant que les réglages
  * s'appliquent après redémarrage.
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -55,39 +57,43 @@ import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceSwitchRo
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceCategoryHeader
 import org.koitharu.kotatsu.desktop.ui.components.preferences.RadioDialog
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CANCEL
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOH
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOH_ADGUARD
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOH_CLOUDFLARE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOH_DISABLED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOH_GOOGLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOH_ZERO_MS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOAD_METERED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NETWORK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_OK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_ADDRESS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_EMPTY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_HOST_HINT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_LOGIN
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_LOGIN_HINT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_PASSWORD
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_PASSWORD_HINT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_PASSWORD_MASK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_PORT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_PORT_HINT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_TYPE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_TYPE_DIRECT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_TYPE_HTTP
+import org.koitharu.kotatsu.desktop.ui.strings.FR_PROXY_TYPE_SOCKS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_RESTART_NOTE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SECTION_DOH
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SECTION_METERED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SECTION_PROXY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS_WIFI_ONLY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TRACKER_WIFI_ONLY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TRISTATE_ASK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TRISTATE_DISABLED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_TRISTATE_ENABLED
 import java.net.Proxy
 
-// Chaînes FR de l'écran « Réseau »
-private const val FR_TITLE = "Réseau"
-private const val FR_SECTION_METERED = "Données mobiles"
-private const val FR_DOWNLOAD_METERED = "Télécharger en données mobiles"
-private const val FR_SUGGESTIONS_WIFI_ONLY = "Suggestions en Wi-Fi seulement"
-private const val FR_TRACKER_WIFI_ONLY = "Vérification des nouveaux chapitres en Wi-Fi seulement"
-private const val FR_SECTION_PROXY = "Proxy"
-private const val FR_PROXY_TYPE = "Type de proxy"
-private const val FR_PROXY_ADDRESS = "Adresse"
-private const val FR_PROXY_PORT = "Port"
-private const val FR_PROXY_LOGIN = "Identifiant"
-private const val FR_PROXY_PASSWORD = "Mot de passe"
-private const val FR_PROXY_EMPTY = "—"
-private const val FR_PROXY_PASSWORD_MASK = "••••••••"
-private const val FR_SECTION_DOH = "DNS sur HTTPS"
-private const val FR_DOH = "Serveur DNS sur HTTPS"
-private const val FR_DOH_DISABLED = "Désactivé"
-private const val FR_RESTART_NOTE =
-	"Ces réglages s'appliquent après redémarrage de l'application."
-private const val FR_OK = "OK"
-private const val FR_CANCEL = "Annuler"
-private const val FR_PROXY_HOST_HINT = "Hôte ou adresse IP"
-private const val FR_PROXY_PORT_HINT = "0 - 65535"
-private const val FR_PROXY_LOGIN_HINT = "Identifiant"
-private const val FR_PROXY_PASSWORD_HINT = "Mot de passe"
-
-// Libellés FR du TriStateOption (Télécharger en données mobiles). L'enum d'origine est
-// ENABLED / ASK / DISABLED : « Wi-Fi seulement » n'existe pas dans ce tri-état, ASK = « Demander ».
-private const val FR_TRISTATE_ENABLED = "Toujours"
-private const val FR_TRISTATE_ASK = "Demander"
-private const val FR_TRISTATE_DISABLED = "Jamais"
+// Chaînes FR de l'écran « Réseau » : voir ui/strings/FrSettings.kt (FR_NETWORK, FR_OK et
+// FR_CANCEL viennent de Fr.kt).
 
 private val NOTE_ICON_SIZE = 20.dp
 private val NOTE_HORIZONTAL_PADDING = 16.dp
@@ -102,18 +108,18 @@ private fun frTriStateLabel(option: TriStateOption): String = when (option) {
 
 /** Libellé FR d'un type de proxy (java.net.Proxy.Type : DIRECT / HTTP / SOCKS). */
 private fun frProxyTypeLabel(type: Proxy.Type): String = when (type) {
-	Proxy.Type.DIRECT -> "Direct"
-	Proxy.Type.HTTP -> "HTTP"
-	Proxy.Type.SOCKS -> "SOCKS"
+	Proxy.Type.DIRECT -> FR_PROXY_TYPE_DIRECT
+	Proxy.Type.HTTP -> FR_PROXY_TYPE_HTTP
+	Proxy.Type.SOCKS -> FR_PROXY_TYPE_SOCKS
 }
 
 /** Libellé FR d'un serveur DNS sur HTTPS (enum DoHProvider, ordre d'origine conservé). */
 private fun frDoHLabel(provider: DoHProvider): String = when (provider) {
 	DoHProvider.NONE -> FR_DOH_DISABLED
-	DoHProvider.GOOGLE -> "Google"
-	DoHProvider.CLOUDFLARE -> "Cloudflare"
-	DoHProvider.ADGUARD -> "AdGuard"
-	DoHProvider.ZERO_MS -> "0ms"
+	DoHProvider.GOOGLE -> FR_DOH_GOOGLE
+	DoHProvider.CLOUDFLARE -> FR_DOH_CLOUDFLARE
+	DoHProvider.ADGUARD -> FR_DOH_ADGUARD
+	DoHProvider.ZERO_MS -> FR_DOH_ZERO_MS
 }
 
 /** Port valide : vide (= aucun, 0) ou entier entre 0 et 65535. */
@@ -147,7 +153,7 @@ public fun NetworkSettingsScreen(
 
 	Column(modifier = Modifier.fillMaxSize()) {
 		SettingsTopBar(
-			title = FR_TITLE,
+			title = FR_NETWORK,
 			onBackClick = onBackClick,
 			onSearchClick = null,
 		)

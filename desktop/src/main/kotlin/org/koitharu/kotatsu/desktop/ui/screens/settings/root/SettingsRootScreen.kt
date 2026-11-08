@@ -4,7 +4,8 @@
  * « Paramètres », reproduit pref_main + SettingsActivity de l'app d'origine (captures frames
  * 7-8 de la vidéo de référence) : 4 sections (Lecture / Trouver des mangas / Vos données /
  * Application) avec lignes icône + titre + sous-titre + chevron. Les sous-écrans encore non
- * portés affichent un état vide explicatif (phases P1–P6 du plan).
+ * portés affichent un état vide explicatif (phases P1–P6 du plan). Modification : 2026-11-08 —
+ * centralisation des chaînes (règle client : aucune chaîne en brut dans les écrans).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings.root
 
@@ -244,8 +245,6 @@ public fun SettingsRootScreen(
 		}
 	}
 }
-
-private const val FR_YOUR_DATA_STR = "Vos données"
 
 /**
  * Sous-écran de Paramètres non encore porté (phases P1–P6) : top bar + état vide explicatif.

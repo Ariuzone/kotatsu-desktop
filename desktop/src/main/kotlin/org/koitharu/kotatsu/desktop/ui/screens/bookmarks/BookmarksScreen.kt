@@ -2,6 +2,8 @@
  * Fichier modifié — portage Windows de Kotatsu-Redo (https://github.com/Kotatsu-Redo/Kotatsu-Redo).
  * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-06 — adaptation Compose
  * Desktop ; 2026-11-08 — phase P2 : état vide traduit (values-fr d'origine : text_bookmark_holder).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  *
  * Écran « Signets » (AllBookmarksActivity/AllBookmarksFragment) : grille des pages marquées,
  * groupées par manga (comme findAll() du BookmarksDao d'origine), miniature de la page,
@@ -38,13 +40,12 @@ import org.koitharu.kotatsu.core.db.entity.MangaWithTags
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmarks
 import org.koitharu.kotatsu.desktop.ui.components.EmptyStateView
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BOOKMARKS_EMPTY_PRIMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BOOKMARKS_EMPTY_SECONDARY
+import org.koitharu.kotatsu.desktop.ui.strings.frBookmarkPage
 
 private val BOOKMARK_CELL_WIDTH = 120.dp
 private val BOOKMARK_CORNER = 12.dp
-
-// strings.xml d'origine (values-fr) : text_bookmark_holder_primary / text_bookmark_holder_secondary
-private const val EMPTY_PRIMARY = "Aucun marque-page"
-private const val EMPTY_SECONDARY = "Vous pouvez créer un marque-page pendant la lecture d'un manga"
 
 /** Signet affichable (équiv. Bookmark model du domaine d'origine, version desktop). */
 public data class BookmarkUi(
@@ -65,8 +66,8 @@ public fun BookmarksScreen(
 	if (bookmarksByManga.isEmpty()) {
 		EmptyStateView(
 			icon = androidx.compose.material.icons.Icons.Filled.Bookmarks,
-			textPrimary = EMPTY_PRIMARY,
-			textSecondary = EMPTY_SECONDARY,
+			textPrimary = FR_BOOKMARKS_EMPTY_PRIMARY,
+			textSecondary = FR_BOOKMARKS_EMPTY_SECONDARY,
 			modifier = modifier.fillMaxSize(),
 		)
 		return
@@ -111,7 +112,7 @@ public fun BookmarksScreen(
 						)
 					}
 					Text(
-						text = "Page ${bookmark.page + 1}",
+						text = frBookmarkPage(bookmark.page),
 						style = MaterialTheme.typography.bodySmall,
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
 						maxLines = 1,

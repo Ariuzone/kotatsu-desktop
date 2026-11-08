@@ -5,6 +5,8 @@
  * presse-papiers via java.awt.datatransfer), licence GNU GPL v3, projets d'origine Kotatsu /
  * Kotatsu-Redo avec liens ouverts dans le navigateur via java.awt.Desktop.browse (protégé par
  * runCatching si Desktop n'est pas supporté) et mention des sources kotatsu-parsers.
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -40,20 +42,20 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ABOUT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ABOUT_VERSION
+import org.koitharu.kotatsu.desktop.ui.strings.FR_APP_NAME
+import org.koitharu.kotatsu.desktop.ui.strings.FR_COPIED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_LICENSE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_LINK_KOTATSU
+import org.koitharu.kotatsu.desktop.ui.strings.FR_LINK_KOTATSU_REDO
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ORIGIN_PROJECT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCES_PARSERS
 import java.awt.Desktop
 import java.net.URI
 
-// Chaînes FR de l'écran « À propos »
-private const val FR_TITLE = "À propos"
-private const val FR_APP_NAME = "Kotatsu Desktop"
-private const val FR_VERSION = "Version 9.8.6"
-private const val FR_COPIED = "Copié dans le presse-papiers"
-private const val FR_LICENSE = "Licence : GNU GPL v3"
-private const val FR_ORIGIN_PROJECT = "Projet d'origine : Kotatsu / Kotatsu-Redo"
-private const val FR_LINK_KOTATSU_REDO = "Kotatsu-Redo (GitHub)"
-private const val FR_LINK_KOTATSU = "Kotatsu (GitHub)"
-private const val FR_SOURCES_PARSERS = "Sources : kotatsu-parsers"
-
+// Chaînes FR : voir ui/strings/FrSettings.kt (FR_APP_NAME, FR_COPIED…) et Fr.kt
+// (FR_ABOUT, FR_ABOUT_VERSION). URLs non affichées (constantes techniques) :
 private const val URL_KOTATSU_REDO = "https://github.com/Kotatsu-Redo/Kotatsu-Redo"
 private const val URL_KOTATSU = "https://github.com/KotatsuApp/Kotatsu"
 
@@ -90,7 +92,7 @@ public fun AboutScreen(
 
 	Column(modifier = Modifier.fillMaxSize()) {
 		SettingsTopBar(
-			title = FR_TITLE,
+			title = FR_ABOUT,
 			onBackClick = onBackClick,
 			onSearchClick = null,
 		)
@@ -127,7 +129,7 @@ public fun AboutScreen(
 					modifier = Modifier.padding(top = 12.dp),
 				)
 				Text(
-					text = if (versionCopied) FR_COPIED else FR_VERSION,
+					text = if (versionCopied) FR_COPIED else FR_ABOUT_VERSION,
 					style = MaterialTheme.typography.bodyMedium,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					modifier = Modifier
@@ -135,9 +137,9 @@ public fun AboutScreen(
 						.clickable {
 							// Presse-papiers Compose en priorité ; repli AWT si nécessaire
 							val copied = runCatching {
-								clipboardManager.setText(AnnotatedString(FR_VERSION))
+								clipboardManager.setText(AnnotatedString(FR_ABOUT_VERSION))
 								true
-							}.getOrDefault(false) || copyToClipboard(FR_VERSION)
+							}.getOrDefault(false) || copyToClipboard(FR_ABOUT_VERSION)
 							versionCopied = copied
 						},
 				)

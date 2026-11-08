@@ -9,6 +9,8 @@
  * Zones de tap équivalentes aux gestes Android (précédent / contrôles / suivant), orientation
  * inversée en mode RTL ; overlay de contrôles : panneau haut (retour, titres, compteur
  * « Ch. %1$d/%2$d Pg. %3$d/%4$d ») et panneau bas (chapitre précédent, curseur, chapitre suivant).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.reader
 
@@ -76,8 +78,12 @@ import org.koitharu.kotatsu.core.prefs.ReaderAnimation
 import org.koitharu.kotatsu.core.prefs.ReaderBackground
 import org.koitharu.kotatsu.core.prefs.ReaderMode
 import org.koitharu.kotatsu.core.prefs.ScaleMode
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CLOSE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_INCOGNITO
 import org.koitharu.kotatsu.desktop.ui.strings.FR_NEXT_CHAPTER
 import org.koitharu.kotatsu.desktop.ui.strings.FR_PREV_CHAPTER
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ZOOM_IN
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ZOOM_OUT
 import org.koitharu.kotatsu.desktop.ui.strings.frReaderInfo
 
 /** Multiplicateur de zoom par pas de Ctrl+molette / boutons. */
@@ -369,7 +375,7 @@ private fun ReaderControls(
 			IconButton(onClick = onClose) {
 				Icon(
 					imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-					contentDescription = "Fermer",
+					contentDescription = FR_CLOSE,
 					tint = Color.White,
 				)
 			}
@@ -391,7 +397,7 @@ private fun ReaderControls(
 			}
 			if (isIncognito) {
 				Text(
-					text = "Incognito",
+					text = FR_INCOGNITO,
 					style = MaterialTheme.typography.labelLarge,
 					color = Color.White.copy(alpha = 0.9f),
 					modifier = Modifier.padding(end = 8.dp),
@@ -419,10 +425,10 @@ private fun ReaderControls(
 						verticalAlignment = Alignment.CenterVertically,
 					) {
 						IconButton(onClick = { onZoom(1f / ZOOM_STEP) }) {
-							Icon(Icons.Filled.Remove, contentDescription = "Zoom -", tint = Color.White)
+							Icon(Icons.Filled.Remove, contentDescription = FR_ZOOM_OUT, tint = Color.White)
 						}
 						IconButton(onClick = { onZoom(ZOOM_STEP) }) {
-							Icon(Icons.Filled.Add, contentDescription = "Zoom +", tint = Color.White)
+							Icon(Icons.Filled.Add, contentDescription = FR_ZOOM_IN, tint = Color.White)
 						}
 						Text(
 							text = "${(zoom * 100).toInt()} %",

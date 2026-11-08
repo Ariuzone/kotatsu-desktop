@@ -13,6 +13,8 @@
  * Divergences : MangaParserSource n'expose pas de flag NSFW — « contenu explicite » = sources
  * ContentType.HENTAI (cf. SourcesCatalogScreen) ; [domainOf] est injecté (optionnel) pour les
  * favicons, faute d'accès au MangaLoaderContext depuis l'écran (cf. AppContainer.domainOf).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.sources
 
@@ -68,38 +70,20 @@ import java.util.Locale
 import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.desktop.ui.components.EmptyStateScreen
 import org.koitharu.kotatsu.desktop.ui.components.SourceFavicon
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CATEGORY_COMICS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CATEGORY_OTHER
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CONTENT_TYPE_HENTAI
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CONTENT_TYPE_MANGA
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DISABLE_ALL
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DISABLE_EXPLICIT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ENABLE_ALL
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MANAGE_SOURCES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MISC_LANGUAGES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NO_SOURCES_FOUND
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SEARCH_SOURCES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCE_DISABLED
 import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
-
-// --- Chaînes FR de cet écran (non présentes dans ui/strings/Fr.kt) ---
-
-/** Placeholder du champ de recherche (vidéo frame 37 : « Rechercher »). */
-private const val FR_SEARCH_SOURCES = "Rechercher"
-
-/** Entrée du menu ⋮ par ligne : case « Désactivée » (cochée = source désactivée). */
-private const val FR_SOURCE_DISABLED = "Désactivée"
-
-/** Entrée du menu ⋮ global : désactive toutes les sources NSFW. */
-private const val FR_DISABLE_EXPLICIT = "Désactiver le contenu explicite"
-
-/** Entrée du menu ⋮ global : désactive toutes les sources. */
-private const val FR_DISABLE_ALL = "Tout désactiver"
-
-/** Entrée du menu ⋮ global : vide hiddenSources. */
-private const val FR_ENABLE_ALL = "Activer toutes les sources"
-
-/** Catégorie « Comics » (sous-titre de ligne). */
-private const val FR_CATEGORY_COMICS = "Comics"
-
-/** Catégorie « Autre » (sous-titre de ligne). */
-private const val FR_CATEGORY_OTHER = "Autre"
-
-/** État vide quand la recherche ne renvoie rien. */
-private const val FR_NO_SOURCES_FOUND = "Aucune source trouvée"
 
 private val SOURCE_ROW_HEIGHT = 64.dp
 private val SOURCE_FAVICON_SIZE = 44.dp

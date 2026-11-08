@@ -6,6 +6,8 @@
  * chips de langues natives (« Español », « Français », « Italiano », …) construites depuis les
  * locales des sources du registry. L'enregistrement est délégué au parent via [onSave]
  * (persistance SourcePresetsDao côté SourcePresetsScreen — voir ce fichier).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.sources
 
@@ -42,12 +44,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import java.util.Locale
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CANCEL
+import org.koitharu.kotatsu.desktop.ui.strings.FR_NEW_PRESET
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SAVE
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
-
-// Chaînes FR locales (phase P3) — ne pas déplacer dans Fr.kt (réservé à l'agent UI FR)
-private const val FR_NEW_PRESET_TITLE = "Nouveau préréglage"
-private const val FR_SAVE = "Enregistrer"
-private const val FR_CANCEL = "Annuler"
 
 /**
  * Créateur de préréglages (vidéo t≈5:30) : sélection d'une ou plusieurs langues parmi les
@@ -99,7 +99,7 @@ public fun PresetCreatorDialog(
 						Icon(Icons.Filled.Close, contentDescription = FR_CANCEL)
 					}
 					Text(
-						text = FR_NEW_PRESET_TITLE,
+						text = FR_NEW_PRESET,
 						style = MaterialTheme.typography.titleLarge,
 						color = MaterialTheme.colorScheme.onSurface,
 						modifier = Modifier.weight(1f),

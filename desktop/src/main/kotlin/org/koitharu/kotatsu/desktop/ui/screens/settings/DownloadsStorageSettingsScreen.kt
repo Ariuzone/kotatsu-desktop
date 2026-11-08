@@ -13,6 +13,8 @@
  *  - ligne « Data removal » (« Effacer les données inutiles ») ;
  *  - section « Create or restore a backup » (libellé EN conservé, non traduit dans l'original)
  *    avec la ligne « Sauvegardes ».
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans) — libellés déplacés vers ui/strings/FrSettings.kt.
  */
 package org.koitharu.kotatsu.desktop.ui.screens.settings
 
@@ -42,28 +44,27 @@ import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceCategory
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceDivider
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceRow
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACKUP_BANNER
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACKUPS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DATA_REMOVAL
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DATA_REMOVAL_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DIR_CHANGED_MESSAGE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DIR_CHANGED_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOADS_DIR
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOADS_STORAGE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ELLIPSIS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_OK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_OPEN_DIR
+import org.koitharu.kotatsu.desktop.ui.strings.FR_OPEN_DIR_FAILED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SAME_DIR_MESSAGE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_STORAGE_USAGE
+import org.koitharu.kotatsu.desktop.ui.strings.frFileSize
 import java.io.File
 import java.io.IOException
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileSystemView
 
-// Chaînes FR de l'écran (SettingsRootFragment + préférences d'origine)
-private const val FR_TITLE = "Téléchargements et stockage"
-private const val FR_DOWNLOADS_DIR = "Dossier pour les téléchargements"
-private const val FR_STORAGE_USAGE = "Utilisation du stockage"
-private const val FR_DATA_REMOVAL = "Data removal"
-private const val FR_DATA_REMOVAL_SUMMARY = "Effacer les données inutiles"
-private const val FR_BACKUP_HEADER = "Create or restore a backup" // libellé EN non traduit (vidéo)
-private const val FR_BACKUPS = "Sauvegardes"
-private const val FR_OPEN_DIR = "Ouvrir le dossier"
-private const val FR_DIR_CHANGED_TITLE = "Dossier modifié"
-private const val FR_DIR_CHANGED_MESSAGE =
-	"Le dossier sélectionné a été noté. Dans ce portage desktop, les téléchargements existants " +
-		"ne sont pas déplacés automatiquement : déplacez-les manuellement vers le nouveau dossier " +
-		"pour les retrouver dans la bibliothèque locale."
-private const val FR_OPEN_DIR_FAILED = "Impossible d'ouvrir le dossier"
-private const val FR_SAME_DIR_MESSAGE = "Le dossier sélectionné est déjà le dossier actuel."
+// Chaînes FR de l'écran : voir ui/strings/FrSettings.kt (FR_DOWNLOADS_STORAGE, FR_OK viennent de Fr.kt).
 
 /**
  * Écran « Téléchargements et stockage » : dossier de téléchargements (choix via JFileChooser,
@@ -86,7 +87,7 @@ public fun DownloadsStorageSettingsScreen(
 		val bytes = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
 			dataBaseSize(appDir) + directorySize(downloadsDir) + directorySize(File(appDir, "okhttp-cache"))
 		}
-		totalSizeText = formatFileSize(bytes)
+		totalSizeText = frFileSize(bytes)
 	}
 
 	// Dialog informatif affiché après le choix d'un dossier différent
@@ -94,7 +95,7 @@ public fun DownloadsStorageSettingsScreen(
 
 	Column(modifier = Modifier.fillMaxSize()) {
 		SettingsTopBar(
-			title = FR_TITLE,
+			title = FR_DOWNLOADS_STORAGE,
 			onBackClick = onBackClick,
 			onSearchClick = null,
 		)
@@ -103,7 +104,7 @@ public fun DownloadsStorageSettingsScreen(
 				.fillMaxSize()
 				.verticalScroll(rememberScrollState()),
 		) {
-			PreferenceCategoryHeader(title = FR_TITLE)
+			PreferenceCategoryHeader(title = FR_DOWNLOADS_STORAGE)
 
 			// « Dossier pour les téléchargements » : chemin réel, JFileChooser proposant CE dossier
 			PreferenceRow(
@@ -129,7 +130,7 @@ public fun DownloadsStorageSettingsScreen(
 			PreferenceRow(
 				icon = Icons.Outlined.Storage,
 				title = FR_STORAGE_USAGE,
-				subtitle = totalSizeText ?: "…",
+				subtitle = totalSizeText ?: FR_ELLIPSIS,
 				onClick = onOpenUsage,
 			)
 			PreferenceDivider()
@@ -144,7 +145,7 @@ public fun DownloadsStorageSettingsScreen(
 			PreferenceDivider()
 
 			// Section sauvegarde : libellé EN non traduit dans l'app d'origine (libellé vidéo)
-			PreferenceCategoryHeader(title = FR_BACKUP_HEADER)
+			PreferenceCategoryHeader(title = FR_BACKUP_BANNER)
 
 			// Ligne « Sauvegardes » (simple info, ouvre l'écran de sauvegarde/restauration)
 			PreferenceRow(
@@ -228,14 +229,4 @@ private fun dataBaseSize(appDir: File): Long {
 	val shm = File(appDir, "kotatsu.db-shm")
 	if (shm.exists()) total += shm.length()
 	return total
-}
-
-/** Taille lisible en Ko/Mo/Go (chaînes FR locales à l'écran). */
-private fun formatFileSize(bytes: Long): String {
-	return when {
-		bytes >= 1_000_000_000L -> String.format("%.1f Go", bytes / 1_000_000_000.0)
-		bytes >= 1_000_000L -> String.format("%.1f Mo", bytes / 1_000_000.0)
-		bytes >= 1_000L -> String.format("%.0f Ko", bytes / 1_000.0)
-		else -> String.format("%d o", bytes)
-	}
 }

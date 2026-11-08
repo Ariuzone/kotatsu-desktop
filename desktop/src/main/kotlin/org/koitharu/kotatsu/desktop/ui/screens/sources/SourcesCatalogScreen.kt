@@ -9,6 +9,8 @@
  * « Disponible : N », menu de langues PLEIN ÉCRAN (liste natives + « Langues diverses »), état
  * vide FR exact de la vidéo, et bouton + fonctionnel : quand [appSettings] est fourni, le bouton
  * écrit directement dans appSettings.hiddenSources (source installée = coche ✓, sinon +).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.sources
 
@@ -64,26 +66,23 @@ import java.util.Locale
 import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.desktop.ui.components.EmptyStateScreen
 import org.koitharu.kotatsu.desktop.ui.components.TotoroIllustration
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACTION_REMOVE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ADD
 import org.koitharu.kotatsu.desktop.ui.strings.FR_ALL_LANGUAGES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_AVAILABLE_COUNT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_BACK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CATEGORY_COMICS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CATEGORY_OTHER
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CONTENT_TYPE_HENTAI
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CONTENT_TYPE_MANGA
+import org.koitharu.kotatsu.desktop.ui.strings.FR_EMPTY_SOURCES_CATALOG_TEXT
+import org.koitharu.kotatsu.desktop.ui.strings.FR_EMPTY_SOURCES_CATALOG_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_MANHWA
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MISC_LANGUAGES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_NEWEST
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCES_CATALOG
 import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
-
-// Chaînes FR locales (phase P3) — ne pas déplacer dans Fr.kt (réservé à l'agent UI FR)
-private const val FR_EMPTY_SOURCES_CATALOG_TITLE = "Aucune source de mangas"
-private const val FR_EMPTY_SOURCES_CATALOG_TEXT =
-	"Il n'y a pas de sources disponibles dans cette section, ou tout cela aurait pu être ajouté. " +
-		"Restez à l'écoute"
-private const val FR_CONTENT_COMICS = "Comics"
-private const val FR_CONTENT_OTHER = "Autre"
-private const val FR_CONTENT_MANHWA = "Manhwa"
-private const val FR_AVAILABLE_COUNT = "Disponible : "
-private const val FR_ACTION_ADD = "Ajouter"
-private const val FR_ACTION_REMOVE = "Retirer"
 
 private val FAVICON_SIZE = 48.dp
 private val FAVICON_CORNER = 12.dp // coins arrondis du favicon (capture)
@@ -144,7 +143,7 @@ public fun SourcesCatalogScreen(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			IconButton(onClick = onBackClick) {
-				Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+				Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = FR_BACK)
 			}
 			Text(
 				text = FR_SOURCES_CATALOG,
@@ -409,7 +408,7 @@ private fun SourceCatalogRow(
 		IconButton(onClick = onToggle) {
 			Icon(
 				imageVector = if (added) Icons.Filled.Check else Icons.Filled.Add,
-				contentDescription = if (added) FR_ACTION_REMOVE else FR_ACTION_ADD,
+				contentDescription = if (added) FR_ACTION_REMOVE else FR_ADD,
 				tint = MaterialTheme.colorScheme.onSurface,
 			)
 		}
@@ -426,9 +425,9 @@ private fun contentTypeLabel(source: MangaParserSource): String = when (source.c
 private fun contentFilterLabel(filter: CatalogContentFilter): String = when (filter) {
 	CatalogContentFilter.MANGAS -> FR_CONTENT_TYPE_MANGA
 	CatalogContentFilter.HENTAIS -> FR_CONTENT_TYPE_HENTAI
-	CatalogContentFilter.COMICS -> FR_CONTENT_COMICS
-	CatalogContentFilter.AUTRE -> FR_CONTENT_OTHER
-	CatalogContentFilter.MANHWA -> FR_CONTENT_MANHWA
+	CatalogContentFilter.COMICS -> FR_CATEGORY_COMICS
+	CatalogContentFilter.AUTRE -> FR_CATEGORY_OTHER
+	CatalogContentFilter.MANHWA -> FR_MANHWA
 }
 
 /** Filtre par catégorie, déduit des métadonnées du parser (ContentType de la source). */

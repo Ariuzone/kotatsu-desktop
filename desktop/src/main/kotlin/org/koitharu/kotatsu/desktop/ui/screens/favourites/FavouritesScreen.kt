@@ -4,6 +4,8 @@
  * Desktop ; 2026-11-08 — phase P2 : l'entrée « Options de liste » du menu ⋮ ouvre la
  * ListOptionsSheet (callback onListOptionsClick, feuille hébergée par Main) ; l'écran consomme
  * désormais listMode + gridSize (3 modes de liste, comme l'historique — bottom sheet frame ~0:30).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  *
  * Écran « Favoris » — reproduit FavouritesContainerFragment (fragment_favourites_container.xml) :
  * barre de recherche pill + menu ⋮ (fidèle aux captures ; menu = Options de liste, Catégories
@@ -70,6 +72,7 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_FAVOURITES_CATEGORIES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_FAVOURITES_CATEGORY_EMPTY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_INCOGNITO_MODE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_LIST_OPTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_MANAGE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SETTINGS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_TEXT_EMPTY_HOLDER_PRIMARY
 import org.koitharu.kotatsu.parsers.model.Manga
@@ -77,9 +80,6 @@ import org.koitharu.kotatsu.parsers.model.Manga
 // strings.xml d'origine (values-fr)
 public const val FAVOURITES_TITLE: String = FR_FAVOURITES // string favourites
 public const val ALL_FAVOURITES: String = FR_ALL_FAVOURITES // string all_favourites
-private const val EMPTY_PRIMARY = FR_TEXT_EMPTY_HOLDER_PRIMARY // text_empty_holder_primary
-private const val EMPTY_SECONDARY = FR_FAVOURITES_CATEGORY_EMPTY // favourites_category_empty
-private const val MANAGE = "Gérer" // string manage
 
 private val GRID_CONTENT_PADDING = 2.dp // grid card margin
 private val GRID_SPACING = 6.dp // espacement de grille (comme CatalogScreen)
@@ -127,9 +127,9 @@ public fun FavouritesScreen(
 		// stub_empty de FavouritesContainerFragment (ItemEmptyStateBinding, Totoro favoris)
 		EmptyStateScreen(
 			illustration = TotoroIllustration.FAVOURITES,
-			textPrimary = EMPTY_PRIMARY,
-			textSecondary = EMPTY_SECONDARY,
-			actionText = if (onManageClick != null) MANAGE else null,
+			textPrimary = FR_TEXT_EMPTY_HOLDER_PRIMARY,
+			textSecondary = FR_FAVOURITES_CATEGORY_EMPTY,
+			actionText = if (onManageClick != null) FR_MANAGE else null,
 			onActionClick = onManageClick,
 			modifier = modifier.fillMaxSize(),
 		)
@@ -195,8 +195,8 @@ public fun FavouritesScreen(
 				// stub_empty de FavouritesListFragment : catégorie vide (Totoro favoris, values-fr)
 				EmptyStateScreen(
 					illustration = TotoroIllustration.FAVOURITES,
-					textPrimary = EMPTY_PRIMARY,
-					textSecondary = EMPTY_SECONDARY,
+					textPrimary = FR_TEXT_EMPTY_HOLDER_PRIMARY,
+					textSecondary = FR_FAVOURITES_CATEGORY_EMPTY,
 				)
 			} else {
 				when (listMode) {

@@ -89,6 +89,27 @@
   liens).
 - App fermée après captures.
 
+### Balayage « chaînes à la source » (consigne client, 11-08)
+
+- **Règle client** : toute description/chaîne affichée vient de la source de chaînes
+  (`ui/strings/`), jamais en brut dans un écran — enregistrée dans COORDINATION.md § Notes
+  (valable aussi pour les contentDescription).
+- Inventaire : 24 fichiers, ~210 `private const val` de chaînes (héritage des compromis
+  anti-conflits des phases P3-P5).
+- **Agent S-B terminé** : `FrSettings.kt` créé — 144 constantes `FR_*` + `frFileSize()` mutualisé,
+  provenance en commentaire, littéraux EN volontaires signalés ; 11 fichiers de settings
+  nettoyés (plus aucun const/littéral de chaîne) ; doublons avec Fr.kt réutilisés
+  (FR_OK, FR_CANCEL, frNewChapters(), frSourcesEnabled()…) ; renommage FR_CLEAR_READ_HISTORY
+  (collision). Compile EXIT=0.
+- **Agent S-A terminé** : `FrSources.kt` créé — 63 constantes `FR_*` + 3 fonctions
+  (frItemsCount, frAvailableCount, frBookmarkPage) ; 14 fichiers nettoyés (sources P3,
+  bookmarks, details, downloads, favourites, history, protect, reader, racine settings) ;
+  contentDescription littéraux (« Retour », « Back », « More options »…) centralisés ;
+  doublons Fr.kt réutilisés (FR_CANCEL, FR_YOUR_DATA, FR_ADD, FR_MANHWA…) ; chaînes EN
+  volontaires migrées avec mention « non traduit ». Compile EXIT=0.
+- **Bilan balayage** : plus aucune chaîne affichée en brut dans les écrans — tout vient des
+  3 fichiers de source `ui/strings/` (Fr.kt, FrSources.kt, FrSettings.kt).
+
 ## ✅ Bilan P5
 
 - Matrice (plan §6) : Téléchargements et stockage ◐ → ✅ ; Sauvegarde et restauration ⛔ → ✅

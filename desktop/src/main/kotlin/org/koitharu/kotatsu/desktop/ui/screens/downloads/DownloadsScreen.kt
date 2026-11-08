@@ -12,6 +12,8 @@
  *
  * Les données viennent en paramètres (le service de téléchargement est porté ailleurs),
  * comme CatalogScreen reçoit `fetchList`.
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.downloads
 
@@ -69,30 +71,30 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import org.koitharu.kotatsu.desktop.ui.components.EmptyStateScreen
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACTION_CANCEL
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACTION_CANCEL_ALL
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACTION_PAUSE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACTION_REMOVE_COMPLETED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACTION_RESUME
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACTION_RETRY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACTION_SKIP
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACTION_SKIP_ALL
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CD_BACK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CD_MORE_OPTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOADS_EMPTY_PRIMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_DOWNLOADS_TITLE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_STATUS_CANCELED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_STATUS_COMPLETE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_STATUS_DOWNLOADING
+import org.koitharu.kotatsu.desktop.ui.strings.FR_STATUS_ERROR
+import org.koitharu.kotatsu.desktop.ui.strings.FR_STATUS_PAUSED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_STATUS_QUEUED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_STATUS_STUCK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_STATUS_UNKNOWN
 import org.koitharu.kotatsu.parsers.model.Manga
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
-
-// strings.xml d'origine
-public const val DOWNLOADS_TITLE: String = "Downloads" // string downloads
-private const val STATUS_DOWNLOADING = "Downloading…" // manga_downloading_
-private const val STATUS_QUEUED = "Queued" // queued
-private const val STATUS_PAUSED = "Paused" // paused
-private const val STATUS_COMPLETE = "Downloaded" // download_complete
-private const val STATUS_ERROR = "An error occurred" // error_occurred
-private const val STATUS_CANCELED = "Canceled" // canceled
-private const val STATUS_STUCK = "Stuck" // stuck
-private const val ACTION_PAUSE = "Pause" // pause
-private const val ACTION_RESUME = "Resume" // resume
-private const val ACTION_RETRY = "Retry" // retry
-private const val ACTION_SKIP = "Skip" // skip
-private const val ACTION_SKIP_ALL = "Skip all" // skip_all
-private const val ACTION_CANCEL = "Cancel" // android.R.string.cancel
-private const val ACTION_CANCEL_ALL = "Cancel all" // cancel_all
-private const val ACTION_REMOVE_COMPLETED = "Remove completed" // remove_completed
-private const val EMPTY_PRIMARY = "You don't have any downloads" // text_downloads_list_holder
-private const val UNKNOWN = "Unknown" // unknown
 
 // percent_string_pattern = « %1$s%% » avec 1 décimale (parsers.util.format(1))
 private fun percentText(percent: Float): String = "%.1f%%".format(percent * 100f)
@@ -176,7 +178,7 @@ public fun DownloadsScreen(
 			// emptyStateList() de DownloadsViewModel
 			EmptyStateScreen(
 				icon = Icons.Outlined.Download, // ic_empty_common
-				textPrimary = EMPTY_PRIMARY,
+				textPrimary = FR_DOWNLOADS_EMPTY_PRIMARY,
 				modifier = Modifier.fillMaxSize(),
 			)
 		} else {
@@ -222,11 +224,11 @@ private fun DownloadsTopBar(
 		) {
 			if (onBackClick != null) {
 				IconButton(onClick = onBackClick) {
-					Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+					Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = FR_CD_BACK)
 				}
 			}
 			Text(
-				text = DOWNLOADS_TITLE,
+				text = FR_DOWNLOADS_TITLE,
 				style = MaterialTheme.typography.titleLarge,
 				color = MaterialTheme.colorScheme.onSurface,
 				maxLines = 1,
@@ -236,23 +238,23 @@ private fun DownloadsTopBar(
 			// action_pause / action_resume : visibles selon l'état (DownloadsMenuProvider#onPrepareMenu)
 			if (hasActiveWorks && onPauseAll != null) {
 				IconButton(onClick = onPauseAll) {
-					Icon(Icons.Filled.Pause, contentDescription = ACTION_PAUSE)
+					Icon(Icons.Filled.Pause, contentDescription = FR_ACTION_PAUSE)
 				}
 			}
 			if (hasPausedWorks && onResumeAll != null) {
 				IconButton(onClick = onResumeAll) {
-					Icon(Icons.Filled.PlayArrow, contentDescription = ACTION_RESUME)
+					Icon(Icons.Filled.PlayArrow, contentDescription = FR_ACTION_RESUME)
 				}
 			}
 			var menuOpen by remember { mutableStateOf(false) }
 			Box {
 				IconButton(onClick = { menuOpen = true }) {
-					Icon(Icons.Filled.MoreVert, contentDescription = "More options")
+					Icon(Icons.Filled.MoreVert, contentDescription = FR_CD_MORE_OPTIONS)
 				}
 				DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
 					if (hasCancellableWorks && onCancelAll != null) {
 						DropdownMenuItem(
-							text = { Text(ACTION_CANCEL_ALL) },
+							text = { Text(FR_ACTION_CANCEL_ALL) },
 							onClick = {
 								menuOpen = false
 								onCancelAll()
@@ -261,7 +263,7 @@ private fun DownloadsTopBar(
 					}
 					if (onRemoveCompleted != null) {
 						DropdownMenuItem(
-							text = { Text(ACTION_REMOVE_COMPLETED) },
+							text = { Text(FR_ACTION_REMOVE_COMPLETED) },
 							onClick = {
 								menuOpen = false
 								onRemoveCompleted()
@@ -328,7 +330,7 @@ private fun DownloadItemCard(
 						.padding(start = CARD_TITLE_MARGIN, end = CARD_INNER_MARGIN),
 				) {
 					Text(
-						text = item.manga?.title ?: UNKNOWN,
+						text = item.manga?.title ?: FR_STATUS_UNKNOWN,
 						style = MaterialTheme.typography.titleSmall,
 						color = MaterialTheme.colorScheme.onSurface,
 						maxLines = 1,
@@ -420,23 +422,23 @@ private fun DownloadItemCard(
 			) {
 				when (item.state) {
 					DownloadUiState.QUEUED -> {
-						OutlinedButtonText(ACTION_CANCEL) { onCancelClick(item) }
+						OutlinedButtonText(FR_ACTION_CANCEL) { onCancelClick(item) }
 					}
 
 					DownloadUiState.RUNNING -> {
 						if (item.canPause) {
-							OutlinedButtonText(ACTION_PAUSE) { onPauseClick(item) }
+							OutlinedButtonText(FR_ACTION_PAUSE) { onPauseClick(item) }
 						}
 						if (item.isPaused) {
-							OutlinedButtonText(if (item.error == null) ACTION_RESUME else ACTION_RETRY) {
+							OutlinedButtonText(if (item.error == null) FR_ACTION_RESUME else FR_ACTION_RETRY) {
 								onResumeClick(item)
 							}
 							if (item.error != null) {
-								OutlinedButtonText(ACTION_SKIP) { onSkipClick?.invoke(item) }
-								OutlinedButtonText(ACTION_SKIP_ALL) { onSkipAllClick?.invoke(item) }
+								OutlinedButtonText(FR_ACTION_SKIP) { onSkipClick?.invoke(item) }
+								OutlinedButtonText(FR_ACTION_SKIP_ALL) { onSkipAllClick?.invoke(item) }
 							}
 						}
-						OutlinedButtonText(ACTION_CANCEL) { onCancelClick(item) }
+						OutlinedButtonText(FR_ACTION_CANCEL) { onCancelClick(item) }
 					}
 
 					else -> Unit // SUCCEEDED / FAILED / CANCELLED : aucun bouton (comme l'original)
@@ -448,18 +450,18 @@ private fun DownloadItemCard(
 
 /** Statut par état, exactement comme downloadItemAD (WorkInfo.State → string res). */
 private fun statusText(item: DownloadItem): String = when (item.state) {
-	DownloadUiState.QUEUED -> STATUS_QUEUED
-	DownloadUiState.RUNNING -> if (item.isPaused) STATUS_PAUSED else STATUS_DOWNLOADING
-	DownloadUiState.SUCCEEDED -> STATUS_COMPLETE
-	DownloadUiState.FAILED -> STATUS_ERROR
-	DownloadUiState.CANCELLED -> STATUS_CANCELED
+	DownloadUiState.QUEUED -> FR_STATUS_QUEUED
+	DownloadUiState.RUNNING -> if (item.isPaused) FR_STATUS_PAUSED else FR_STATUS_DOWNLOADING
+	DownloadUiState.SUCCEEDED -> FR_STATUS_COMPLETE
+	DownloadUiState.FAILED -> FR_STATUS_ERROR
+	DownloadUiState.CANCELLED -> FR_STATUS_CANCELED
 }
 
 /** textView_details par état, comme downloadItemAD : ETA / Stuck / erreur / « N chapters ». */
 private fun detailsText(item: DownloadItem): String = when (item.state) {
 	DownloadUiState.RUNNING -> when {
 		item.isPaused -> item.error.orEmpty()
-		item.isStuck -> STATUS_STUCK
+		item.isStuck -> FR_STATUS_STUCK
 		item.eta != null -> etaText(item.eta)
 		else -> ""
 	}

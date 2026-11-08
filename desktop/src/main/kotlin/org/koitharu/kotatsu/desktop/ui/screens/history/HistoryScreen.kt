@@ -3,6 +3,8 @@
  * Dérivé de l'app Android Kotatsu-Redo (GPLv3). Modification : 2026-11-05 — adaptation Compose
  * Desktop ; 2026-11-08 — phase P2 : l'entrée « Options de liste » du menu ⋮ ouvre la
  * ListOptionsSheet (callback onListOptionsClick, feuille hébergée par Main).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  *
  * Écran « Historique » — reproduit HistoryListFragment (fragment_list_simple.xml) :
  * barre de recherche pill + menu ⋮ (fidèle aux captures de référence ; menu = opt_history :
@@ -76,22 +78,18 @@ import org.koitharu.kotatsu.desktop.ui.components.calculateTimeAgo
 import org.koitharu.kotatsu.desktop.ui.components.format
 import org.koitharu.kotatsu.desktop.ui.components.percentPattern
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CLEAR_HISTORY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CONTINUE_READING_CD
 import org.koitharu.kotatsu.desktop.ui.strings.FR_INCOGNITO_MODE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_LIST_OPTIONS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SETTINGS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_TEXT_HISTORY_HOLDER_PRIMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_TEXT_HISTORY_HOLDER_SECONDARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_UNKNOWN
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-
-// strings.xml d'origine (values-fr)
-private const val EMPTY_PRIMARY = FR_TEXT_HISTORY_HOLDER_PRIMARY // text_history_holder_primary
-private const val EMPTY_SECONDARY = FR_TEXT_HISTORY_HOLDER_SECONDARY // text_history_holder_secondary
-private const val CONTINUE_READING_CD = "Continuer la lecture" // action « lire la suite »
-private const val UNKNOWN = "Inconnu" // string unknown
 
 private val LIST_SPACING = 8.dp // list_spacing_normal (padding du RecyclerView)
 private val GRID_SPACING = 8.dp // grid_spacing (padding des en-têtes)
@@ -173,8 +171,8 @@ public fun HistoryScreen(
 			// getEmptyState(hasFilters = false) de HistoryListViewModel (Totoro ic_empty_history)
 			EmptyStateScreen(
 				illustration = TotoroIllustration.HISTORY,
-				textPrimary = EMPTY_PRIMARY,
-				textSecondary = EMPTY_SECONDARY,
+				textPrimary = FR_TEXT_HISTORY_HOLDER_PRIMARY,
+				textSecondary = FR_TEXT_HISTORY_HOLDER_SECONDARY,
 				modifier = Modifier.fillMaxSize(),
 			)
 		} else {
@@ -359,7 +357,7 @@ private fun HistoryListCard(
 				overflow = TextOverflow.Ellipsis,
 			)
 			Text(
-				text = item.chapter?.name ?: UNKNOWN,
+				text = item.chapter?.name ?: FR_UNKNOWN,
 				style = MaterialTheme.typography.bodyMedium,
 				color = MaterialTheme.colorScheme.onSurfaceVariant,
 				maxLines = 1,
@@ -378,7 +376,7 @@ private fun HistoryListCard(
 		IconButton(onClick = onContinueClick) {
 			Icon(
 				imageVector = Icons.Filled.PlayArrow,
-				contentDescription = CONTINUE_READING_CD,
+				contentDescription = FR_CONTINUE_READING_CD,
 				tint = MaterialTheme.colorScheme.primary,
 			)
 		}

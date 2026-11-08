@@ -10,6 +10,8 @@
  * n'est pas observable, chaque ligne garde donc son état local (cf. ReaderSettingsScreen).
  * « Choisir le miroir automatiquement » est persisté mais sans effet : le changement automatique
  * de domaine (miroirs) sera branché plus tard (backend non porté).
+ * Modification : 2026-11-08 — centralisation des chaînes (règle client : aucune chaîne en brut
+ * dans les écrans).
  */
 package org.koitharu.kotatsu.desktop.ui.screens.sources
 
@@ -35,52 +37,21 @@ import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceRow
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceSwitchRow
 import org.koitharu.kotatsu.desktop.ui.components.preferences.RadioDialog
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
+import org.koitharu.kotatsu.desktop.ui.strings.FR_AUTO_MIRROR
+import org.koitharu.kotatsu.desktop.ui.strings.FR_AUTO_MIRROR_SUMMARY
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ENABLE_ALL_SOURCES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ENABLE_ALL_SOURCES_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MANGA_SOURCES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_MANAGE_LINKS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_MANAGE_LINKS_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MANAGE_SOURCES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SHOW_GRID
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SORT_ORDER
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SORT_ORDER_ALPHABETIC
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SORT_ORDER_SCORE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCES_CATALOG
-
-// --- Chaînes FR de cet écran (non présentes dans ui/strings/Fr.kt) ---
-
-/** Titre du dialog « Ordre de tri ». */
-private const val FR_SORT_ORDER = "Ordre de tri"
-
-/** Option du dialog de tri — l'app d'origine laisse « Popular & reliable » non traduit (vidéo). */
-private const val FR_SORT_ORDER_SCORE = "Popular & reliable"
-
-/** Option du dialog de tri (alphabetical). */
-private const val FR_SORT_ORDER_ALPHABETIC = "Alphabétique"
-
-/** Ligne « Afficher en vue grille » (pref_sources d'origine). */
-private const val FR_SHOW_GRID = "Afficher en vue grille"
-
-/** Ligne « Activer toutes les sources de mangas ». */
-private const val FR_ENABLE_ALL_SOURCES = "Activer toutes les sources de mangas"
-
-/** Sous-titre de la ligne précédente (vidéo frame 45). */
-private const val FR_ENABLE_ALL_SOURCES_SUMMARY =
-	"Toutes les sources de mangas disponibles seront activées de façon permanente"
-
-/** Ligne « Choisir le miroir automatiquement ». */
-private const val FR_AUTO_MIRROR = "Choisir le miroir automatiquement"
-
-/** Sous-titre de la ligne précédente (vidéo frame 45). */
-private const val FR_AUTO_MIRROR_SUMMARY =
-	"Changement automatique de domaine pour les sources de mangas en cas d'erreur " +
-		"si des miroirs sont disponibles"
-
-/** Ligne « Gérer les liens ». */
-private const val FR_MANAGE_LINKS = "Gérer les liens"
-
-/** Sous-titre de la ligne précédente (vidéo frames 39/45, texte tronqué dans la capture). */
-private const val FR_MANAGE_LINKS_SUMMARY =
-	"Gérer les liens vers des mangas à partir d'applications externes (par exemple, un navigateur web)"
-
-/** Sous-titre « N éléments » de « Gérer les sources » (vidéo : « 361 éléments »). */
-private fun frItemsCount(count: Int): String =
-	if (count == 1) "1 élément" else "$count éléments"
-
-/** Sous-titre « Disponible : N » de « Sources catalogue » (vidéo : « Disponible : 596 »). */
-private fun frAvailableCount(count: Int): String = "Disponible : $count"
+import org.koitharu.kotatsu.desktop.ui.strings.frAvailableCount
+import org.koitharu.kotatsu.desktop.ui.strings.frItemsCount
 
 /** Libellé courant de l'ordre de tri (sous-titre de « Ordre de tri »). */
 private fun sourcesOrderLabel(order: String): String =
