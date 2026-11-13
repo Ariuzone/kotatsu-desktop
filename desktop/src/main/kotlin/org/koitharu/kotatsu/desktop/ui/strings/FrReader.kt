@@ -28,8 +28,9 @@ public var FR_RESET: String = "Réinitialiser"
 /** Étiquette du contenu factice des deux aperçus (desktop, sans resource image dispo). */
 public var FR_COLOR_PREVIEW_LABEL: String = "Exemple de page"
 
-/** Valeur d'un slider en pourcentage : « N % » (format vidéo, ex. « 120 % »). */
-public fun frPercentage(value: Float): String = "${(value * 100).toInt()} %"
+/** Valeur d'un slider en pourcentage : « N % » (format vidéo, ex. « 120 % » ; anglais « N% »). */
+public fun frPercentage(value: Float): String =
+	"${(value * 100).toInt()}".let { n -> t("$n %", "$n%") }
 
 // --- Dialog « Défilement automatique » (vidéo t≈8:35-9:19, adaptation desktop : dialog M3
 //     + bouton de commande flottant Play/Pause) ---
@@ -38,8 +39,11 @@ public var FR_ENABLE: String = "Activer"
 public var FR_SPEED: String = "Vitesse"
 public var FR_AUTO_SCROLL_FAB_NOTE: String = "Défilement via le bouton de commande flottant"
 
-/** Libellé du slider de vitesse au format vidéo : « Vitesse xN.N » (ex. « Vitesse x4.0 »). */
-public fun frAutoScrollSpeed(speed: Float): String = "Vitesse x%.1f".format(java.util.Locale.US, speed)
+/** Libellé du slider de vitesse au format vidéo : « Vitesse xN.N » / « Speed xN.N ». */
+public fun frAutoScrollSpeed(speed: Float): String {
+	val formatted = "x%.1f".format(java.util.Locale.US, speed)
+	return t("Vitesse $formatted", "Speed $formatted")
+}
 
 /** Description d'accessibilité du bouton flottant « lancer ». */
 public var FR_AUTO_SCROLL_PLAY: String = "Lancer le défilement automatique"
@@ -55,3 +59,23 @@ public var FR_ERASER_TUTORIAL_TEXT: String =
 		"zone à masquer pendant la lecture. La zone sélectionnée sera recouverte dès que vous " +
 		"relâchez le bouton."
 public var FR_SKIP: String = "Passer"
+
+// --- Chaînes temporaires du lecteur migrées depuis ReaderScreen.kt (phase P9, ex-const
+//     FR_READER_* avec marqueur TODO) et notifications (« toasts ») de Main.kt —
+//     chaque constante cite sa provenance ; EN ajoutées dans I18n.kt ---
+
+/** Menu ⋮ du lecteur (ReaderScreen.kt, adaptation desktop du panneau haut). */
+public var FR_READER_MORE_OPTIONS: String = "Plus d'options"
+public var FR_READER_ADD_BOOKMARK: String = "Ajouter un marque-page" // menu ⋮, marque-page absent
+public var FR_READER_REMOVE_BOOKMARK: String = "Retirer le marque-page" // menu ⋮, marque-page présent
+public var FR_READER_READING_MODE: String = "Mode lecture" // sous-menu du menu ⋮
+public var FR_READER_DOUBLE_PAGES: String = "Pages doubles (paysage) — bêta" // option du sous-menu
+public var FR_READER_ROTATE: String = "Faire pivoter l'écran" // option du sous-menu
+public var FR_READER_ERASER: String = "Gomme" // action du menu ⋮ (masquage d'image)
+
+/** Notifications de l'écran lecteur (Main.kt, bloc lecteur — ex-const FR_READER_*). */
+public var FR_READER_BOOKMARK_ADDED: String = "Marque-page ajouté" // toast après insertion
+public var FR_READER_BOOKMARK_REMOVED: String = "Marque-page retiré" // toast après suppression
+public var FR_READER_PAGE_SAVED: String = "Page enregistrée" // toast après sauvegarde locale
+public var FR_READER_PAGE_URL_COPIED: String =
+	"Enregistrement impossible : URL de la page copiée" // toast repli (échec de sauvegarde)

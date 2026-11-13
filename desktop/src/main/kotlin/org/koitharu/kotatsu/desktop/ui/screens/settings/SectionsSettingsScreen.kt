@@ -47,13 +47,19 @@ import org.koitharu.kotatsu.desktop.ui.nav.NavItem
 import org.koitharu.kotatsu.desktop.ui.components.preferences.PreferenceDivider
 import org.koitharu.kotatsu.desktop.ui.screens.settings.root.SettingsTopBar
 import org.koitharu.kotatsu.desktop.ui.strings.FR_ADD
+import org.koitharu.kotatsu.desktop.ui.strings.FR_ACTION_REMOVE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_BOOKMARKS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_CANCEL
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MAIN_SECTIONS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_ON_DEVICE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_UPDATES
+import org.koitharu.kotatsu.desktop.ui.strings.currentUiLang
 import org.koitharu.kotatsu.desktop.ui.strings.frNavItemLabel
+
+/** Chaîne dépendant de la langue d'interface courante (P9 : zéro chaîne FR-only en anglais). */
+private fun t(fr: String, en: String): String =
+	if (currentUiLang() == org.koitharu.kotatsu.desktop.ui.strings.UiLang.EN) en else fr
 
 @Composable
 public fun SectionsSettingsScreen(
@@ -108,7 +114,7 @@ public fun SectionsSettingsScreen(
 						},
 						enabled = index > 0,
 					) {
-						Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Monter")
+						Icon(Icons.Filled.KeyboardArrowUp, contentDescription = t("Monter", "Move up"))
 					}
 					IconButton(
 						onClick = {
@@ -120,14 +126,14 @@ public fun SectionsSettingsScreen(
 						},
 						enabled = index < sections.lastIndex,
 					) {
-						Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Descendre")
+						Icon(Icons.Filled.KeyboardArrowDown, contentDescription = t("Descendre", "Move down"))
 					}
 					IconButton(
 						onClick = { persist(sections.filterIndexed { i, _ -> i != index }) },
 					) {
 						Icon(
 							Icons.Outlined.Delete,
-							contentDescription = "Retirer",
+							contentDescription = FR_ACTION_REMOVE,
 							tint = MaterialTheme.colorScheme.error,
 						)
 					}
@@ -176,7 +182,10 @@ public fun SectionsSettingsScreen(
 				Column {
 					if (addOptions.none { (_, item) -> item != null && item.name !in sections }) {
 						Text(
-							text = "Toutes les sections disponibles sont déjà affichées",
+							text = t(
+								"Toutes les sections disponibles sont déjà affichées",
+								"All available sections are already shown",
+							),
 							style = MaterialTheme.typography.bodyMedium,
 							color = MaterialTheme.colorScheme.onSurfaceVariant,
 						)

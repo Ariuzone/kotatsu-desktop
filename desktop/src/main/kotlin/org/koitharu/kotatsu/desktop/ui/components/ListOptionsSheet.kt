@@ -53,14 +53,18 @@ import org.koitharu.kotatsu.core.prefs.AppSettings
 import org.koitharu.kotatsu.core.prefs.ListMode
 import org.koitharu.kotatsu.desktop.ui.strings.FR_GRID_SIZE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_LIST_MODE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_SORT_ORDER
+import org.koitharu.kotatsu.desktop.ui.strings.currentUiLang
 import org.koitharu.kotatsu.desktop.ui.strings.frListModeLabel
 import org.koitharu.kotatsu.parsers.model.SortOrder
 
-// strings.xml d'origine (values-fr) — non présents dans Fr.kt (fichier tenu par un autre agent)
-private const val SORT_ORDER = "Ordre de tri" // string sort_order
-private const val SORT_LAST_READ = "Dernier lu" // string/entry list_sort_last_read
-private const val SORT_BY_NAME = "Par nom" // string/entry list_sort_name
-private const val GROUP = "Groupe" // string group
+/** Chaîne dépendant de la langue d'interface courante (P9 : zéro chaîne FR-only en anglais). */
+private fun t(fr: String, en: String): String =
+	if (currentUiLang() == org.koitharu.kotatsu.desktop.ui.strings.UiLang.EN) en else fr
+
+// strings.xml d'origine (values-fr) — « Ordre de tri » est déjà une constante i18n
+// (FR_SORT_ORDER, FrSources.kt) ; les trois autres libellés passent par le pattern t() (P9).
+// Anciennes clés : list_sort_last_read « Dernier lu », list_sort_name « Par nom », group « Groupe ».
 
 private val SHEET_HORIZONTAL_PADDING = 16.dp
 private val SHEET_BOTTOM_PADDING = 24.dp
@@ -121,10 +125,10 @@ public class ListOptionsState(private val settings: AppSettings) {
 		}
 }
 
-/** Libellé FR d'un ordre de tri proposé dans la feuille. */
+/** Libellé (FR/EN) d'un ordre de tri proposé dans la feuille. */
 private fun sortLabel(order: SortOrder): String = when (order) {
-	SortOrder.ALPHABETICAL, SortOrder.ALPHABETICAL_DESC -> SORT_BY_NAME
-	else -> SORT_LAST_READ // défaut / NEWEST : « Dernier lu »
+	SortOrder.ALPHABETICAL, SortOrder.ALPHABETICAL_DESC -> t("Par nom", "By name")
+	else -> t("Dernier lu", "Last read") // défaut / NEWEST : « Dernier lu »
 }
 
 /** Ordres de tri proposés (comme l'original : dernier lu, par nom). */
@@ -204,7 +208,7 @@ public fun ListOptionsSheet(
 				horizontalArrangement = Arrangement.spacedBy(CONTROL_SPACING),
 			) {
 				Text(
-					text = SORT_ORDER,
+					text = FR_SORT_ORDER,
 					style = MaterialTheme.typography.titleSmall,
 					color = MaterialTheme.colorScheme.onSurface,
 					maxLines = 1,
@@ -249,7 +253,7 @@ public fun ListOptionsSheet(
 				horizontalArrangement = Arrangement.spacedBy(CONTROL_SPACING),
 			) {
 				Text(
-					text = GROUP,
+					text = t("Groupe", "Group"),
 					style = MaterialTheme.typography.titleSmall,
 					color = MaterialTheme.colorScheme.onSurface,
 					maxLines = 1,

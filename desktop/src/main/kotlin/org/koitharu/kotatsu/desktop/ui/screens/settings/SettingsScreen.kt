@@ -104,10 +104,15 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_RELATED_MANGA_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SEARCH_SUGGESTIONS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SEARCH_SUGGESTIONS_SUMMARY
 import org.koitharu.kotatsu.desktop.ui.strings.FR_THEME
+import org.koitharu.kotatsu.desktop.ui.strings.currentUiLang
 import org.koitharu.kotatsu.desktop.ui.strings.frListModeLabel
 import org.koitharu.kotatsu.desktop.ui.strings.frProgressModeLabel
 import org.koitharu.kotatsu.desktop.ui.theme.ThemeMode
 import org.koitharu.kotatsu.desktop.ui.theme.isDarkTheme
+
+/** Chaîne dépendant de la langue d'interface courante (P9 : zéro chaîne FR-only en anglais). */
+private fun t(fr: String, en: String): String =
+	if (currentUiLang() == org.koitharu.kotatsu.desktop.ui.strings.UiLang.EN) en else fr
 
 @Composable
 public fun AppearanceSettingsScreen(
@@ -255,8 +260,8 @@ private fun AppearanceSettingsContent(
 				icon = Icons.Outlined.Info,
 				title = FR_LANGUAGE,
 				subtitle = when (langValue) {
-					"en" -> "English"
-					"fr" -> "Français"
+					"en" -> t("English", "English")
+					"fr" -> t("Français", "French")
 					else -> FR_LANGUAGE_SUMMARY
 				},
 				onClick = { if (appSettings != null) langMenu = true },
@@ -266,9 +271,9 @@ private fun AppearanceSettingsContent(
 				RadioDialog(
 					title = FR_LANGUAGE,
 					options = listOf(
-						FR_LANGUAGE_SUMMARY, // « Suivre le système »
-						"English",
-						"Français",
+						FR_LANGUAGE_SUMMARY, // « Suivre le système » / « Follow the system »
+						t("English", "English"),
+						t("Français", "French"),
 					),
 					selectedIndex = when (langValue) {
 						"en" -> 1

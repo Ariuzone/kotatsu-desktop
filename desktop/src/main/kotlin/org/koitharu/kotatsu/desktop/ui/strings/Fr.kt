@@ -88,8 +88,8 @@ public var FR_CLEAR_FEED: String = "Effacer le flux"
 
 /** Pluriel « nouveau(x) chapitre(s) » (plurals.xml : new_chapters, values-fr). */
 public fun frNewChapters(count: Int): String = when (count) {
-	1 -> "1 nouveau chapitre"
-	else -> "$count nouveaux chapitres"
+	1 -> t("1 nouveau chapitre", "1 new chapter")
+	else -> t("$count nouveaux chapitres", "$count new chapters")
 }
 
 // --- Détails du manga (string/read, chapters, chapters_empty, description, expand, collapse,
@@ -119,7 +119,8 @@ public var FR_TEXT_LOCAL_HOLDER_SECONDARY: String =
 	"Enregistrez quelque chose à partir d'un catalogue en ligne ou importez-le à partir d'un fichier."
 public var FR_IMPORT: String = "Importer"
 
-/** Barre d'infos du lecteur (string/reader_info_pattern) : « Ch. %1$d/%2$d Pg. %3$d/%4$d ». */
+/** Barre d'infos du lecteur (string/reader_info_pattern) : « Ch. %1$d/%2$d Pg. %3$d/%4$d ».
+ *  Note i18n : les abréviations « Ch. » / « Pg. » sont identiques en anglais — parité FR/EN. */
 public fun frReaderInfo(chapter: Int, chaptersCount: Int, page: Int, pagesCount: Int): String =
 	"Ch. $chapter/$chaptersCount Pg. $page/$pagesCount"
 
@@ -158,7 +159,8 @@ public var FR_ABOUT_VERSION: String = "Version 1.1.1" // version
 public var FR_COMING_SOON: String = "Cette section sera disponible dans une prochaine phase"
 
 /** Sous-titre « Sources des mangas » : « %1$d de %2$d activé(s) » (capture frame 8). */
-public fun frSourcesEnabled(enabled: Int, total: Int): String = "$enabled de $total activé(s)"
+public fun frSourcesEnabled(enabled: Int, total: Int): String =
+	t("$enabled de $total activé(s)", "$enabled of $total enabled")
 
 // --- Paramètres du lecteur : valeurs affichées (labels values-fr de l'app d'origine) ---
 public var FR_IMAGES_MASKED: String = "Images masquées" // masked_images
@@ -169,44 +171,44 @@ public var FR_IMAGES_MASKED_EMPTY: String =
 
 /** « Mode par défaut » : Standard / De droite à gauche / Vertical / Webtoon (captures §2.1). */
 public fun frReaderModeLabel(mode: org.koitharu.kotatsu.core.prefs.ReaderMode): String = when (mode) {
-	org.koitharu.kotatsu.core.prefs.ReaderMode.STANDARD -> "Standard"
-	org.koitharu.kotatsu.core.prefs.ReaderMode.REVERSED -> "De droite à gauche"
-	org.koitharu.kotatsu.core.prefs.ReaderMode.VERTICAL -> "Vertical"
-	org.koitharu.kotatsu.core.prefs.ReaderMode.WEBTOON -> "Webtoon"
+	org.koitharu.kotatsu.core.prefs.ReaderMode.STANDARD -> t("Standard", "Standard")
+	org.koitharu.kotatsu.core.prefs.ReaderMode.REVERSED -> t("De droite à gauche", "Right to left")
+	org.koitharu.kotatsu.core.prefs.ReaderMode.VERTICAL -> t("Vertical", "Vertical")
+	org.koitharu.kotatsu.core.prefs.ReaderMode.WEBTOON -> t("Webtoon", "Webtoon")
 }
 
 /** « Mode mise à l'échelle » (values-fr : Ajuster au centre…). */
 public fun frReaderScaleLabel(mode: org.koitharu.kotatsu.core.prefs.ScaleMode): String = when (mode) {
-	org.koitharu.kotatsu.core.prefs.ScaleMode.FIT_CENTER -> "Ajuster au centre"
-	org.koitharu.kotatsu.core.prefs.ScaleMode.FIT_WIDTH -> "Ajuster à la largeur"
-	org.koitharu.kotatsu.core.prefs.ScaleMode.FIT_HEIGHT -> "Ajuster à la hauteur"
-	org.koitharu.kotatsu.core.prefs.ScaleMode.CROP -> "Recadrer"
+	org.koitharu.kotatsu.core.prefs.ScaleMode.FIT_CENTER -> t("Ajuster au centre", "Fit center")
+	org.koitharu.kotatsu.core.prefs.ScaleMode.FIT_WIDTH -> t("Ajuster à la largeur", "Fit width")
+	org.koitharu.kotatsu.core.prefs.ScaleMode.FIT_HEIGHT -> t("Ajuster à la hauteur", "Fit height")
+	org.koitharu.kotatsu.core.prefs.ScaleMode.CROP -> t("Recadrer", "Crop")
 }
 
 /** « Animation de page » (enum ReaderAnimation : NONE / DEFAULT / ADVANCED). */
 public fun frReaderAnimationLabel(animation: org.koitharu.kotatsu.core.prefs.ReaderAnimation): String =
 	when (animation) {
-		org.koitharu.kotatsu.core.prefs.ReaderAnimation.NONE -> "Aucune"
-		org.koitharu.kotatsu.core.prefs.ReaderAnimation.DEFAULT -> "Par défaut"
-		org.koitharu.kotatsu.core.prefs.ReaderAnimation.ADVANCED -> "Avancée"
+		org.koitharu.kotatsu.core.prefs.ReaderAnimation.NONE -> t("Aucune", "None")
+		org.koitharu.kotatsu.core.prefs.ReaderAnimation.DEFAULT -> t("Par défaut", "Default")
+		org.koitharu.kotatsu.core.prefs.ReaderAnimation.ADVANCED -> t("Avancée", "Advanced")
 	}
 
 /** « Arrière-plan » (enum ReaderBackground). */
 public fun frReaderBackgroundLabel(background: org.koitharu.kotatsu.core.prefs.ReaderBackground): String =
 	when (background) {
-		org.koitharu.kotatsu.core.prefs.ReaderBackground.DEFAULT -> "Par défaut"
-		org.koitharu.kotatsu.core.prefs.ReaderBackground.LIGHT -> "Clair"
-		org.koitharu.kotatsu.core.prefs.ReaderBackground.DARK -> "Sombre"
-		org.koitharu.kotatsu.core.prefs.ReaderBackground.WHITE -> "Blanc"
-		org.koitharu.kotatsu.core.prefs.ReaderBackground.BLACK -> "Noir"
+		org.koitharu.kotatsu.core.prefs.ReaderBackground.DEFAULT -> t("Par défaut", "Default")
+		org.koitharu.kotatsu.core.prefs.ReaderBackground.LIGHT -> t("Clair", "Light")
+		org.koitharu.kotatsu.core.prefs.ReaderBackground.DARK -> t("Sombre", "Dark")
+		org.koitharu.kotatsu.core.prefs.ReaderBackground.WHITE -> t("Blanc", "White")
+		org.koitharu.kotatsu.core.prefs.ReaderBackground.BLACK -> t("Noir", "Black")
 	}
 
 /** « Précharger les pages » (enum NetworkPolicy : Toujours / Uniquement en Wi-Fi / Jamais). */
 public fun frNetworkPolicyLabel(policy: org.koitharu.kotatsu.core.prefs.NetworkPolicy): String =
 	when (policy) {
-		org.koitharu.kotatsu.core.prefs.NetworkPolicy.ALWAYS -> "Toujours"
-		org.koitharu.kotatsu.core.prefs.NetworkPolicy.NON_METERED -> "Uniquement en Wi-Fi"
-		org.koitharu.kotatsu.core.prefs.NetworkPolicy.NEVER -> "Jamais"
+		org.koitharu.kotatsu.core.prefs.NetworkPolicy.ALWAYS -> t("Toujours", "Always")
+		org.koitharu.kotatsu.core.prefs.NetworkPolicy.NON_METERED -> t("Uniquement en Wi-Fi", "Wi-Fi only")
+		org.koitharu.kotatsu.core.prefs.NetworkPolicy.NEVER -> t("Jamais", "Never")
 	}
 
 // --- Phase P2 : Apparence (libellés exacts des captures frames 21-25) ---
@@ -270,19 +272,19 @@ public var FR_EXIT_DIALOG_CONFIRM: String = "Quitter"
 
 /** « Mode liste » : Compact / Détails / Grille (bottom sheet Options de liste, frame 0:30). */
 public fun frListModeLabel(mode: org.koitharu.kotatsu.core.prefs.ListMode): String = when (mode) {
-	org.koitharu.kotatsu.core.prefs.ListMode.LIST -> "Compact"
-	org.koitharu.kotatsu.core.prefs.ListMode.DETAILED_LIST -> "Détails"
-	org.koitharu.kotatsu.core.prefs.ListMode.GRID -> "Grille"
+	org.koitharu.kotatsu.core.prefs.ListMode.LIST -> t("Compact", "Compact")
+	org.koitharu.kotatsu.core.prefs.ListMode.DETAILED_LIST -> t("Détails", "Detailed")
+	org.koitharu.kotatsu.core.prefs.ListMode.GRID -> t("Grille", "Grid")
 }
 
 /** « Afficher les indicateurs de progression de lecture » (dialog radio, frame 1:45). */
 public fun frProgressModeLabel(mode: org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode): String =
 	when (mode) {
-		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.NONE -> "Désactivé"
-		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.PERCENT_READ -> "Pourcentage lu"
-		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.PERCENT_LEFT -> "Pourcentage restant"
-		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.CHAPTERS_READ -> "Chapitres lus"
-		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.CHAPTERS_LEFT -> "Chapitres restants"
+		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.NONE -> t("Désactivé", "Disabled")
+		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.PERCENT_READ -> t("Pourcentage lu", "Percent read")
+		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.PERCENT_LEFT -> t("Pourcentage restant", "Percent left")
+		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.CHAPTERS_READ -> t("Chapitres lus", "Chapters read")
+		org.koitharu.kotatsu.core.prefs.ProgressIndicatorMode.CHAPTERS_LEFT -> t("Chapitres restants", "Chapters left")
 	}
 
 /** Libellés FR du rail (Principales sections de l'écran + rail principal). */
@@ -329,8 +331,8 @@ public var FR_NO_CHAPTERS: String = "Aucun chapitre"
 
 /** « 26 chapitres » (vidéo t≈7:10 « Chapitres : 26 chapitres (1 h 26 m) ») ; singulier « 1 chapitre ». */
 public fun frChaptersCount(count: Int): String = when (count) {
-	1 -> "1 chapitre"
-	else -> "$count chapitres"
+	1 -> t("1 chapitre", "1 chapter")
+	else -> t("$count chapitres", "$count chapters")
 }
 
 /**
@@ -348,6 +350,8 @@ public fun frDuration(minutes: Int): String {
 	} else {
 		"$m m"
 	}
+	// Note i18n : « h » / « m » sont identiques en anglais (« 1 h 26 m » / « 26 m ») —
+	// aucun branchement t() nécessaire (parité FR/EN vérifiée).
 }
 
 /** « Lire le chapitre 1 » (menu ▾ du bouton Lire, vidéo t≈7:15 ; pas de clé values-fr relevée). */
@@ -360,7 +364,8 @@ public var FR_CONTINUE: String = "Continuer"
 public fun frContinueChapter(chapterNumber: Int): String = "$FR_CONTINUE · $chapterNumber"
 
 /** « Chapitre 2 sur 26 » (string/chapter_d_of_d, values-fr ; vidéo t≈9:25). */
-public fun frChapterXofY(current: Int, total: Int): String = "Chapitre $current sur $total"
+public fun frChapterXofY(current: Int, total: Int): String =
+	t("Chapitre $current sur $total", "Chapter $current of $total")
 
 /** « Progression : » (string/progress, values-fr ; vidéo t≈9:25 ligne « Progression : 4 % »). */
 public var FR_PROGRESS: String = "Progression"

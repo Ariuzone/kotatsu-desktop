@@ -268,10 +268,10 @@ public var FR_DISCORD_HIDE_NSFW: String = "Masquer le contenu NSFW sur Discord" 
 public var FR_DISCORD_HIDE_NSFW_SUMMARY: String =
 	"Ne pas utiliser la présence enrichie pour du contenu adulte" // frame 78
 
-/** Taille lisible en Ko/Mo/Go (unités affichées de l'original, libellés vidéo). */
+/** Taille lisible en Ko/Mo/Go (unités affichées de l'original, libellés vidéo) ; anglais B/KB/MB/GB. */
 public fun frFileSize(bytes: Long): String = when {
-	bytes >= 1_000_000_000L -> String.format("%.1f Go", bytes / 1_000_000_000.0)
-	bytes >= 1_000_000L -> String.format("%.1f Mo", bytes / 1_000_000.0)
-	bytes >= 1_000L -> String.format("%.0f Ko", bytes / 1_000.0)
-	else -> String.format("%d o", bytes)
+	bytes >= 1_000_000_000L -> String.format(t("%.1f Go", "%.1f GB"), bytes / 1_000_000_000.0)
+	bytes >= 1_000_000L -> String.format(t("%.1f Mo", "%.1f MB"), bytes / 1_000_000.0)
+	bytes >= 1_000L -> String.format(t("%.0f Ko", "%.0f KB"), bytes / 1_000.0)
+	else -> String.format(t("%d o", "%d B"), bytes)
 }

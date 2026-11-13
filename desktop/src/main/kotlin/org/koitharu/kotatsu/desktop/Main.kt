@@ -84,6 +84,11 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_EXPLORE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SOURCE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_FEED
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SETTINGS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CONTINUE_READING_CD
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_BOOKMARK_ADDED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_BOOKMARK_REMOVED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_PAGE_SAVED
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_PAGE_URL_COPIED
 import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_SETTINGS
 import org.koitharu.kotatsu.desktop.ui.strings.FR_MANGA_SOURCES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SUGGESTIONS
@@ -1042,7 +1047,7 @@ private fun MainScreen(container: AppContainer) {
 						}
 					},
 					icon = { Icon(Icons.Filled.PlayArrow, contentDescription = null) },
-					text = { Text("Continuer la lecture") },
+					text = { Text(FR_CONTINUE_READING_CD) },
 					modifier = Modifier
 						.align(Alignment.BottomEnd)
 						.padding(16.dp),
@@ -1078,12 +1083,6 @@ private data class ReaderRequest(
 	val chapterIndex: Int,
 	val chapters: List<MangaChapter>,
 )
-
-// TODO(vague 2) : chaînes temporaires — migrer vers FrReader.kt (créé par l'agent P7-B)
-private const val FR_READER_BOOKMARK_ADDED = "Marque-page ajouté"
-private const val FR_READER_BOOKMARK_REMOVED = "Marque-page retiré"
-private const val FR_READER_PAGE_SAVED = "Page enregistrée"
-private const val FR_READER_PAGE_URL_COPIED = "Enregistrement impossible : URL de la page copiée"
 
 // --- Gomme webtoon (vague 2) : encodage des rectangles normalisés dans PageScanEntity.bands ---
 // Format « x1,y1,x2,y2;x1,y1,x2,y2 » (coordonnées 0..1, page-scans de HiddenImagesDatabase,

@@ -1,5 +1,24 @@
 # Plan de travail (lots)
 
+> **PLAN TERMINÉ (2026-11-13)** — toutes les phases P0→P9 sont exécutées ; version livrée
+> **1.1.1** (`Kotatsu-Desktop-1.1.1.exe`). Récapitulatif :
+>
+> | Phase | Contenu |
+> |---|---|
+> | P0 | Squelette `:core` (Kotlin/JVM) + `:desktop` (Compose M3), modèles/prefs/DI, build validé |
+> | P1 | Core complet (Room v28, réseau, parsers JitPack), shell + écrans de base (Explore/Recherche/Détails/Lecteur/Favoris/Historique), packaging jpackage |
+> | P2 | Téléchargements + CBZ local, signets, apparence complète, options de liste, sections réordonnables |
+> | P3 | Sources des mangas (gestion, catalogue, préréglages, liens), tracker + verrouillage par mot de passe |
+> | P4 | Suggestions, nouveaux chapitres (scheduler branché, journal) |
+> | P5 | Vos données (stockage, sauvegarde/restauration ZIP, data removal), notifications, réseau, À propos |
+> | P6 | Comptes et synchronisation, confidentialité et contenu |
+> | P7 | Lecteur avancé (modes mémorisés par manga, défilement auto, correction des couleurs, gomme) |
+> | P8 | Découverte & écriture (fiche enrichie, dialog favoris, filtres catalogue, puce ★) |
+> | P9 | i18n final FR/EN (363 chaînes), parité finale documentée, version 1.1.1 |
+>
+> Journaux par phase : `docs/P2_JOURNAL.md` → `docs/P9_JOURNAL.md` (coordination :
+> `docs/COORDINATION.md`, rapport final : `docs/PORTING_REPORT.md`).
+
 Découpage en lots avec propriétaire exclusif des fichiers, dépendances et critères de fin.
 Mode d'exécution : sous-agents en parallèle quand l'environnement le permet (limite de concurrence
 observée : 1 sous-agent simultané → lots séquencés, l'agent principal travaille en parallèle sur

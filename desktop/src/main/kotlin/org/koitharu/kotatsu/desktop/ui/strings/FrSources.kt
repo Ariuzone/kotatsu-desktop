@@ -34,7 +34,7 @@ public var FR_MANAGE_LINKS_SUMMARY: String =
 
 /** Sous-titre « N éléments » de « Gérer les sources » (vidéo : « 361 éléments »). */
 public fun frItemsCount(count: Int): String =
-	if (count == 1) "1 élément" else "$count éléments"
+	if (count == 1) t("1 élément", "1 item") else t("$count éléments", "$count items")
 
 /** Sous-titre « Disponible : N » de « Sources catalogue » (vidéo : « Disponible : 596 »). */
 public fun frAvailableCount(count: Int): String = FR_AVAILABLE_COUNT + count
@@ -77,7 +77,8 @@ public var FR_BOOKMARKS_EMPTY_PRIMARY: String = "Aucun marque-page"
 public var FR_BOOKMARKS_EMPTY_SECONDARY: String =
 	"Vous pouvez créer un marque-page pendant la lecture d'un manga"
 
-/** Libellé « Page N » sous chaque signet (N = index de page + 1). */
+/** Libellé « Page N » sous chaque signet (N = index de page + 1).
+ *  Note i18n : « Page N » est identique en anglais — parité FR/EN vérifiée. */
 public fun frBookmarkPage(page: Int): String = "Page ${page + 1}"
 
 // --- Écran « Favoris » (FavouritesScreen, string manage) ---
@@ -136,24 +137,24 @@ public var FR_RETRY: String = "Réessayer" // bouton du pied d'erreur catalogue 
  * adaptations desktop (non montrées dans la vidéo).
  */
 public fun frSortOrderLabel(order: SortOrder): String = when (order) {
-	SortOrder.UPDATED -> FR_UPDATES // string updated (« Mis à jour », Fr.kt)
-	SortOrder.UPDATED_ASC -> "Mis à jour (croissant)"
-	SortOrder.POPULARITY -> FR_SORT_POPULARITY
-	SortOrder.POPULARITY_ASC -> "Populaires (croissant)"
-	SortOrder.POPULARITY_HOUR -> "Populaires (dernière heure)"
-	SortOrder.POPULARITY_TODAY -> "Populaires (aujourd'hui)"
-	SortOrder.POPULARITY_WEEK -> "Populaires (semaine)"
-	SortOrder.POPULARITY_MONTH -> "Populaires (mois)"
-	SortOrder.POPULARITY_YEAR -> "Populaires (année)"
-	SortOrder.RATING -> FR_SORT_RATING
-	SortOrder.RATING_ASC -> "Mieux notés (croissant)"
-	SortOrder.NEWEST -> FR_NEWEST // string sources_catalog « Nouveaux » (Fr.kt)
-	SortOrder.NEWEST_ASC -> "Nouveaux (croissant)"
-	SortOrder.ALPHABETICAL -> FR_SORT_ORDER_ALPHABETIC // « Alphabétique » (constante ci-dessus)
-	SortOrder.ALPHABETICAL_DESC -> "Alphabétique (inverse)"
-	SortOrder.ADDED -> "Ajoutés"
-	SortOrder.ADDED_ASC -> "Ajoutés (croissant)"
-	SortOrder.RELEVANCE -> "Pertinence"
+	SortOrder.UPDATED -> FR_UPDATES // string updated (« Mis à jour » / « Updated », Fr.kt)
+	SortOrder.UPDATED_ASC -> t("Mis à jour (croissant)", "Updated (ascending)")
+	SortOrder.POPULARITY -> FR_SORT_POPULARITY // « Populaires » / « Popular »
+	SortOrder.POPULARITY_ASC -> t("Populaires (croissant)", "Popular (ascending)")
+	SortOrder.POPULARITY_HOUR -> t("Populaires (dernière heure)", "Popular in the last hour")
+	SortOrder.POPULARITY_TODAY -> t("Populaires (aujourd'hui)", "Popular today")
+	SortOrder.POPULARITY_WEEK -> t("Populaires (semaine)", "Popular this week")
+	SortOrder.POPULARITY_MONTH -> t("Populaires (mois)", "Popular this month")
+	SortOrder.POPULARITY_YEAR -> t("Populaires (année)", "Popular this year")
+	SortOrder.RATING -> FR_SORT_RATING // « Mieux notés » / « Top rated »
+	SortOrder.RATING_ASC -> t("Mieux notés (croissant)", "Top rated (ascending)")
+	SortOrder.NEWEST -> FR_NEWEST // « Nouveaux » / « Newest » (string sources_catalog, Fr.kt)
+	SortOrder.NEWEST_ASC -> t("Nouveaux (croissant)", "Newest (ascending)")
+	SortOrder.ALPHABETICAL -> FR_SORT_ORDER_ALPHABETIC // « Alphabétique » / « Alphabetical »
+	SortOrder.ALPHABETICAL_DESC -> t("Alphabétique (inverse)", "Alphabetical (reverse)")
+	SortOrder.ADDED -> t("Ajoutés", "Added")
+	SortOrder.ADDED_ASC -> t("Ajoutés (croissant)", "Added (ascending)")
+	SortOrder.RELEVANCE -> t("Pertinence", "Relevance")
 }
 
 /** Ordres de tri proposés par défaut dans la sheet du catalogue (comme la vidéo : popularité d'abord). */

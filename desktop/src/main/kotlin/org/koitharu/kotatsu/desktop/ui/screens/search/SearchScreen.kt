@@ -65,13 +65,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koitharu.kotatsu.desktop.ui.components.MangaGrid
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CONTENT_TYPE_HENTAI
+import org.koitharu.kotatsu.desktop.ui.strings.FR_CONTENT_TYPE_MANGA
+import org.koitharu.kotatsu.desktop.ui.strings.FR_MISC_LANGUAGES
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SEARCH_HINT
+import org.koitharu.kotatsu.desktop.ui.strings.currentUiLang
 import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 
 private val SUGGESTION_WIDTH = 120.dp // largeur des couvertures de suggestions (capture)
 private val SUGGESTION_CORNER = 12.dp
+
+/** Chaîne dépendant de la langue d'interface courante (P9 : zéro chaîne FR-only en anglais). */
+private fun t(fr: String, en: String): String =
+	if (currentUiLang() == org.koitharu.kotatsu.desktop.ui.strings.UiLang.EN) en else fr
 
 /**
  * Recherche multi-sources. Saisie débounce 500 ms comme l'app d'origine ; [onQuery] déclenche
@@ -149,7 +157,7 @@ public fun SearchScreen(
 					},
 				)
 				IconButton(onClick = {}) {
-					Icon(Icons.Filled.Mic, contentDescription = "Recherche vocale")
+					Icon(Icons.Filled.Mic, contentDescription = t("Recherche vocale", "Voice search"))
 				}
 				IconButton(onClick = {}) {
 					Icon(Icons.Filled.MoreVert, contentDescription = null)
@@ -281,7 +289,7 @@ private fun HistoryRow(history: List<String>, onHistoryClick: (String) -> Unit) 
 			)
 			Icon(
 				imageVector = Icons.Filled.NorthWest,
-				contentDescription = "Rechercher à nouveau",
+				contentDescription = t("Rechercher à nouveau", "Search again"),
 				tint = MaterialTheme.colorScheme.onSurfaceVariant,
 			)
 		}
@@ -341,12 +349,12 @@ private fun SourceSuggestions(
 }
 
 private fun sourceContentType(source: MangaParserSource): String = when (source.contentType) {
-	ContentType.HENTAI -> "Hentais"
-	else -> "Mangas"
+	ContentType.HENTAI -> FR_CONTENT_TYPE_HENTAI
+	else -> FR_CONTENT_TYPE_MANGA
 }
 
 private fun localeDisplay(locale: String): String {
-	if (locale.isBlank()) return "Langues diverses"
+	if (locale.isBlank()) return FR_MISC_LANGUAGES
 	val l = runCatching { Locale.forLanguageTag(locale) }.getOrNull() ?: return locale
 	return l.getDisplayLanguage(l).ifBlank { locale }
 }

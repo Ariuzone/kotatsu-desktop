@@ -132,6 +132,13 @@ import org.koitharu.kotatsu.desktop.ui.strings.FR_COLOR_CORRECTION
 import org.koitharu.kotatsu.desktop.ui.strings.FR_INCOGNITO
 import org.koitharu.kotatsu.desktop.ui.strings.FR_NEXT_CHAPTER
 import org.koitharu.kotatsu.desktop.ui.strings.FR_PREV_CHAPTER
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_ADD_BOOKMARK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_DOUBLE_PAGES
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_ERASER
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_MORE_OPTIONS
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_READING_MODE
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_REMOVE_BOOKMARK
+import org.koitharu.kotatsu.desktop.ui.strings.FR_READER_ROTATE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_SAVE_PAGE
 import org.koitharu.kotatsu.desktop.ui.strings.FR_ZOOM_IN
 import org.koitharu.kotatsu.desktop.ui.strings.FR_ZOOM_OUT
@@ -144,15 +151,6 @@ private const val ZOOM_MAX = 6f
 
 /** Intervalle de base (ms) entre deux sauts de page en défilement automatique pager (x1.0). */
 private const val AUTO_SCROLL_PAGE_INTERVAL_MS = 4000.0
-
-// TODO(vague 3) : chaînes temporaires — migrer vers FrReader.kt (fichier propriété de P7-B)
-private const val FR_READER_MORE_OPTIONS = "Plus d'options"
-private const val FR_READER_ADD_BOOKMARK = "Ajouter un marque-page"
-private const val FR_READER_REMOVE_BOOKMARK = "Retirer le marque-page"
-private const val FR_READER_READING_MODE = "Mode lecture"
-private const val FR_READER_DOUBLE_PAGES = "Pages doubles (paysage) — bêta"
-private const val FR_READER_ROTATE = "Faire pivoter l'écran"
-private const val FR_READER_ERASER = "Gomme"
 
 /**
  * Tuto gomme déjà affiché pendant cette session (état local, spec vague 2 #3 : à la première

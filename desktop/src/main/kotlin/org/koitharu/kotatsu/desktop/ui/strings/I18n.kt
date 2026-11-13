@@ -11,6 +11,23 @@ package org.koitharu.kotatsu.desktop.ui.strings
 /** Langues d'interface disponibles (français par défaut de ce portage, anglais). */
 public enum class UiLang { FR, EN }
 
+/**
+ * Langue d'interface actuellement appliquée (mise à jour par [applyUiLanguage]).
+ * Utilisée par le pattern `t(fr, en)` des chaînes hors constantes (libellés calculés,
+ * chaînes inline des écrans) : la valeur affichée ne se rafraîchit qu'à la recomposition.
+ */
+internal var currentLang: UiLang = UiLang.FR
+
+/** Langue d'interface courante (pour le pattern `t(fr, en)` des écrans et libellés calculés). */
+public fun currentUiLang(): UiLang = currentLang
+
+/**
+ * Chaîne dépendant de la langue courante : pattern `t("français", "English")`.
+ * Utilisé pour les chaînes inline des écrans et les libellés calculés hors constantes FR_* ;
+ * la valeur affichée ne se rafraîchit qu'à la recomposition (accepté, documenté).
+ */
+internal fun t(fr: String, en: String): String = if (currentLang == UiLang.EN) en else fr
+
 /** Traductions anglaises, indexées par nom de constante. */
 private val EN_STRINGS: Map<String, String> = mapOf(
 	"FR_SEARCH_MANGA" to "Search a manga",
@@ -108,6 +125,8 @@ private val EN_STRINGS: Map<String, String> = mapOf(
 	"FR_LIST_MODE" to "List mode",
 	"FR_GRID_SIZE" to "Grid size",
 	"FR_QUICK_FILTERS" to "Show quick filters",
+	"FR_QUICK_FILTERS_SUMMARY" to "Provides the ability to filter manga lists by certain parameters",
+	"FR_AMOLED_SUMMARY" to "Uses less power on AMOLED screens",
 	"FR_PROGRESS_INDICATORS" to "Show reading progress indicators",
 	"FR_LIST_BADGES" to "Badges in lists",
 	"FR_LIST_BADGES_SUMMARY" to "Saved mangas, Favourites",
@@ -376,6 +395,69 @@ private val EN_STRINGS: Map<String, String> = mapOf(
 	"FR_SERVICE_SHIKIMORI" to "Shikimori",
 	"FR_COMMUNITY_ROW" to "Community: Comments, ratings and source reliability",
 	"FR_DISCORD_ROW" to "Discord Rich Presence",
+	// Chaînes temporaires du lecteur migrées (ReaderScreen.kt) + toasts lecteur (Main.kt), P9
+	"FR_READER_MORE_OPTIONS" to "More options",
+	"FR_READER_ADD_BOOKMARK" to "Add a bookmark",
+	"FR_READER_REMOVE_BOOKMARK" to "Remove bookmark",
+	"FR_READER_READING_MODE" to "Reading mode",
+	"FR_READER_DOUBLE_PAGES" to "Double pages (landscape) — beta",
+	"FR_READER_ROTATE" to "Rotate screen",
+	"FR_READER_ERASER" to "Eraser",
+	"FR_READER_BOOKMARK_ADDED" to "Bookmark added",
+	"FR_READER_BOOKMARK_REMOVED" to "Bookmark removed",
+	"FR_READER_PAGE_SAVED" to "Page saved",
+	"FR_READER_PAGE_URL_COPIED" to "Cannot save: page URL copied",
+	// public var multi-lignes des fichiers Fr*.k (valeur sur la ligne suivante), P9 complément
+	"FR_TEXT_LOCAL_HOLDER_SECONDARY" to "Save something from an online catalog or import it from a file.",
+	"FR_READER_SETTINGS_SUMMARY" to "Reading mode, Scale mode, Page switching",
+	"FR_NEW_CHAPTERS_SUMMARY" to "Check frequency, Check for updates",
+	"FR_DOWNLOADS_STORAGE_SUMMARY" to "Downloads folder, Storage usage, Data removal",
+	"FR_PRIVACY_SUMMARY" to "Adult content, Application security, Your activity",
+	"FR_IMAGES_MASKED_SUMMARY" to "Everything you have erased. Remove an image to see it again",
+	"FR_IMAGES_MASKED_EMPTY" to "Nothing masked yet. Rub an image with your thumb while reading to mask it",
+	"FR_RELATED_MANGA_SUMMARY" to "Show a list of related mangas. In some cases it may be inaccurate or missing",
+	"FR_PIN_NAVIGATION_SUMMARY" to "Don't hide the navigation bar and the search view while scrolling",
+	"FR_FLOATING_CONTINUE_SUMMARY" to "Lets you continue reading with one click. This button will not appear in incognito mode or when the history is empty",
+	"FR_SEARCH_SUGGESTIONS_SUMMARY" to "Manga sources, Genres, Recent queries, Authors, Suggested queries, Recent sources, Mangas",
+	"FR_EXIT_CONFIRMATION_SUMMARY" to "Ask for confirmation before closing the window (desktop)",
+	"FR_RECENT_SHORTCUTS_SUMMARY" to "Long-press gesture on the Android icon, no desktop equivalent",
+	"FR_ENABLE_ALL_SOURCES_SUMMARY" to "All available manga sources will be permanently enabled",
+	"FR_AUTO_MIRROR_SUMMARY" to "Automatic domain switching for manga sources on error if mirrors are available",
+	"FR_MANAGE_LINKS_SUMMARY" to "Manage manga links from external applications (for example, a web browser)",
+	"FR_EMPTY_SOURCES_CATALOG_TEXT" to "There are no sources available in this section, or all of them may have been added. Stay tuned",
+	"FR_MANAGE_LINKS_EXPLANATION" to "Manage manga links from external applications (for example, a web browser). You may also need to enable it manually in the application's system settings.",
+	"FR_MANAGE_LINKS_DESKTOP_NOTE" to "In the desktop version, deep links from external applications are not supported: open a manga link directly in Kotatsu-Redo. Mirror domains, if any, will be listed here read-only.",
+	"FR_BOOKMARKS_EMPTY_SECONDARY" to "You can create a bookmark while reading a manga",
+	"FR_CREATE_BACKUP_SUMMARY" to "Save the database and settings to a ZIP file",
+	"FR_RESTORE_BACKUP_SUMMARY" to "Restore the database and settings from a ZIP file",
+	"FR_RESTORE_WARNING" to "The application will be closed to restore the backup. Continue?",
+	"FR_CLOSE_APP_NOTE" to "It is recommended to close the application before creating or restoring a backup to ensure database consistency. Restoring closes the application automatically: restart it afterwards.",
+	"FR_DIR_CHANGED_MESSAGE" to "The selected folder has been saved. In this desktop port, existing downloads are not moved automatically: move them manually to the new folder to find them in the local library.",
+	"FR_CONFIRM_HISTORY" to "Are you sure you want to clear the whole reading history? This action cannot be undone.",
+	"FR_CONFIRM_SUGGESTIONS" to "Are you sure you want to clear all suggestions? This action cannot be undone.",
+	"FR_CONFIRM_NETWORK_CACHE" to "Are you sure you want to clear the network cache? Already loaded pages will be downloaded again.",
+	"FR_CONFIRM_COOKIES" to "Are you sure you want to clear the cookies? You will be logged out of the sources.",
+	"FR_FEED_LOG_SUBTITLE" to "Debug information about the background check for new chapters",
+	"FR_BATTERY_OPTIMIZATION_SUBTITLE" to "Helps with background update checks…",
+	"FR_CATEGORIES_EMPTY" to "No favourite categories. Add mangas to your favourites to organize the new chapters check by category.",
+	"FR_FEED_LOG_EMPTY_TEXT" to "The background new chapters check log is empty. Performed checks will appear here.",
+	"FR_RESTART_NOTE" to "These settings apply after restarting the application.",
+	"FR_TRACKER_NOTIFICATIONS" to "Show a notification when new chapters are detected",
+	"FR_TRACKER_FREQUENCY_SUMMARY" to "Choose how often new chapters are checked",
+	"FR_SUGGESTIONS_NOTIFICATIONS_UNAVAILABLE" to "No suggestions notification setting exists in the current desktop port",
+	"FR_SUGGESTIONS_INCLUDE_DISABLED_SUMMARY" to "Show suggestions from all manga sources, including disabled ones",
+	"FR_SUGGESTIONS_EXCLUDE_GENRES_SUMMARY" to "Specify the genres you don't want to appear in suggestions",
+	"FR_SUGGESTIONS_LOCAL_NOTE" to "All data is analyzed locally on this device and is never sent anywhere else.",
+	"FR_READER_MODE_DETECT_SUMMARY" to "Automatically detect whether a manga is a webtoon",
+	"FR_READER_PAGES_NUMBERED_SUMMARY" to "Show page numbers in the bottom corner",
+	"FR_READER_WEBTOON_SEPARATORS_SUMMARY" to "Show vertical gaps between pages in webtoon mode",
+	"FR_READER_WEBTOON_ZOOM_SUMMARY" to "Ctrl+mouse wheel or double-click in the reader (desktop)",
+	"FR_SUGGESTIONS_18_PLUS_SUMMARY" to "Adult mangas will not be shown in suggestions",
+	"FR_DISCORD_HIDE_NSFW_SUMMARY" to "Don't use rich presence for adult content",
+	"FR_ERASER_TUTORIAL_TEXT" to "Swipe with your finger over the areas to erase; on desktop, drag the mouse over the area to mask while reading. The selected area will be covered as soon as you release the button.",
+	"FR_TRACKERS_UNAVAILABLE" to "Signing in to tracking services is not yet available in the desktop port (web authentication not ported). It will be restored in a future version.",
+	"FR_DISCORD_UNAVAILABLE" to "Discord Rich Presence is not yet available in the desktop port (RPC not ported). It will be restored in a future version.",
+	"FR_SYNC_UNAVAILABLE_NOTE" to "Multi-device sync is not available in the desktop port.",
 )
 
 /** Valeurs françaises d'origine (généré depuis les chaînes du portage). */
@@ -743,10 +825,77 @@ private val FR_STRINGS: Map<String, String> = mapOf(
 	"FR_SERVICE_SHIKIMORI" to "Shikimori",
 	"FR_COMMUNITY_ROW" to "Community : Comments, ratings and source reliability",
 	"FR_DISCORD_ROW" to "Discord Rich Presence",
+	// Chaînes temporaires du lecteur migrées (ReaderScreen.kt) + toasts lecteur (Main.kt), P9
+	"FR_READER_MORE_OPTIONS" to "Plus d'options",
+	"FR_READER_ADD_BOOKMARK" to "Ajouter un marque-page",
+	"FR_READER_REMOVE_BOOKMARK" to "Retirer le marque-page",
+	"FR_READER_READING_MODE" to "Mode lecture",
+	"FR_READER_DOUBLE_PAGES" to "Pages doubles (paysage) — bêta",
+	"FR_READER_ROTATE" to "Faire pivoter l'écran",
+	"FR_READER_ERASER" to "Gomme",
+	"FR_READER_BOOKMARK_ADDED" to "Marque-page ajouté",
+	"FR_READER_BOOKMARK_REMOVED" to "Marque-page retiré",
+	"FR_READER_PAGE_SAVED" to "Page enregistrée",
+	"FR_READER_PAGE_URL_COPIED" to "Enregistrement impossible : URL de la page copiée",
+	// public var multi-lignes des fichiers Fr*.k (valeur sur la ligne suivante), P9 complément
+	"FR_TEXT_LOCAL_HOLDER_SECONDARY" to "Enregistrez quelque chose à partir d'un catalogue en ligne ou importez-le à partir d'un fichier.",
+	"FR_READER_SETTINGS_SUMMARY" to "Mode lecture, Mode mise à l'échelle, Changer de pages",
+	"FR_NEW_CHAPTERS_SUMMARY" to "Fréquence de vérification, Rechercher les mises à jour",
+	"FR_DOWNLOADS_STORAGE_SUMMARY" to "Dossier pour les téléchargements, Utilisation du stockage, Data removal",
+	"FR_PRIVACY_SUMMARY" to "Contenu pour adultes, Sécurité de l'application, Votre activité",
+	"FR_IMAGES_MASKED_SUMMARY" to "Tout ce que vous avez effacé. Retirez une image pour la revoir",
+	"FR_IMAGES_MASKED_EMPTY" to "Rien de masqué pour l'instant. Frottez une image du pouce pendant la lecture pour la masquer",
+	"FR_RELATED_MANGA_SUMMARY" to "Afficher une liste de mangas connexes. Dans certains cas, elle peut être inexacte ou manquante",
+	"FR_PIN_NAVIGATION_SUMMARY" to "Ne pas masquer la barre de navigation et la vue de recherche lors du défilement",
+	"FR_FLOATING_CONTINUE_SUMMARY" to "Permet de continuer la lecture en un clic. Ce bouton n'apparaîtra pas en mode navigation privée ou lorsque l'historique est vide",
+	"FR_SEARCH_SUGGESTIONS_SUMMARY" to "Sources des mangas, Genres, Requêtes récentes, Auteurs, Requêtes suggérées, Sources récentes, Mangas",
+	"FR_EXIT_CONFIRMATION_SUMMARY" to "Demander confirmation avant de fermer la fenêtre (desktop)",
+	"FR_RECENT_SHORTCUTS_SUMMARY" to "Geste long-press de l'icône Android, sans équivalent sur desktop",
+	"FR_ENABLE_ALL_SOURCES_SUMMARY" to "Toutes les sources de mangas disponibles seront activées de façon permanente",
+	"FR_AUTO_MIRROR_SUMMARY" to "Changement automatique de domaine pour les sources de mangas en cas d'erreur si des miroirs sont disponibles",
+	"FR_MANAGE_LINKS_SUMMARY" to "Gérer les liens vers des mangas à partir d'applications externes (par exemple, un navigateur web)",
+	"FR_EMPTY_SOURCES_CATALOG_TEXT" to "Il n'y a pas de sources disponibles dans cette section, ou tout cela aurait pu être ajouté. Restez à l'écoute",
+	"FR_MANAGE_LINKS_EXPLANATION" to "Gérer les liens vers des mangas à partir d'applications externes (par exemple, un navigateur web). Il se peut que vous deviez également l'activer manuellement dans les paramètres système de l'application.",
+	"FR_MANAGE_LINKS_DESKTOP_NOTE" to "Sur la version de bureau, les liens profonds (deep links) d'applications externes ne sont pas pris en charge : ouvrez directement un lien de manga dans Kotatsu-Redo. Les domaines miroir, s'il en existe, seront listés ici en lecture seule.",
+	"FR_BOOKMARKS_EMPTY_SECONDARY" to "Vous pouvez créer un marque-page pendant la lecture d'un manga",
+	"FR_CREATE_BACKUP_SUMMARY" to "Enregistrer la base de données et les paramètres dans un fichier ZIP",
+	"FR_RESTORE_BACKUP_SUMMARY" to "Restaurer la base de données et les paramètres depuis un fichier ZIP",
+	"FR_RESTORE_WARNING" to "L'application sera fermée pour restaurer la sauvegarde. Continuer ?",
+	"FR_CLOSE_APP_NOTE" to "Il est recommandé de fermer l'application avant de créer ou de restaurer une sauvegarde pour garantir la cohérence de la base de données. La restauration ferme l'application automatiquement : relancez-la ensuite.",
+	"FR_DIR_CHANGED_MESSAGE" to "Le dossier sélectionné a été noté. Dans ce portage desktop, les téléchargements existants ne sont pas déplacés automatiquement : déplacez-les manuellement vers le nouveau dossier pour les retrouver dans la bibliothèque locale.",
+	"FR_CONFIRM_HISTORY" to "Êtes-vous sûr de vouloir effacer tout l'historique de lecture ? Cette action est irréversible.",
+	"FR_CONFIRM_SUGGESTIONS" to "Êtes-vous sûr de vouloir effacer toutes les suggestions ? Cette action est irréversible.",
+	"FR_CONFIRM_NETWORK_CACHE" to "Êtes-vous sûr de vouloir vider le cache réseau ? Les pages déjà chargées seront retéléchargées.",
+	"FR_CONFIRM_COOKIES" to "Êtes-vous sûr de vouloir effacer les cookies ? Vous serez déconnecté des sources.",
+	"FR_FEED_LOG_SUBTITLE" to "Informations de débogage sur la vérification en arrière-plan des nouveaux chapitres",
+	"FR_BATTERY_OPTIMIZATION_SUBTITLE" to "Aide à la vérification des mises à jour des arrière-plans…",
+	"FR_CATEGORIES_EMPTY" to "Aucune catégorie favorite. Ajoutez des mangas à vos favoris pour organiser la vérification des nouveaux chapitres par catégorie.",
+	"FR_FEED_LOG_EMPTY_TEXT" to "Le journal de la vérification en arrière-plan des nouveaux chapitres est vide. Les vérifications effectuées apparaîtront ici.",
+	"FR_RESTART_NOTE" to "Ces réglages s'appliquent après redémarrage de l'application.",
+	"FR_TRACKER_NOTIFICATIONS" to "Afficher une notification quand de nouveaux chapitres sont détectés",
+	"FR_TRACKER_FREQUENCY_SUMMARY" to "Choisir la fréquence de vérification des nouveaux chapitres",
+	"FR_SUGGESTIONS_NOTIFICATIONS_UNAVAILABLE" to "Aucun réglage de notification des suggestions n'existe dans le portage desktop actuel",
+	"FR_SUGGESTIONS_INCLUDE_DISABLED_SUMMARY" to "Afficher les suggestions de toutes les sources de mangas, y compris celles désactivées",
+	"FR_SUGGESTIONS_EXCLUDE_GENRES_SUMMARY" to "Spécifiez les genres que vous ne voulez pas voir apparaître dans les suggestions",
+	"FR_SUGGESTIONS_LOCAL_NOTE" to "Toutes les données sont analysées localement sur cet appareil et ne sont jamais envoyées ailleurs.",
+	"FR_READER_MODE_DETECT_SUMMARY" to "Détecter automatiquement si un manga est un webtoon",
+	"FR_READER_PAGES_NUMBERED_SUMMARY" to "Afficher les numéros de page dans le coin inférieur",
+	"FR_READER_WEBTOON_SEPARATORS_SUMMARY" to "Afficher des espaces verticaux entre les pages en mode webtoon",
+	"FR_READER_WEBTOON_ZOOM_SUMMARY" to "Ctrl+molette ou double-clic dans le lecteur (desktop)",
+	"FR_SUGGESTIONS_18_PLUS_SUMMARY" to "Les mangas pour adultes ne seront pas affichés dans les suggestions",
+	"FR_DISCORD_HIDE_NSFW_SUMMARY" to "Ne pas utiliser la présence enrichie pour du contenu adulte",
+	"FR_ERASER_TUTORIAL_TEXT" to "Balayez avec le doigt les zones à effacer ; sur desktop, faites glisser la souris sur la zone à masquer pendant la lecture. La zone sélectionnée sera recouverte dès que vous relâchez le bouton.",
+	"FR_TRACKERS_UNAVAILABLE" to "La connexion aux services de suivi n'est pas encore disponible dans le portage desktop (authentification web non portée). Elle sera rétablie dans une future version.",
+	"FR_DISCORD_UNAVAILABLE" to "Discord Rich Presence n'est pas encore disponible dans le portage desktop (RPC non porté). Il sera rétabli dans une future version.",
+	"FR_SYNC_UNAVAILABLE_NOTE" to "La synchronisation multi-appareils n'est pas disponible dans le portage desktop.",
+	// Var multi-lignes déjà présentes côté EN (P9) — valeurs FR ajoutées pour compléter
+	"FR_QUICK_FILTERS_SUMMARY" to "Fournit la capacité de filtrer les listes de manga par certains paramètres",
+	"FR_AMOLED_SUMMARY" to "Utilise moins d'énergie pour les écrans AMOLED",
 )
 
 /** Applique la langue à toutes les chaînes de l'interface (FR = valeurs d'origine). */
 public fun applyUiLanguage(lang: UiLang) {
+	currentLang = lang
 	val target = if (lang == UiLang.EN) EN_STRINGS else FR_STRINGS
 	ALL_STRING_NAMES.forEach { name ->
 		val value = target[name] ?: return@forEach
@@ -1120,6 +1269,72 @@ private fun setStringByName(name: String, value: String) {
 		"FR_SERVICE_SHIKIMORI" -> FR_SERVICE_SHIKIMORI = value
 		"FR_COMMUNITY_ROW" -> FR_COMMUNITY_ROW = value
 		"FR_DISCORD_ROW" -> FR_DISCORD_ROW = value
+		// Chaînes temporaires du lecteur migrées + toasts lecteur (P9)
+		"FR_READER_MORE_OPTIONS" -> FR_READER_MORE_OPTIONS = value
+		"FR_READER_ADD_BOOKMARK" -> FR_READER_ADD_BOOKMARK = value
+		"FR_READER_REMOVE_BOOKMARK" -> FR_READER_REMOVE_BOOKMARK = value
+		"FR_READER_READING_MODE" -> FR_READER_READING_MODE = value
+		"FR_READER_DOUBLE_PAGES" -> FR_READER_DOUBLE_PAGES = value
+		"FR_READER_ROTATE" -> FR_READER_ROTATE = value
+		"FR_READER_ERASER" -> FR_READER_ERASER = value
+		"FR_READER_BOOKMARK_ADDED" -> FR_READER_BOOKMARK_ADDED = value
+		"FR_READER_BOOKMARK_REMOVED" -> FR_READER_BOOKMARK_REMOVED = value
+		"FR_READER_PAGE_SAVED" -> FR_READER_PAGE_SAVED = value
+		"FR_READER_PAGE_URL_COPIED" -> FR_READER_PAGE_URL_COPIED = value
+		// public var multi-lignes des fichiers Fr*.k (P9 complément)
+		"FR_TEXT_LOCAL_HOLDER_SECONDARY" -> FR_TEXT_LOCAL_HOLDER_SECONDARY = value
+		"FR_READER_SETTINGS_SUMMARY" -> FR_READER_SETTINGS_SUMMARY = value
+		"FR_NEW_CHAPTERS_SUMMARY" -> FR_NEW_CHAPTERS_SUMMARY = value
+		"FR_DOWNLOADS_STORAGE_SUMMARY" -> FR_DOWNLOADS_STORAGE_SUMMARY = value
+		"FR_PRIVACY_SUMMARY" -> FR_PRIVACY_SUMMARY = value
+		"FR_IMAGES_MASKED_SUMMARY" -> FR_IMAGES_MASKED_SUMMARY = value
+		"FR_IMAGES_MASKED_EMPTY" -> FR_IMAGES_MASKED_EMPTY = value
+		"FR_RELATED_MANGA_SUMMARY" -> FR_RELATED_MANGA_SUMMARY = value
+		"FR_PIN_NAVIGATION_SUMMARY" -> FR_PIN_NAVIGATION_SUMMARY = value
+		"FR_FLOATING_CONTINUE_SUMMARY" -> FR_FLOATING_CONTINUE_SUMMARY = value
+		"FR_SEARCH_SUGGESTIONS_SUMMARY" -> FR_SEARCH_SUGGESTIONS_SUMMARY = value
+		"FR_EXIT_CONFIRMATION_SUMMARY" -> FR_EXIT_CONFIRMATION_SUMMARY = value
+		"FR_RECENT_SHORTCUTS_SUMMARY" -> FR_RECENT_SHORTCUTS_SUMMARY = value
+		"FR_ENABLE_ALL_SOURCES_SUMMARY" -> FR_ENABLE_ALL_SOURCES_SUMMARY = value
+		"FR_AUTO_MIRROR_SUMMARY" -> FR_AUTO_MIRROR_SUMMARY = value
+		"FR_MANAGE_LINKS_SUMMARY" -> FR_MANAGE_LINKS_SUMMARY = value
+		"FR_EMPTY_SOURCES_CATALOG_TEXT" -> FR_EMPTY_SOURCES_CATALOG_TEXT = value
+		"FR_MANAGE_LINKS_EXPLANATION" -> FR_MANAGE_LINKS_EXPLANATION = value
+		"FR_MANAGE_LINKS_DESKTOP_NOTE" -> FR_MANAGE_LINKS_DESKTOP_NOTE = value
+		"FR_BOOKMARKS_EMPTY_SECONDARY" -> FR_BOOKMARKS_EMPTY_SECONDARY = value
+		"FR_CREATE_BACKUP_SUMMARY" -> FR_CREATE_BACKUP_SUMMARY = value
+		"FR_RESTORE_BACKUP_SUMMARY" -> FR_RESTORE_BACKUP_SUMMARY = value
+		"FR_RESTORE_WARNING" -> FR_RESTORE_WARNING = value
+		"FR_CLOSE_APP_NOTE" -> FR_CLOSE_APP_NOTE = value
+		"FR_DIR_CHANGED_MESSAGE" -> FR_DIR_CHANGED_MESSAGE = value
+		"FR_CONFIRM_HISTORY" -> FR_CONFIRM_HISTORY = value
+		"FR_CONFIRM_SUGGESTIONS" -> FR_CONFIRM_SUGGESTIONS = value
+		"FR_CONFIRM_NETWORK_CACHE" -> FR_CONFIRM_NETWORK_CACHE = value
+		"FR_CONFIRM_COOKIES" -> FR_CONFIRM_COOKIES = value
+		"FR_FEED_LOG_SUBTITLE" -> FR_FEED_LOG_SUBTITLE = value
+		"FR_BATTERY_OPTIMIZATION_SUBTITLE" -> FR_BATTERY_OPTIMIZATION_SUBTITLE = value
+		"FR_CATEGORIES_EMPTY" -> FR_CATEGORIES_EMPTY = value
+		"FR_FEED_LOG_EMPTY_TEXT" -> FR_FEED_LOG_EMPTY_TEXT = value
+		"FR_RESTART_NOTE" -> FR_RESTART_NOTE = value
+		"FR_TRACKER_NOTIFICATIONS" -> FR_TRACKER_NOTIFICATIONS = value
+		"FR_TRACKER_FREQUENCY_SUMMARY" -> FR_TRACKER_FREQUENCY_SUMMARY = value
+		"FR_SUGGESTIONS_NOTIFICATIONS_UNAVAILABLE" -> FR_SUGGESTIONS_NOTIFICATIONS_UNAVAILABLE = value
+		"FR_SUGGESTIONS_INCLUDE_DISABLED_SUMMARY" -> FR_SUGGESTIONS_INCLUDE_DISABLED_SUMMARY = value
+		"FR_SUGGESTIONS_EXCLUDE_GENRES_SUMMARY" -> FR_SUGGESTIONS_EXCLUDE_GENRES_SUMMARY = value
+		"FR_SUGGESTIONS_LOCAL_NOTE" -> FR_SUGGESTIONS_LOCAL_NOTE = value
+		"FR_READER_MODE_DETECT_SUMMARY" -> FR_READER_MODE_DETECT_SUMMARY = value
+		"FR_READER_PAGES_NUMBERED_SUMMARY" -> FR_READER_PAGES_NUMBERED_SUMMARY = value
+		"FR_READER_WEBTOON_SEPARATORS_SUMMARY" -> FR_READER_WEBTOON_SEPARATORS_SUMMARY = value
+		"FR_READER_WEBTOON_ZOOM_SUMMARY" -> FR_READER_WEBTOON_ZOOM_SUMMARY = value
+		"FR_SUGGESTIONS_18_PLUS_SUMMARY" -> FR_SUGGESTIONS_18_PLUS_SUMMARY = value
+		"FR_DISCORD_HIDE_NSFW_SUMMARY" -> FR_DISCORD_HIDE_NSFW_SUMMARY = value
+		"FR_ERASER_TUTORIAL_TEXT" -> FR_ERASER_TUTORIAL_TEXT = value
+		"FR_TRACKERS_UNAVAILABLE" -> FR_TRACKERS_UNAVAILABLE = value
+		"FR_DISCORD_UNAVAILABLE" -> FR_DISCORD_UNAVAILABLE = value
+		"FR_SYNC_UNAVAILABLE_NOTE" -> FR_SYNC_UNAVAILABLE_NOTE = value
+		// Var multi-lignes déjà présentes côté EN (P9) — branches ajoutées pour compléter
+		"FR_QUICK_FILTERS_SUMMARY" -> FR_QUICK_FILTERS_SUMMARY = value
+		"FR_AMOLED_SUMMARY" -> FR_AMOLED_SUMMARY = value
 	}
 }
 
@@ -1229,4 +1444,32 @@ private val ALL_STRING_NAMES: List<String> = listOf(
 	"FR_AUTO_SCROLL_PAUSE", "FR_ERASER_TUTORIAL_TITLE", "FR_SKIP", "FR_ACCOUNTS_TITLE",
 	"FR_TRACKERS_HEADER", "FR_DISABLED", "FR_SERVICE_ANILIST", "FR_SERVICE_KITSU",
 	"FR_SERVICE_MAL", "FR_SERVICE_SHIKIMORI", "FR_COMMUNITY_ROW", "FR_DISCORD_ROW",
+	// Chaînes temporaires du lecteur migrées + toasts lecteur (P9)
+	"FR_READER_MORE_OPTIONS", "FR_READER_ADD_BOOKMARK", "FR_READER_REMOVE_BOOKMARK",
+	"FR_READER_READING_MODE", "FR_READER_DOUBLE_PAGES", "FR_READER_ROTATE",
+	"FR_READER_ERASER", "FR_READER_BOOKMARK_ADDED", "FR_READER_BOOKMARK_REMOVED",
+	"FR_READER_PAGE_SAVED", "FR_READER_PAGE_URL_COPIED",
+	// public var multi-lignes des fichiers Fr*.k (P9 complément)
+	"FR_TEXT_LOCAL_HOLDER_SECONDARY", "FR_READER_SETTINGS_SUMMARY", "FR_NEW_CHAPTERS_SUMMARY",
+	"FR_DOWNLOADS_STORAGE_SUMMARY", "FR_PRIVACY_SUMMARY", "FR_IMAGES_MASKED_SUMMARY",
+	"FR_IMAGES_MASKED_EMPTY", "FR_RELATED_MANGA_SUMMARY", "FR_PIN_NAVIGATION_SUMMARY",
+	"FR_FLOATING_CONTINUE_SUMMARY", "FR_SEARCH_SUGGESTIONS_SUMMARY",
+	"FR_EXIT_CONFIRMATION_SUMMARY", "FR_RECENT_SHORTCUTS_SUMMARY",
+	"FR_ENABLE_ALL_SOURCES_SUMMARY", "FR_AUTO_MIRROR_SUMMARY", "FR_MANAGE_LINKS_SUMMARY",
+	"FR_EMPTY_SOURCES_CATALOG_TEXT", "FR_MANAGE_LINKS_EXPLANATION",
+	"FR_MANAGE_LINKS_DESKTOP_NOTE", "FR_BOOKMARKS_EMPTY_SECONDARY",
+	"FR_CREATE_BACKUP_SUMMARY", "FR_RESTORE_BACKUP_SUMMARY", "FR_RESTORE_WARNING",
+	"FR_CLOSE_APP_NOTE", "FR_DIR_CHANGED_MESSAGE", "FR_CONFIRM_HISTORY",
+	"FR_CONFIRM_SUGGESTIONS", "FR_CONFIRM_NETWORK_CACHE", "FR_CONFIRM_COOKIES",
+	"FR_FEED_LOG_SUBTITLE", "FR_BATTERY_OPTIMIZATION_SUBTITLE", "FR_CATEGORIES_EMPTY",
+	"FR_FEED_LOG_EMPTY_TEXT", "FR_RESTART_NOTE", "FR_TRACKER_NOTIFICATIONS",
+	"FR_TRACKER_FREQUENCY_SUMMARY", "FR_SUGGESTIONS_NOTIFICATIONS_UNAVAILABLE",
+	"FR_SUGGESTIONS_INCLUDE_DISABLED_SUMMARY", "FR_SUGGESTIONS_EXCLUDE_GENRES_SUMMARY",
+	"FR_SUGGESTIONS_LOCAL_NOTE", "FR_READER_MODE_DETECT_SUMMARY",
+	"FR_READER_PAGES_NUMBERED_SUMMARY", "FR_READER_WEBTOON_SEPARATORS_SUMMARY",
+	"FR_READER_WEBTOON_ZOOM_SUMMARY", "FR_SUGGESTIONS_18_PLUS_SUMMARY",
+	"FR_DISCORD_HIDE_NSFW_SUMMARY", "FR_ERASER_TUTORIAL_TEXT", "FR_TRACKERS_UNAVAILABLE",
+	"FR_DISCORD_UNAVAILABLE", "FR_SYNC_UNAVAILABLE_NOTE",
+	// Var multi-lignes déjà présentes côté EN (P9) — noms ajoutés pour compléter
+	"FR_QUICK_FILTERS_SUMMARY", "FR_AMOLED_SUMMARY",
 )

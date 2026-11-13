@@ -13,7 +13,7 @@
 | P3 tracker + verrouillage | sous-agent E | **fini, fusionné** — 14/14 tests verts, câblé (Tray + ProtectScreen) | agent/tracker | fusion | — | — |
 | L5 packaging/CI | principal | **fini** — installateur final Kotatsu-9.8.6.exe (94 Mo, JDK embarqué, WiX 3 portable) ; fix ProGuard keep Room/sqlite vérifié par lancement de l'app packagée (DB v28 créée) ; install locale bloquée par UAC → CI | main | — | — | — |
 | Signets (UI) | principal | **fini, branché** | main | — | — | — |
-| L6 docs | principal | en cours | main | — | — | rapport final |
+| L6 docs | principal | **fini (2026-11-13)** — README, WORK_PLAN, checklist, audit à jour + rapport final `docs/PORTING_REPORT.md` | main | — | — | — |
 
 ## Requêtes (destinataire : agent)
 
@@ -79,6 +79,16 @@ les écrans.
 |---|---|---|---|
 | **P6-A Comptes** | agent P6-A | nouveau `ui/screens/settings/AccountsScreen.kt` + `ui/strings/FrAccounts.kt` | Écran « Comptes et synchronisation » : « Services de suivi » (AniList, Kitsu, MyAnimeList, Shikimori — chacun « Désactivé » + dialog de connexion reportée, divergence OAuth/WebView), Community (EN d'origine) + sous-titres exacts, Discord ; compile OK |
 | **P6-B Confidentialité** | agent P6-B | nouveau `ui/screens/settings/PrivacySettingsScreen.kt` (chaînes → FrSettings.kt) | Écran « Confidentialité et contenu » : « Contenu pour adultes » (switch KEY_DISABLE_NSFW), « Politique des captures d'écran » (dialog ScreenshotsPolicy), « Statistiques de lecture » (switch KEY_STATS_ENABLED), « Partager la fiabilité des sources » (état réel ou désactivé+divergence), incognito (état), « Protéger l'application » (état via ProtectManager — lecture) ; compile OK |
+
+## Phase P9 — Parité finale (2026-11-13, en cours)
+
+Journal : `docs/P9_JOURNAL.md`. Règles actives : chaînes à la source (`ui/strings/`), tests
+sur app vierge, jamais de contenu explicite. Version livrée : 1.1.1 (aucun bump demandé).
+
+| Lot | Agent | Périmètre exclusif | Critères de fin |
+|---|---|---|---|
+| **P9-A i18n final** | agent P9-A | écrans + composants avec chaînes/inline restants, `ui/strings/*` (ajouts), `Main.kt` blocs limités (lecteur/maintenance) | Zéro chaîne FR-only visible en mode EN : sous-titres inline convertis (ex. AMOLED), fonctions de libellés branchées i18n (frListModeLabel, frSortOrderLabel, frStateLabel, frDuration, frChaptersCount, frReaderInfo, frNavItemLabel, frProgressModeLabel… via paramètre lang ou I18n), temporaires FR_READER_* migrées vers FrReader.kt ; compile OK |
+| **P9-B docs finales** | agent P9-B | `README.md`, `docs/WORK_PLAN.md`, `docs/UI_PARITY_CHECKLIST.md`, `docs/PORTING_AUDIT.md`, `docs/P*_JOURNAL.md` (bilans), `docs/UI_DIVERGENCES.md` (cohérence) | README à jour (1.1.1, multilingue, installateur/désinstallateur GUI, per-user) ; checklist finale par écran avec preuves ; WORK_PLAN marqué terminé ; rapport final de portage (docs/PORTING_REPORT.md) ; docs cohérentes ; aucun code touché |
 
 ## Phase P7 — Lecteur avancé (2026-11-08, en cours) — 2 vagues
 

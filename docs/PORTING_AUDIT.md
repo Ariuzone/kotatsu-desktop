@@ -1,5 +1,8 @@
 # Audit de portage — Kotatsu-Redo (Android) → Windows Desktop
 
+> **Note finale (2026-11-13)** : cet audit a servi de base au portage, désormais **terminé**
+> (plan P0-P9, version 1.1.1). Bilan d'exécution : voir [`PORTING_REPORT.md`](PORTING_REPORT.md).
+
 Date : 2026-11-05. Source auditée : https://github.com/Kotatsu-Redo/Kotatsu-Redo, branche `devel`
 (commit du 2026-11-05), module `app/`, 1152 fichiers Kotlin, `versionName 9.8.6`.
 
